@@ -61,3 +61,52 @@ Lemma eq_existT_curried_dep {A x} {P: A -> Type} {Q: {a &T P a} -> Type}
 Proof.
    now destruct Hu, Hv, H.
 Qed.
+
+Lemma eq_existT_curried_eq {A: Type} {P: A -> Type}
+  {x y: A} {u: P x} {v: P y}
+  {p p': x = y}
+  {q: rew [P] p in u = v} {q': rew [P] p' in u = v}
+  (Hp: p = p')
+  (Hq: rew [fun r => rew [P] r in u = v] Hp in q = q'):
+  (= p; q) = (= p'; q').
+Proof.
+  destruct Hp; simpl in Hq. now destruct Hq.
+Qed.
+
+Definition sigT_map_eq {A B: Type} {P: A -> Type} {Q: B -> Type}
+  (f: A -> B) (g: forall a, P a -> Q (f a))
+  {x y: A} {u: P x} {v: P y}
+  (p: x = y) (q: rew [P] p in u = v):
+  rew [Q] f_equal f p in g x u = g y v.
+Proof.
+  now destruct q, p.
+Defined.
+
+Lemma f_equal_eq_existT_curried {A B: Type} {P: A -> Type} {Q: B -> Type}
+  (f: A -> B) (g: forall a, P a -> Q (f a))
+  {x y: A} {u: P x} {v: P y}
+  (p: x = y) (q: rew [P] p in u = v):
+  f_equal (fun z: {a: A &T P a} => (f z.1; g z.1 z.2)) (= p; q) =
+  (= f_equal f p; sigT_map_eq f g p q).
+Proof.
+  now destruct q, p.
+Qed.
+
+Definition sigT_trans_eq {A: Type} {P: A -> Type}
+  {x y z: A} {u: P x} {v: P y} {w: P z}
+  (p: x = y) (q: rew [P] p in u = v)
+  (p': y = z) (q': rew [P] p' in v = w):
+  rew [P] eq_trans p p' in u = w.
+Proof.
+  now destruct q', p', q, p.
+Defined.
+
+Lemma eq_trans_eq_existT_curried {A: Type} {P: A -> Type}
+  {x y z: A} {u: P x} {v: P y} {w: P z}
+  (p: x = y) (q: rew [P] p in u = v)
+  (p': y = z) (q': rew [P] p' in v = w):
+  eq_trans (= p; q) (= p'; q') =
+  (= eq_trans p p'; sigT_trans_eq p q p' q').
+Proof.
+  now destruct q', p', q, p.
+Qed.
