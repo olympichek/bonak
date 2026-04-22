@@ -24,6 +24,14 @@ Proof.
   intros * ->. now destruct H'.
 Qed.
 
+Lemma rew_map_eq_l {A B: Type} (f: A -> B) {x y: A} (H: x = y)
+  {z: B} (p: f x = z):
+  rew [fun a: A => f a = z] H in p =
+  rew [fun b: B => b = z] (f_equal f H) in p.
+Proof.
+  exact (rew_map (fun b => b = z) f H p).
+Qed.
+
 Lemma map_subst_app {A B} {x y} {𝛉: A} (H: x = y :> B) (P: A -> B -> Type)
   (f: forall 𝛉, P 𝛉 x):
   rew [P 𝛉] H in f 𝛉 = (rew [fun x => forall 𝛉, P 𝛉 x] H in f) 𝛉.

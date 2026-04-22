@@ -644,7 +644,8 @@ Proof.
       rewrite 4 eq_trans_eq_existT_curried.
       unshelve eapply eq_existT_curried_eq.
       * now exact (h.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) s.+1 (⇑ Hs) ε ω θ d).
-      * admit.
+      * rewrite rew_map_eq_l.
+        admit.
 Admitted.
 
 End νGpd.

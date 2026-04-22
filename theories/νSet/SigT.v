@@ -94,19 +94,21 @@ Qed.
 
 Definition sigT_trans_eq {A: Type} {P: A -> Type}
   {x y z: A} {u: P x} {v: P y} {w: P z}
-  (p: x = y) (q: rew [P] p in u = v)
-  (p': y = z) (q': rew [P] p' in v = w):
+  {p: x = y} (q: rew [P] p in u = v)
+  {p': y = z} (q': rew [P] p' in v = w):
   rew [P] eq_trans p p' in u = w.
 Proof.
   now destruct q', p', q, p.
 Defined.
+
+Infix "⊙" := sigT_trans_eq (at level 65, left associativity).
 
 Lemma eq_trans_eq_existT_curried {A: Type} {P: A -> Type}
   {x y z: A} {u: P x} {v: P y} {w: P z}
   (p: x = y) (q: rew [P] p in u = v)
   (p': y = z) (q': rew [P] p' in v = w):
   eq_trans (= p; q) (= p'; q') =
-  (= eq_trans p p'; sigT_trans_eq p q p' q').
+  (= eq_trans p p'; sigT_trans_eq q q').
 Proof.
   now destruct q', p', q, p.
 Qed.
