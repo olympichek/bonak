@@ -74,9 +74,9 @@ Proof.
 Qed.
 
 Definition sigT_map_eq {A B: Type} {P: A -> Type} {Q: B -> Type}
-  (f: A -> B) (g: forall a, P a -> Q (f a))
+  {f: A -> B} (g: forall a, P a -> Q (f a))
   {x y: A} {u: P x} {v: P y}
-  (p: x = y) (q: rew [P] p in u = v):
+  {p: x = y} (q: rew [P] p in u = v):
   rew [Q] f_equal f p in g x u = g y v.
 Proof.
   now destruct q, p.
@@ -87,7 +87,7 @@ Lemma f_equal_eq_existT_curried {A B: Type} {P: A -> Type} {Q: B -> Type}
   {x y: A} {u: P x} {v: P y}
   (p: x = y) (q: rew [P] p in u = v):
   f_equal (fun z: {a: A &T P a} => (f z.1; g z.1 z.2)) (= p; q) =
-  (= f_equal f p; sigT_map_eq f g p q).
+  (= f_equal f p; sigT_map_eq g q).
 Proof.
   now destruct q, p.
 Qed.
@@ -102,6 +102,9 @@ Proof.
 Defined.
 
 Infix "⊙" := sigT_trans_eq (at level 65, left associativity).
+
+Notation "q ⊙[ P ] q'" := (@sigT_trans_eq _ P _ _ _ _ _ _ _ q _ q')
+  (at level 65, left associativity, only parsing).
 
 Lemma eq_trans_eq_existT_curried {A: Type} {P: A -> Type}
   {x y z: A} {u: P x} {v: P y} {w: P z}
