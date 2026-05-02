@@ -62,6 +62,35 @@ Proof.
    now destruct Hu, Hv, H.
 Qed.
 
+Definition rew_sigT_projT1 {A: Type} {P: A -> Type}
+  {Q: forall a, P a -> Type}
+  {x y: A} (e: x = y) (u: P x) (v: Q x u):
+  (rew [fun a => {u: P a &T Q a u}] e in (u; v)).1 =
+  rew [P] e in u.
+Proof.
+  now destruct e.
+Defined.
+
+Definition rew_sigT_projT2 {A: Type} {P: A -> Type}
+  {Q: forall a, P a -> Type}
+  {x y: A} (e: x = y) (u: P x) (v: Q x u):
+  rew [fun u' => Q y u'] (rew_sigT_projT1 e u v) in
+    (rew [fun a => {u: P a &T Q a u}] e in (u; v)).2 =
+  rew dependent [fun y e => Q y (rew [P] e in u)] e in v.
+Proof.
+  now destruct e.
+Defined.
+
+Definition rew_sigT_projT2_inv {A: Type} {P: A -> Type}
+  {Q: forall a, P a -> Type}
+  {x y: A} (e: x = y) (u: P x) (v: Q x u):
+  (rew [fun a => {u: P a &T Q a u}] e in (u; v)).2 =
+  rew <- [fun u' => Q y u'] (rew_sigT_projT1 e u v) in
+    rew dependent [fun y e => Q y (rew [P] e in u)] e in v.
+Proof.
+  now destruct e.
+Defined.
+
 Lemma eq_existT_curried_eq {A: Type} {P: A -> Type}
   {x y: A} {u: P x} {v: P y}
   {p p': x = y}
@@ -71,6 +100,58 @@ Lemma eq_existT_curried_eq {A: Type} {P: A -> Type}
   (= p; q) = (= p'; q').
 Proof.
   destruct Hp; simpl in Hq. now destruct Hq.
+Qed.
+
+Lemma rew_eq_existT_curried {A: Type} {P: A -> Type}
+  {Q: {a: A &T P a} -> Type}
+  {x y: A} {u: P x} {v: P y}
+  (p: x = y) (q: rew [P] p in u = v)
+  (z: Q (x; u)):
+  rew [Q] (= p; q) in z =
+  rew [fun v => Q (y; v)] q in rew [Q] (= p; eq_refl) in z.
+Proof.
+  now destruct q, p.
+Qed.
+
+Lemma rew_eq_existT_curried' {A: Type} {P: A -> Type}
+  {Q: {a: A &T P a} -> Type}
+  {x y: A} {u: P x} {v: P y}
+  (p: x = y) (q: rew [P] p in u = v)
+  (z: Q (x; u)):
+  rew [Q] (= p; q) in z =
+  rew [fun v => Q (y; v)] q in
+  rew dependent [fun y e => Q (y; (rew [P] e in u))] p in
+  z.
+Proof.
+  now destruct q, p.
+Qed.
+
+Lemma rew_eq_existT_curried_eq {A: Type} {P: A -> Type}
+  {Q: {a: A &T P a} -> Type}
+  {x y: A} {u: P x} {v: P y}
+  {p p': x = y}
+  {q: rew [P] p in u = v} {q': rew [P] p' in u = v}
+  (Hp: p = p')
+  (Hq: rew [fun r => rew [P] r in u = v] Hp in q = q')
+  (z: Q (x; u)):
+  rew [Q] (= p; q) in z = rew [Q] (= p'; q') in z.
+Proof.
+  now rewrite (eq_existT_curried_eq Hp Hq).
+Qed.
+
+Lemma rew_eq_existT_curried_congr {A: Type} {P: A -> Type}
+  {Q: {a: A &T P a} -> Type}
+  {x y: A} {u: P x} {v: P y}
+  {p p': x = y}
+  {q: rew [P] p in u = v} {q': rew [P] p' in u = v}
+  (Hp: p = p')
+  (Hq: rew [fun r => rew [P] r in u = v] Hp in q = q')
+  {z z': Q (x; u)}
+  (Hz: z = z'):
+  rew [Q] (= p; q) in z = rew [Q] (= p'; q') in z'.
+Proof.
+  destruct Hz.
+  exact (rew_eq_existT_curried_eq (Q := Q) Hp Hq z).
 Qed.
 
 Definition sigT_map_eq {A B: Type} {P: A -> Type} {Q: B -> Type}
@@ -114,4 +195,23 @@ Lemma eq_trans_eq_existT_curried {A: Type} {P: A -> Type}
   (= eq_trans p p'; sigT_trans_eq q q').
 Proof.
   now destruct q', p', q, p.
+Qed.
+
+Lemma rew_eq_existT_curried_trans_eq {A: Type} {P: A -> Type}
+  {Q: {a: A &T P a} -> Type}
+  {x y z: A} {u: P x} {v: P y} {w: P z}
+  {p1 p1': x = y}
+  {q1: rew [P] p1 in u = v} {q1': rew [P] p1' in u = v}
+  {p2 p2': y = z}
+  {q2: rew [P] p2 in v = w} {q2': rew [P] p2' in v = w}
+  (Hp: eq_trans p1 p2 = eq_trans p1' p2')
+  (Hq: rew [fun r => rew [P] r in u = w] Hp in
+    (q1 ⊙ q2) = (q1' ⊙ q2'))
+  (a: Q (x; u)):
+  rew [Q] (= p2; q2) in rew [Q] (= p1; q1) in a =
+  rew [Q] (= p2'; q2') in rew [Q] (= p1'; q1') in a.
+Proof.
+  rewrite !rew_compose.
+  rewrite !eq_trans_eq_existT_curried.
+  exact (rew_eq_existT_curried_eq Hp Hq a).
 Qed.
