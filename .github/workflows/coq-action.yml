@@ -1,4 +1,4 @@
-name: coq-action
+name: rocq-action
 
 on:
   push:
@@ -23,8 +23,24 @@ jobs:
       - uses: "actions/checkout@v4"
         with:
           submodules: "true"
-      - name: "Docker Coq action"
+      - name: "Docker Rocq action"
         uses: "coq-community/docker-coq-action@v1"
         with:
           opam_file: "bonak.opam"
-          coq_version: "9.1.1"
+          coq_version: "9.2"
+          before_install: |
+            startGroup "Configure opam"
+              if opam pin list --short | grep -qx dune; then
+                opam unpin -y dune
+              fi
+              opam config list
+              opam repo list
+              opam list
+            endGroup
+          install: |
+            startGroup "Install dependencies"
+              sudo apt-get update -y -q
+              opam pin add -n -y -k path $PACKAGE $WORKDIR
+              opam update -y default
+              opam install --confirm-level=unsafe-yes -j 2 $PACKAGE --deps-only
+            endGroup
