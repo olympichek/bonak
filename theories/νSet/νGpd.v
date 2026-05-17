@@ -921,10 +921,101 @@ Proof.
     now exact (mkExtraCohs2 p.+1 k depsCohs3 extraDepsCohs3).
 Defined.
 
+Definition sigT_map_eq_mkRestrPainting
+  `{depsCohs2: DepsCohs2 p.+1 k}
+  q (Hq: q.+1 <= k.+1) (ε: arity) :=
+  @sigT_map_eq_existT_curried_dep_curried
+    _ _ _ _
+    (fun d => mkLayer depsCohs2.(_depsCohs).(_deps).(_restrFrames) d)
+    (fun d l =>
+      (mkDepsRestr (depsCohs := depsCohs2.(_depsCohs))).(_paintings).2
+        (d; l))
+    ((mkDepsCohs depsCohs2.(1)).(_deps).(_restrFrames).2 q.+1 Hq ε)
+    (fun d l =>
+      mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings)
+        depsCohs2.(_depsCohs).(_cohs) q (⇓ Hq) ε d l)
+    (fun d l c =>
+      mkRestrPainting depsCohs2.(_extraDepsCohs)
+        q (⇓ Hq) ε (d; l) c).
+
+Definition sigT_trans_eq_mkRestrPainting
+  `{depsCohs2: DepsCohs2 p.+1 k} :=
+  @sigT_trans_eq_existT_curried_dep
+    (((mkRestrFrameTypesAndFrames
+        (mkDepsCohs depsCohs2.(1)).(_deps).(_paintings).1)
+      .(FrameDef)
+        (mkDepsCohs depsCohs2.(1)).(_deps).(_restrFrames).1).2)
+    (fun d =>
+      mkLayer
+        ((mkCohFrameTypesAndRestrFrames
+            depsCohs2.(_depsCohs).(_restrPaintings).1)
+          .(RestrFramesDef) depsCohs2.(_depsCohs).(_cohs).1)
+        d)
+    (fun z =>
+      (mkPaintings
+        (mkDepsRestr; mkExtraDeps depsCohs2.(_extraDepsCohs))).2
+        (z.1; z.2)).
+
+Arguments sigT_trans_eq_mkRestrPainting
+  {p k depsCohs2 x y z u v u' v' u'' v''} H Hu Hv H' Hu' Hv'.
+
 Definition mkCoh2Painting `{depsCohs3: DepsCohs3 p k}
   (extraDepsCohs3: DepsCohs3Extension p k depsCohs3):
   mkCoh2PaintingType (mkDepsCohs2 depsCohs3) (mkExtraCohs2 extraDepsCohs3).
 Proof.
+  intros q Hq r Hr s Hs ε ω θ d c.
+  cbv zeta.
+  Local Opaque mkCoh2Frames mkCoh2Layer.
+  Local Opaque mkCohFrames mkCohLayer mkCohPainting.
+  set (Q := mkCoh2PaintingEndpointType _ _ q Hq r Hr s Hs ε ω θ d c).
+  set (H := (mkDepsCohs2 depsCohs3).(_coh2Frames).2 q Hq r Hr s Hs ε ω θ d).
+  destruct s.
+  - destruct r.
+    + Local Transparent mkCohPainting.
+      Local Opaque sigT_map_eq sigT_trans_eq.
+      cbn.
+      lazymatch goal with
+      | |- context [@sigT_map_eq ?A ?B ?P ?Q ?f ?g ?x ?y ?u ?v ?p0 ?q0] =>
+          rewrite (@sigT_map_eq_transport_refl A B P Q f g x y u p0)
+      end.
+      lazymatch goal with
+      | |- _ = ?rhs =>
+          lazymatch rhs with
+          | context [@sigT_map_eq ?A ?B ?P ?Q ?f ?g ?x ?y ?u ?v ?p0 ?q0] =>
+              lazymatch q0 with
+              | eq_refl =>
+                  rewrite (@sigT_map_eq_transport_refl A B P Q f g x y u p0)
+              end
+          end
+      end.
+      lazymatch goal with
+      | |- ?lhs = _ =>
+          lazymatch lhs with
+          | context [@sigT_map_eq ?A ?B ?Pdomain ?P' ?f ?map ?x ?y ?uv ?uv' ?p0
+              (@eq_existT_curried_dep ?A0 ?x0 ?P0 ?R0 ?y0 ?H1
+                ?u0 ?v0 ?u1 ?v1 ?Hu ?Hv)] =>
+              rewrite (@sigT_map_eq_existT_curried_dep_fst A0 B P0 P' R0 f
+                    (fun a u => u θ) x0 y0 u0 v0 u1 v1 H1 Hu Hv)
+          end
+      end.
+      Local Transparent mkCohLayer.
+      unfold mkCohLayer.
+      admit.
+    + admit.
+  - destruct r; [now contradiction |].
+    destruct q; [now contradiction |].
+    destruct extraDepsCohs3; [now contradiction |].
+    destruct depsCohs3 as [depsCohs2 extraDepsCohs2 coh2Paintings].
+    destruct c as [l c].
+    unfold mkDepsCohs2, mkDepsCohs.
+    cbn [_cohPaintings _depsCohs _restrPaintings].
+    cbn [mkRestrPaintings projT2].
+    Local Transparent mkCohPainting.
+    unfold mkCohPainting; cbn [nat_ind].
+    rewrite 3 sigT_map_eq_mkRestrPainting.
+    unfold mkCohPaintings; cbn [projT2].
+    unfold mkCohPainting; cbn [nat_ind].
+    unfold proj1DepsCohs3; cbn [_extraDepsCohs2].
     admit.
 Admitted.
 

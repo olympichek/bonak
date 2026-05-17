@@ -560,7 +560,7 @@ Fixpoint mkCohPainting `{depsCohs2: DepsCohs2 p k}
 Proof.
   red; intros *. destruct c as (l, c), r.
   - (* r = 0 *)
-    now trivial.
+    cbn. now trivial.
   - (* r = r'+1, q is necessarily q'+1 and extraDepsCohs non empty *)
     destruct q.
     { exfalso; now apply leR_O_contra in Hr. }
