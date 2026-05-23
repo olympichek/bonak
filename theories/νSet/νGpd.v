@@ -1,7 +1,5 @@
 (** Groupoid-level variant of the νSet construction. *)
 
-From Stdlib Require Import Logic.FunctionalExtensionality.
-
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT RewLemmas HSet HGpd Notation LeSProp νSet.νSet.
 Import Bonak.νSet.νSet.
@@ -81,7 +79,7 @@ Definition mkLayer `{paintings: mkPaintingTypes p.+1 k frames}
   {prev: RestrFrameTypeBlock p k.+1}
   (restrFrames: mkRestrFrameTypesStep frames prev)
   (d: (prev.(FrameDef) restrFrames.1).2) :=
-  gforall ε, paintings.2 (restrFrames.2 0 leR_O ε d).
+  gvec arityLength (fun ε => paintings.2 (restrFrames.2 0 leR_O ε d)).
 
 Fixpoint mkRestrFrameTypesAndFrames {p k}:
   forall `(paintings: mkPaintingTypes p k frames), RestrFrameTypeBlock p k :=
@@ -224,8 +222,9 @@ Definition mkRestrLayer `{extraDeps: DepsRestrExtension p.+1 k deps}
   (d: mkFrame (toDepsRestr (prev.(RestrFramesDef) cohFrames.1)).(1)):
   mkLayer (prev.(RestrFramesDef) cohFrames.1) d -> mkLayer deps.(_restrFrames)
     ((prev.(RestrFramesDef) cohFrames.1).2 q.+1 (⇑ Hq) ε d) :=
-  fun l ω => rew [deps.(_paintings).2] cohFrames.2 q Hq 0 leR_O ε ω d in
-             restrPaintings.2 q Hq ε _ (l ω).
+  fun l => gvec_map (fun ω c =>
+    rew [deps.(_paintings).2] cohFrames.2 q Hq 0 leR_O ε ω d in
+    restrPaintings.2 q Hq ε _ c) l.
 
 (** Under previous assumptions, and, additionally:
     - {restrPainting(n,0);...;restrPainting(n,p-1)}
@@ -376,7 +375,7 @@ Fixpoint mkRestrPainting `(extraDepsCohs: DepsCohsExtension p k depsCohs)
     (mkPaintings (mkDepsRestr; mkExtraDeps extraDepsCohs)).2 d ->
     mkDepsRestr.(_paintings).2 (mkDepsRestr.(_restrFrames).2 q Hq ε d) :=
   match q with
-  | 0 => fun _ ε _ '(l; _) => l ε
+  | 0 => fun _ ε _ '(l; _) => gvec_nth l ε
   | q.+1 =>
     match extraDepsCohs with
     | TopCohDep E => fun Hq _ _ _ => match leR_O_contra Hq with end
@@ -474,9 +473,10 @@ Definition mkCohLayer `{extraDepsCohs: DepsCohsExtension p.+1 k depsCohs}
   (l: mkLayer mkRestrFrames d):
   mkCohLayerType q Hq r Hr ε ω d l.
 Proof.
-  apply functional_extensionality_dep; intros 𝛉.
-  unfold mkRestrLayer.
-  rewrite <- map_subst_app.
+  apply gvec_ext; intros 𝛉.
+  rewrite <- (map_subst (fun d0 l => gvec_nth l 𝛉) (P := mkLayer _)).
+  rewrite !gvec_nth_map.
+  unfold mkRestrLayer; simpl.
   rewrite
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 q Hq ε x),
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 r (Hr ↕ Hq) ω x).
@@ -617,7 +617,7 @@ Proof.
   generalize dependent p.
   induction r as [|r mkCohPainting].
   - intros p k depsCohs2 extraDepsCohs2 q Hq Hr ε ω d c.
-    now trivial.
+    cbn. now rewrite gvec_nth_map.
   - intros p k depsCohs2 extraDepsCohs2 q Hq Hr ε ω d c.
     destruct q; [now contradict Hq |].
     destruct extraDepsCohs2; [now contradict Hq |].
@@ -973,36 +973,7 @@ Proof.
   set (H := (mkDepsCohs2 depsCohs3).(_coh2Frames).2 q Hq r Hr s Hs ε ω θ d).
   destruct s.
   - destruct r.
-    + Local Transparent mkCohPainting.
-      Local Opaque sigT_map_eq sigT_trans_eq.
-      cbn.
-      lazymatch goal with
-      | |- context [@sigT_map_eq ?A ?B ?P ?Q ?f ?g ?x ?y ?u ?v ?p0 ?q0] =>
-          rewrite (@sigT_map_eq_transport_refl A B P Q f g x y u p0)
-      end.
-      lazymatch goal with
-      | |- _ = ?rhs =>
-          lazymatch rhs with
-          | context [@sigT_map_eq ?A ?B ?P ?Q ?f ?g ?x ?y ?u ?v ?p0 ?q0] =>
-              lazymatch q0 with
-              | eq_refl =>
-                  rewrite (@sigT_map_eq_transport_refl A B P Q f g x y u p0)
-              end
-          end
-      end.
-      lazymatch goal with
-      | |- ?lhs = _ =>
-          lazymatch lhs with
-          | context [@sigT_map_eq ?A ?B ?Pdomain ?P' ?f ?map ?x ?y ?uv ?uv' ?p0
-              (@eq_existT_curried_dep ?A0 ?x0 ?P0 ?R0 ?y0 ?H1
-                ?u0 ?v0 ?u1 ?v1 ?Hu ?Hv)] =>
-              rewrite (@sigT_map_eq_existT_curried_dep_fst A0 B P0 P' R0 f
-                    (fun a u => u θ) x0 y0 u0 v0 u1 v1 H1 Hu Hv)
-          end
-      end.
-      Local Transparent mkCohLayer.
-      unfold mkCohLayer.
-      admit.
+    + admit.
     + admit.
   - destruct r; [now contradiction |].
     destruct q; [now contradiction |].

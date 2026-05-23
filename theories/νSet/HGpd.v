@@ -1,5 +1,7 @@
 (** This file defines HGpd and provides unit, sigT and forall on HGpd. *)
 
+Set Warnings "-stdlib-vector".
+From Stdlib Require Import Vectors.Fin.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Stdlib Require Import Logic.Eqdep_dec.
 
@@ -98,6 +100,57 @@ Set Warnings "-notation-overridden".
 
 Notation "{ x & P }" := (gsigT (fun x => P%type)): type_scope.
 Notation "{ x : A & P }" := (gsigT (A := A) (fun x => P%type)): type_scope.
+
+(** Finite dependent tuples over [Fin.t n]. *)
+
+Fixpoint gvec (n: nat): (Fin.t n -> HGpd) -> HGpd :=
+  match n with
+  | 0 => fun _ => gunit
+  | S n => fun B => { x: B Fin.F1 & gvec n (fun i => B (Fin.FS i)) }
+  end.
+
+Fixpoint gvec_nth {n: nat}:
+  forall {B: Fin.t n -> HGpd}, gvec n B -> forall i: Fin.t n, B i :=
+  match n return forall {B: Fin.t n -> HGpd},
+    gvec n B -> forall i: Fin.t n, B i with
+  | 0 => fun B _ i => Fin.case0 (fun i => B i) i
+  | S n => fun B xs i =>
+      Fin.caseS' i (fun i => B i) xs.1 (fun i => gvec_nth xs.2 i)
+  end.
+
+Fixpoint gvec_map {n: nat}:
+  forall {B C: Fin.t n -> HGpd},
+  (forall i, B i -> C i) -> gvec n B -> gvec n C :=
+  match n return forall {B C: Fin.t n -> HGpd},
+    (forall i, B i -> C i) -> gvec n B -> gvec n C with
+  | 0 => fun _ _ _ _ => tt
+  | S n => fun B C f xs =>
+      (f Fin.F1 xs.1; gvec_map (fun i => f (Fin.FS i)) xs.2)
+  end.
+
+Lemma gvec_nth_map {n: nat} {B C: Fin.t n -> HGpd}
+  (f: forall i, B i -> C i) (xs: gvec n B) (i: Fin.t n):
+  gvec_nth (gvec_map f xs) i = f i (gvec_nth xs i).
+Proof.
+  revert B C f xs i. induction n as [|n IH].
+  - intros B C f xs i. now apply Fin.case0 with (p := i).
+  - intros B C f xs i.
+    apply (Fin.caseS' i (fun i =>
+      gvec_nth (gvec_map f xs) i = f i (gvec_nth xs i))).
+    + now reflexivity.
+    + intro j. cbn.
+      now exact (IH _ _ (fun i => f (Fin.FS i)) xs.2 j).
+Defined.
+
+Lemma gvec_ext {n: nat} {B: Fin.t n -> HGpd} (xs ys: gvec n B):
+  (forall i, gvec_nth xs i = gvec_nth ys i) -> xs = ys.
+Proof.
+  revert B xs ys. induction n as [|n IH].
+  - intros B xs ys _. now destruct xs, ys.
+  - intros B [x xs] [y ys] H. simpl in H.
+    specialize (H Fin.F1) as Hx. simpl in Hx. destruct Hx.
+    f_equal. apply IH. intro i. now exact (H (Fin.FS i)).
+Defined.
 
 (** [forall] defined over an [HGpd] codomain *)
 
