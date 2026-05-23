@@ -13,6 +13,8 @@ Set Keyed Unification.
 Module νGpd (A : AritySig).
 Import A.
 
+Definition arity := Fin.t arityLength.
+
 (** The type of lists {frame(n,0);...;frame(n,p-1)} for arbitrary k := n-p
     (the non-mandatory dependency in k is useful for type inference) *)
 
