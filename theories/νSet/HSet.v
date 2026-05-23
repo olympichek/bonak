@@ -114,35 +114,7 @@ Module HSetProduct <: FiniteProductSig.
   Defined.
 End HSetProduct.
 
-Module HSetVector := FiniteVector(HSetProduct).
-
-Definition vec (n: nat): (Fin.t n -> HSet) -> HSet := HSetVector.vec n.
-
-Definition vec_nth {n: nat} {B: Fin.t n -> HSet}
-  (xs: vec n B) (i: Fin.t n): B i :=
-  HSetVector.vec_nth xs i.
-
-Definition vec_map {n: nat} {B C: Fin.t n -> HSet}
-  (f: forall i, B i -> C i) (xs: vec n B): vec n C :=
-  HSetVector.vec_map f xs.
-
-Definition vec_of_fun {n: nat} {B: Fin.t n -> HSet}
-  (f: forall i, B i): vec n B :=
-  HSetVector.vec_of_fun f.
-
-Definition vec_nth_map {n: nat} {B C: Fin.t n -> HSet}
-  (f: forall i, B i -> C i) (xs: vec n B) (i: Fin.t n):
-  vec_nth (vec_map f xs) i = f i (vec_nth xs i) :=
-  HSetVector.vec_nth_map f xs i.
-
-Definition vec_nth_of_fun {n: nat} {B: Fin.t n -> HSet}
-  (f: forall i, B i) (i: Fin.t n):
-  vec_nth (vec_of_fun f) i = f i :=
-  HSetVector.vec_nth_of_fun f i.
-
-Definition vec_ext {n: nat} {B: Fin.t n -> HSet} (xs ys: vec n B):
-  (forall i, vec_nth xs i = vec_nth ys i) -> xs = ys :=
-  HSetVector.vec_ext xs ys.
+Module HSetVec := FiniteVector(HSetProduct).
 
 Set Universe Polymorphism.
 

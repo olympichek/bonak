@@ -79,7 +79,7 @@ Definition mkLayer `{paintings: mkPaintingTypes p.+1 k frames}
   {prev: RestrFrameTypeBlock p k.+1}
   (restrFrames: mkRestrFrameTypesStep frames prev)
   (d: (prev.(FrameDef) restrFrames.1).2) :=
-  vec arityLength (fun ε => paintings.2 (restrFrames.2 0 leR_O ε d)).
+  HGpdVec.vec arityLength (fun ε => paintings.2 (restrFrames.2 0 leR_O ε d)).
 
 Fixpoint mkRestrFrameTypesAndFrames {p k}:
   forall `(paintings: mkPaintingTypes p k frames), RestrFrameTypeBlock p k :=
@@ -222,9 +222,10 @@ Definition mkRestrLayer `{extraDeps: DepsRestrExtension p.+1 k deps}
   (d: mkFrame (toDepsRestr (prev.(RestrFramesDef) cohFrames.1)).(1)):
   mkLayer (prev.(RestrFramesDef) cohFrames.1) d -> mkLayer deps.(_restrFrames)
     ((prev.(RestrFramesDef) cohFrames.1).2 q.+1 (⇑ Hq) ε d) :=
-  fun l => vec_map (fun ω c =>
-    rew [deps.(_paintings).2] cohFrames.2 q Hq 0 leR_O ε ω d in
-    restrPaintings.2 q Hq ε _ c) l.
+  fun l => HGpdVec.vec_map (B := fun ω => (mkPaintings (deps; extraDeps)).2 _)
+    (fun ω c =>
+      rew [deps.(_paintings).2] cohFrames.2 q Hq 0 leR_O ε ω d in
+      restrPaintings.2 q Hq ε _ c) l.
 
 (** Under previous assumptions, and, additionally:
     - {restrPainting(n,0);...;restrPainting(n,p-1)}
@@ -375,7 +376,7 @@ Fixpoint mkRestrPainting `(extraDepsCohs: DepsCohsExtension p k depsCohs)
     (mkPaintings (mkDepsRestr; mkExtraDeps extraDepsCohs)).2 d ->
     mkDepsRestr.(_paintings).2 (mkDepsRestr.(_restrFrames).2 q Hq ε d) :=
   match q with
-  | 0 => fun _ ε _ '(l; _) => vec_nth l ε
+  | 0 => fun _ ε _ '(l; _) => HGpdVec.vec_nth l ε
   | q.+1 =>
     match extraDepsCohs with
     | TopCohDep E => fun Hq _ _ _ => match leR_O_contra Hq with end
@@ -473,9 +474,9 @@ Definition mkCohLayer `{extraDepsCohs: DepsCohsExtension p.+1 k depsCohs}
   (l: mkLayer mkRestrFrames d):
   mkCohLayerType q Hq r Hr ε ω d l.
 Proof.
-  apply vec_ext; intros 𝛉.
-  rewrite <- (map_subst (fun d0 l => vec_nth l 𝛉) (P := mkLayer _)).
-  rewrite !vec_nth_map.
+  apply HGpdVec.vec_ext; intros 𝛉.
+  rewrite <- (map_subst (fun d0 l => HGpdVec.vec_nth l 𝛉) (P := mkLayer _)).
+  rewrite !HGpdVec.vec_nth_map.
   unfold mkRestrLayer; simpl.
   rewrite
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 q Hq ε x),
@@ -617,7 +618,7 @@ Proof.
   generalize dependent p.
   induction r as [|r mkCohPainting].
   - intros p k depsCohs2 extraDepsCohs2 q Hq Hr ε ω d c.
-    cbn. now rewrite vec_nth_map.
+    cbn. now rewrite HGpdVec.vec_nth_map.
   - intros p k depsCohs2 extraDepsCohs2 q Hq Hr ε ω d c.
     destruct q; [now contradict Hq |].
     destruct extraDepsCohs2; [now contradict Hq |].
