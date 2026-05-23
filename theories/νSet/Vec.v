@@ -1,9 +1,6 @@
 Set Warnings "-stdlib-vector".
 From Stdlib Require Import Vectors.Fin.
 
-Set Warnings "-notation-overridden".
-From Bonak Require Import SigT HSet.
-
 Module Type FiniteProductSig.
   Parameter Obj : Type.
   Parameter El : Obj -> Type.
@@ -98,63 +95,3 @@ Proof.
 Defined.
 
 End FiniteVector.
-
-Module HSetProduct <: FiniteProductSig.
-  Definition Obj := HSet.
-  Definition El (A: Obj) : Type := A.
-  Coercion El : Obj >-> Sortclass.
-
-  Definition unit_obj := hunit.
-  Definition unit_intro : unit_obj := tt.
-  Definition unit_ext (x y: unit_obj): x = y.
-  Proof.
-    now destruct x, y.
-  Defined.
-
-  Definition prod_obj (A B: Obj): Obj := hsigT (fun _ : A => B).
-  Definition pair {A B: Obj} (x: A) (y: B): prod_obj A B := (x; y).
-  Definition fst {A B: Obj} (x: prod_obj A B): A := x.1.
-  Definition snd {A B: Obj} (x: prod_obj A B): B := x.2.
-
-  Definition fst_pair {A B: Obj} (x: A) (y: B): fst (pair x y) = x :=
-    eq_refl.
-  Definition snd_pair {A B: Obj} (x: A) (y: B): snd (pair x y) = y :=
-    eq_refl.
-
-  Definition prod_ext {A B: Obj} (x y: prod_obj A B)
-    (H1: fst x = fst y) (H2: snd x = snd y): x = y.
-  Proof.
-    destruct x as [x1 x2], y as [y1 y2].
-    simpl in H1, H2. now destruct H1, H2.
-  Defined.
-End HSetProduct.
-
-Module HSetVector := FiniteVector(HSetProduct).
-
-Definition hvec (n: nat): (Fin.t n -> HSet) -> HSet := HSetVector.vec n.
-
-Definition hvec_nth {n: nat} {B: Fin.t n -> HSet}
-  (xs: hvec n B) (i: Fin.t n): B i :=
-  HSetVector.vec_nth xs i.
-
-Definition hvec_map {n: nat} {B C: Fin.t n -> HSet}
-  (f: forall i, B i -> C i) (xs: hvec n B): hvec n C :=
-  HSetVector.vec_map f xs.
-
-Definition hvec_of_fun {n: nat} {B: Fin.t n -> HSet}
-  (f: forall i, B i): hvec n B :=
-  HSetVector.vec_of_fun f.
-
-Definition hvec_nth_map {n: nat} {B C: Fin.t n -> HSet}
-  (f: forall i, B i -> C i) (xs: hvec n B) (i: Fin.t n):
-  hvec_nth (hvec_map f xs) i = f i (hvec_nth xs i) :=
-  HSetVector.vec_nth_map f xs i.
-
-Definition hvec_nth_of_fun {n: nat} {B: Fin.t n -> HSet}
-  (f: forall i, B i) (i: Fin.t n):
-  hvec_nth (hvec_of_fun f) i = f i :=
-  HSetVector.vec_nth_of_fun f i.
-
-Definition hvec_ext {n: nat} {B: Fin.t n -> HSet} (xs ys: hvec n B):
-  (forall i, hvec_nth xs i = hvec_nth ys i) -> xs = ys :=
-  HSetVector.vec_ext xs ys.

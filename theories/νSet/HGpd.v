@@ -1,12 +1,14 @@
 (** This file defines HGpd and provides unit, sigT and forall on HGpd. *)
 
+Set Warnings "-stdlib-vector".
+From Stdlib Require Import Vectors.Fin.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Stdlib Require Import Logic.Eqdep_dec.
 
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT HSet HVec.
+From Bonak Require Import SigT HSet Vec.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -133,32 +135,32 @@ End HGpdProduct.
 
 Module HGpdVector := FiniteVector(HGpdProduct).
 
-Definition gvec (n: nat): (Fin.t n -> HGpd) -> HGpd := HGpdVector.vec n.
+Definition vec (n: nat): (Fin.t n -> HGpd) -> HGpd := HGpdVector.vec n.
 
-Definition gvec_nth {n: nat} {B: Fin.t n -> HGpd}
-  (xs: gvec n B) (i: Fin.t n): B i :=
+Definition vec_nth {n: nat} {B: Fin.t n -> HGpd}
+  (xs: vec n B) (i: Fin.t n): B i :=
   HGpdVector.vec_nth xs i.
 
-Definition gvec_map {n: nat} {B C: Fin.t n -> HGpd}
-  (f: forall i, B i -> C i) (xs: gvec n B): gvec n C :=
+Definition vec_map {n: nat} {B C: Fin.t n -> HGpd}
+  (f: forall i, B i -> C i) (xs: vec n B): vec n C :=
   HGpdVector.vec_map f xs.
 
-Definition gvec_of_fun {n: nat} {B: Fin.t n -> HGpd}
-  (f: forall i, B i): gvec n B :=
+Definition vec_of_fun {n: nat} {B: Fin.t n -> HGpd}
+  (f: forall i, B i): vec n B :=
   HGpdVector.vec_of_fun f.
 
-Definition gvec_nth_map {n: nat} {B C: Fin.t n -> HGpd}
-  (f: forall i, B i -> C i) (xs: gvec n B) (i: Fin.t n):
-  gvec_nth (gvec_map f xs) i = f i (gvec_nth xs i) :=
+Definition vec_nth_map {n: nat} {B C: Fin.t n -> HGpd}
+  (f: forall i, B i -> C i) (xs: vec n B) (i: Fin.t n):
+  vec_nth (vec_map f xs) i = f i (vec_nth xs i) :=
   HGpdVector.vec_nth_map f xs i.
 
-Definition gvec_nth_of_fun {n: nat} {B: Fin.t n -> HGpd}
+Definition vec_nth_of_fun {n: nat} {B: Fin.t n -> HGpd}
   (f: forall i, B i) (i: Fin.t n):
-  gvec_nth (gvec_of_fun f) i = f i :=
+  vec_nth (vec_of_fun f) i = f i :=
   HGpdVector.vec_nth_of_fun f i.
 
-Definition gvec_ext {n: nat} {B: Fin.t n -> HGpd} (xs ys: gvec n B):
-  (forall i, gvec_nth xs i = gvec_nth ys i) -> xs = ys :=
+Definition vec_ext {n: nat} {B: Fin.t n -> HGpd} (xs ys: vec n B):
+  (forall i, vec_nth xs i = vec_nth ys i) -> xs = ys :=
   HGpdVector.vec_ext xs ys.
 
 Set Universe Polymorphism.
