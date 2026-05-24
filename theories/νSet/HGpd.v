@@ -44,12 +44,12 @@ Qed.
 Lemma unit_GUIP (x y: unit) (h g: x = y) (p q: h = g): p = q.
 Proof.
   apply UIP_dec. intros u v. left. now apply unit_UIP.
-Qed.
+Defined.
 
 Lemma bool_GUIP (x y: bool) (h g: x = y) (p q: h = g): p = q.
 Proof.
   apply UIP_dec. intros u v. left. now apply bool_UIP.
-Qed.
+Defined.
 
 Definition gunit@{m}: HGpd@{m} := {|
   GDom := unit;
@@ -80,7 +80,7 @@ Lemma sigT_path_decode_encode {A: HGpd} {B: A -> HGpd} {x y: {a: A &T B a}}
   (p: x = y): sigT_path_decode (sigT_path_encode p) = p.
 Proof.
   symmetry. apply sigT_decompose_eq.
-Qed.
+Defined.
 
 Lemma sigT_GUIP {A: HGpd} {B: A -> HGpd} (x y: {a: A &T B a})
   (h g: x = y) (p q: h = g): p = q.
@@ -89,7 +89,7 @@ Proof.
     (f := @sigT_path_encode A B x y)
     (g := @sigT_path_decode A B x y).
   exact sigT_path_decode_encode.
-Qed.
+Defined.
 
 Definition gsigT {A: HGpd} (B: A -> HGpd): HGpd := {|
   GDom := {a: A &T B a};
