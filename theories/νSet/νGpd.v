@@ -410,22 +410,22 @@ Definition mkCoh2FrameType
   `(extraDepsCohs: DepsCohsExtension p.+1 k depsCohs)
   (prevCohFrames: mkCohFrameTypes
     (mkRestrPaintings (depsCohs; extraDepsCohs))): Type :=
-  forall q (Hq: q <= k) r (Hr: r <= q) s (Hs: s <= r) (ε ω 𝛉: arity)
+  forall q (Hq: q <= k) r (Hr: r <= q) s (Hs: s <= r) (ε ω θ: arity)
     (d: mkFrame (mkDepsRestr (depsCohs := toDepsCohs prevCohFrames.1)).(1)),
   f_equal
     (fun x => depsCohs.(_deps).(_restrFrames).2 q _ ε x)
-    (prevCohFrames.2 r (Hr ↕ ↑ Hq) s Hs ω 𝛉 d)
-  • (depsCohs.(_cohs).2 q Hq s (Hs ↕ Hr) ε 𝛉
+    (prevCohFrames.2 r (Hr ↕ ↑ Hq) s Hs ω θ d)
+  • (depsCohs.(_cohs).2 q Hq s (Hs ↕ Hr) ε θ
       (mkRestrFrame r.+1 (⇑ (Hr ↕ ↑ Hq)) ω d)
   • f_equal
-      (fun x => depsCohs.(_deps).(_restrFrames).2 s (Hs ↕ (Hr ↕ Hq)) 𝛉 x)
+      (fun x => depsCohs.(_deps).(_restrFrames).2 s (Hs ↕ (Hr ↕ Hq)) θ x)
       (prevCohFrames.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω d)) =
   depsCohs.(_cohs).2 q Hq r Hr ε ω
-    (mkRestrFrame s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) 𝛉 d)
+    (mkRestrFrame s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) θ d)
   • (f_equal
       (fun x => depsCohs.(_deps).(_restrFrames).2 r _ ω x)
-      (prevCohFrames.2 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) ε 𝛉 d)
-  • depsCohs.(_cohs).2 r (Hr ↕ Hq) s Hs ω 𝛉
+      (prevCohFrames.2 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) ε θ d)
+  • depsCohs.(_cohs).2 r (Hr ↕ Hq) s Hs ω θ
       (mkRestrFrame q.+2 (⇑ (⇑ Hq)) ε d)).
 
 Definition mkCohPaintingType
@@ -474,8 +474,8 @@ Definition mkCohLayer `{extraDepsCohs: DepsCohsExtension p.+1 k depsCohs}
   (l: mkLayer mkRestrFrames d):
   mkCohLayerType q Hq r Hr ε ω d l.
 Proof.
-  apply HGpdVec.vec_ext; intros 𝛉.
-  rewrite <- (map_subst (fun d0 l => HGpdVec.vec_nth l 𝛉) (P := mkLayer _)).
+  apply HGpdVec.vec_ext; intros θ.
+  rewrite <- (map_subst (fun d0 l => HGpdVec.vec_nth l θ) (P := mkLayer _)).
   rewrite !HGpdVec.vec_nth_map.
   unfold mkRestrLayer; simpl.
   rewrite
@@ -484,7 +484,7 @@ Proof.
   rewrite <- cohPaintings.2.
   rewrite
     rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-      (f := fun x => depsCohs.(_deps).(_restrFrames).2 O leR_O 𝛉 x),
+      (f := fun x => depsCohs.(_deps).(_restrFrames).2 O leR_O θ x),
     rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
       (f := fun x => depsCohs.(_deps).(_restrFrames).2 r (Hr ↕ Hq) ω x),
     rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
@@ -492,7 +492,7 @@ Proof.
   rewrite 4 rew_compose.
   apply rew_swap with (P := fun x => depsCohs.(_deps).(_paintings).2 x).
   rewrite rew_app_rl. now trivial.
-  now apply (coh2Frame q Hq r Hr 0 leR_O ε ω 𝛉 d).
+  now apply (coh2Frame q Hq r Hr 0 leR_O ε ω θ d).
 Defined.
 
 Class Coh2FrameTypeBlock `{extraDepsCohs: DepsCohsExtension p k depsCohs}
