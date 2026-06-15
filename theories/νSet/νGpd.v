@@ -836,6 +836,7 @@ Definition mkCoh2Layer {p k}
   mkCoh2LayerType depsCohs2 extraDepsCohs2 coh2Frames q Hq r Hr s Hs ε ω θ d l.
 Proof.
   unfold mkCoh2LayerType.
+  apply HGpdVec_path_ext; intros ζ.
   admit.
 Admitted.
 

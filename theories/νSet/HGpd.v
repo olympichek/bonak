@@ -135,6 +135,23 @@ End HGpdProduct.
 
 Module HGpdVec := FiniteVector(HGpdProduct).
 
+Lemma HGpdVec_path_ext {n: nat} {B: Fin.t n -> HGpd}
+  {xs ys: HGpdVec.vec n B} (p q: xs = ys):
+  (forall i,
+    f_equal (fun z => HGpdVec.vec_nth z i) p =
+    f_equal (fun z => HGpdVec.vec_nth z i) q) ->
+  p = q.
+Proof.
+  revert B xs ys p q.
+  induction n as [|n IH].
+  - intros B xs ys p q _. now apply unit_UIP.
+  - intros B xs ys p q H. cbn in xs, ys, p, q, H |- *.
+    unshelve eapply sigT_const_path_ext.
+    + exact (H Fin.F1).
+    + apply IH. intro i. rewrite !f_equal_compose.
+      exact (H (Fin.FS i)).
+Defined.
+
 Set Universe Polymorphism.
 
 (** [forall] defined over an [HGpd] codomain *)

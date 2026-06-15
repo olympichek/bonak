@@ -52,6 +52,34 @@ Definition projT2_eq {A} {P: A -> Type} {u v: { a: A &T P a }} (p: u = v):
 Notation "(= u ; v )" := (eq_existT_curried u v)
   (at level 0, format "(= u ;  '/  ' v )").
 
+Definition sigT_const_path {A B: Type} {x y: { _ : A &T B }}
+  (p1: x.1 = y.1) (p2: x.2 = y.2): x = y.
+Proof.
+  destruct x as [x1 x2], y as [y1 y2].
+  simpl in p1, p2. destruct p1, p2. reflexivity.
+Defined.
+
+Lemma sigT_const_path_eta {A B: Type} {x y: { _ : A &T B }}
+  (p: x = y):
+  sigT_const_path (f_equal (fun z => z.1) p)
+    (f_equal (fun z => @projT2 A (fun _ : A => B) z) p) = p.
+Proof.
+  destruct p. destruct x. reflexivity.
+Defined.
+
+Lemma sigT_const_path_ext {A B: Type} {x y: { _ : A &T B }}
+  (p q: x = y):
+  f_equal (fun z => z.1) p = f_equal (fun z => z.1) q ->
+  f_equal (fun z => @projT2 A (fun _ : A => B) z) p =
+    f_equal (fun z => @projT2 A (fun _ : A => B) z) q ->
+  p = q.
+Proof.
+  intros H1 H2.
+  rewrite <- (sigT_const_path_eta p).
+  rewrite <- (sigT_const_path_eta q).
+  now rewrite H1, H2.
+Defined.
+
 Lemma eq_existT_curried_dep {A x} {P: A -> Type} {Q: {a &T P a} -> Type}
    {y} {H: x = y}
    {u: P x} {v: Q (x; u)}
