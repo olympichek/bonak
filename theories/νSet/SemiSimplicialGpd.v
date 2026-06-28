@@ -497,9 +497,7 @@ Proof.
     rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
       (f := fun x => depsCohs.(_deps).(_restrFrames).2 q _ x).
   rewrite 4 rew_compose.
-  apply rew_swap with (P := fun x => depsCohs.(_deps).(_paintings).2 x).
-  rewrite rew_app_rl. now trivial.
-  now apply (coh2Frame q Hq r Hr 0 leR_O d).
+  now rewrite (coh2Frame q Hq r Hr 0 leR_O d).
 Defined.
 
 Class Coh2FrameTypeBlock `{extraDepsCohs: DepsCohsExtension p k depsCohs}
