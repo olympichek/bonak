@@ -1018,6 +1018,48 @@ Proof.
     + Local Transparent mkCohPainting.
       Local Opaque sigT_map_eq sigT_trans_eq.
       cbn.
+      lazymatch goal with
+      | |- context [@sigT_map_eq ?A ?B ?P ?Q ?f ?g ?x ?y ?u ?v ?p0 ?q0] =>
+          rewrite (@sigT_map_eq_transport_refl A B P Q f g x y u p0)
+      end.
+      lazymatch goal with
+      | |- _ = ?rhs =>
+          lazymatch rhs with
+          | context [@sigT_map_eq ?A ?B ?P ?Q ?f ?g ?x ?y ?u ?v ?p0 ?q0] =>
+              lazymatch q0 with
+              | eq_refl =>
+                  rewrite (@sigT_map_eq_transport_refl A B P Q f g x y u p0)
+              end
+          end
+      end.
+      lazymatch goal with
+      | |- ?lhs = _ =>
+          lazymatch lhs with
+          | context [@sigT_map_eq ?A ?B ?Pdomain ?P' ?f ?map ?x ?y ?uv ?uv' ?p0
+              (@eq_existT_curried_dep ?A0 ?x0 ?P0 ?R0 ?y0 ?H1 ?u0 ?v0 ?u1 ?v1 ?Hu ?Hv)] =>
+              rewrite (@sigT_map_eq_existT_curried_dep_fst A0 B P0 P' R0 f
+                    (fun a u => u) x0 y0 u0 v0 u1 v1 H1 Hu Hv)
+          end
+      end.
+      lazymatch goal with
+      | |- context [@sigT_trans_eq ?A ?P ?x ?y ?z ?u ?v ?w ?p eq_refl ?p' ?q'] =>
+          rewrite (@sigT_trans_eq_eq_refl_l A P x y z u w p p' q')
+      end.
+      lazymatch goal with
+      | |- context [@sigT_trans_eq ?A ?P ?x ?y ?z ?u ?v ?w ?p ?qq ?p' eq_refl] =>
+          rewrite (@sigT_trans_eq_eq_refl_r A P x y z u v p qq p')
+      end.
+      lazymatch goal with
+      | |- context [@sigT_trans_eq ?A ?P ?x ?y ?z ?u ?v ?w ?p eq_refl ?p' ?q'] =>
+          rewrite (@sigT_trans_eq_eq_refl_l A P x y z u w p p' q')
+      end.
+      unfold Q.
+      unfold mkCoh2PaintingEndpointType, mkCoh2PaintingFrameEndpointType.
+      unfold mkDepsRestr, mkRestrFrame.
+      cbn [_restrFrames].
+      rewrite (rew_eq_dep_l
+        (B := fun x : (mkDepsCohs2 depsCohs3).(_depsCohs).(_deps).(_frames).2 =>
+                (mkDepsCohs2 depsCohs3).(_depsCohs).(_deps).(_paintings).2 x)).
       admit.
     + admit.
   - destruct r; [now contradiction |].
