@@ -38,3 +38,19 @@ Lemma map_subst_app {A B} {x y} {𝛉: A} (H: x = y :> B) (P: A -> B -> Type)
 Proof.
   now destruct H.
 Defined.
+
+(** Transport in an equality type whose left-hand side is itself a transport of
+    a fixed [C1] along the index, and whose right-hand side is fixed.  This is
+    the cancellation used by [mkCoh2Painting]: the outer
+    [rew [Endpoint] coh2Frame] motive has exactly this shape (with the index
+    being a *path* [fe : a = b] and the inner transport in some fibre [B]), so
+    rewriting with it turns the outer transport into
+    [f_equal (fun fe => rew [B] fe in C1) coh2Frame] — the very factor produced
+    by [mkCohLayer], which then cancels. *)
+Lemma rew_eq_dep_l {A: Type} {B: A -> Type} {a b: A} {C1: B a} {C2: B b}
+  {p1 p2: a = b} (e: p1 = p2) (q: rew [B] p1 in C1 = C2):
+  rew [fun fe: a = b => rew [B] fe in C1 = C2] e in q =
+  eq_sym (f_equal (fun fe: a = b => rew [B] fe in C1) e) • q.
+Proof.
+  now destruct e, q.
+Defined.
