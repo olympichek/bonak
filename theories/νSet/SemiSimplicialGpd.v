@@ -75,16 +75,21 @@ That is, we build:
 
 Generalizable Variables p k frames.
 
+Definition mkRestrFrameType
+  `(prevFrames: mkFrameTypes p.+1 k.+1)
+   (frames: mkFrameTypes p.+1 k) :=
+  forall q (Hq: q <= k), prevFrames.2 -> frames.2.
+
 Definition mkRestrFrameTypesStep `(frames: mkFrameTypes p.+1 k)
   (prev: RestrFrameTypeBlock p k.+1) :=
-  { R: prev.(RestrFrameTypesDef) &T
-    forall q (Hq: q <= k), (prev.(FrameDef) R).2 -> frames.2 }.
+  { R: prev.(RestrFrameTypesDef) &T mkRestrFrameType (prev.(FrameDef) R) frames }.
 
-Definition mkLayer `{paintings: mkPaintingTypes p.+1 k frames}
-  {prev: RestrFrameTypeBlock p k.+1}
-  (restrFrames: mkRestrFrameTypesStep frames prev)
-  (d: (prev.(FrameDef) restrFrames.1).2) :=
-  paintings.2 (restrFrames.2 0 leR_O d).
+Definition mkLayer `{frames: mkFrameTypes p.+1 k}
+  {prevFrames: mkFrameTypes p.+1 k.+1}
+  (restrFrame: mkRestrFrameType prevFrames frames)
+  {painting: frames.2 -> HGpd}
+  (d: prevFrames.2) :=
+  painting (restrFrame 0 leR_O d).
 
 Fixpoint mkRestrFrameTypesAndFrames {p k}:
   forall `(paintings: mkPaintingTypes p k frames), RestrFrameTypeBlock p k :=
@@ -102,7 +107,7 @@ Fixpoint mkRestrFrameTypesAndFrames {p k}:
       RestrFrameTypesDef := mkRestrFrameTypesStep frames prev;
       FrameDef R :=
         (frames' R.1; { d: (frames' R.1).2 &
-          mkLayer (paintings := paintings) R d }): mkFrameTypes p.+2 k
+          mkLayer R.2 (painting := paintings.2) d }): mkFrameTypes p.+2 k
     |}
   end.
 
@@ -162,7 +167,7 @@ Fixpoint mkPainting `(extraDeps: DepsRestrExtension p k deps):
   match extraDeps with
   | TopRestrDep E => fun d => E d
   | AddRestrDep deps extraDeps => fun (d: mkFrame deps.(1)) =>
-      {l: mkLayer deps.(_restrFrames) d & mkPainting extraDeps (d; l)}
+      {l: mkLayer deps.(_restrFrames).2 d & mkPainting extraDeps (d; l)}
   end.
 
 Fixpoint mkPaintingsPrefix {p k}:
@@ -206,31 +211,26 @@ Class CohFrameTypeBlock `{extraDeps: DepsRestrExtension p k deps} := {
 (** Auxiliary definitions to mutually build cohFrameTypes and restrFrames *)
 
 Definition mkCohFrameType `{extraDeps: DepsRestrExtension p.+1 k deps}
-  (prev: CohFrameTypeBlock (extraDeps := (deps; extraDeps)))
-  (Q: prev.(CohFrameTypesDef)): Type :=
+  (prevRestrFrames: mkRestrFrameTypes (mkPaintings (deps; extraDeps))): Type :=
   forall q (Hq: q <= k) r (Hr: r <= q)
-    (d: mkFrame (toDepsRestr (prev.(RestrFramesDef) Q)).(1)),
-  deps.(_restrFrames).2 q Hq
-    ((prev.(RestrFramesDef) Q).2 r (Hr ↕ (↑ Hq)) d) =
-  deps.(_restrFrames).2 r (Hr ↕ Hq)
-    ((prev.(RestrFramesDef) Q).2 q.+1 (⇑ Hq) d).
+    (d: mkFrame (toDepsRestr prevRestrFrames).(1)),
+  deps.(_restrFrames).2 q Hq (prevRestrFrames.2 r (Hr ↕ (↑ Hq)) d) =
+  deps.(_restrFrames).2 r (Hr ↕ Hq) (prevRestrFrames.2 q.+1 (⇑ Hq) d).
 
 Definition mkCohFrameTypesStep `{extraDeps: DepsRestrExtension p.+1 k deps}
   (prev: CohFrameTypeBlock (extraDeps := (deps; extraDeps))): Type :=
-  { Q: prev.(CohFrameTypesDef) &T mkCohFrameType prev Q }.
+  { Q: prev.(CohFrameTypesDef) &T mkCohFrameType (prev.(RestrFramesDef) Q) }.
 
 Definition mkRestrLayer `{extraDeps: DepsRestrExtension p.+1 k deps}
-  (restrPaintings: mkRestrPaintingTypes extraDeps)
-  {prev: CohFrameTypeBlock (extraDeps := (deps; extraDeps))}
-  (cohFrames: mkCohFrameTypesStep prev)
+  {prevRestrFrames: mkRestrFrameTypes (mkPaintings (deps;extraDeps))}
+  (restrPainting: mkRestrPaintingType extraDeps)
+  (cohFrame: mkCohFrameType prevRestrFrames)
   q (Hq: q <= k)
-  (d: mkFrame (toDepsRestr (prev.(RestrFramesDef) cohFrames.1)).(1)):
-  mkLayer (prev.(RestrFramesDef) cohFrames.1) d -> mkLayer deps.(_restrFrames)
-    ((prev.(RestrFramesDef) cohFrames.1).2 q.+1 (⇑ Hq) d) :=
-  fun (l : mkLayer (paintings := mkPaintings (deps; extraDeps))
-      (prev.(RestrFramesDef) cohFrames.1) d) =>
-    rew [deps.(_paintings).2] cohFrames.2 q Hq 0 leR_O d in
-    restrPaintings.2 q Hq _ l.
+  (d: mkFrame (toDepsRestr prevRestrFrames).(1))
+  (l: mkLayer prevRestrFrames.2 d):
+  mkLayer deps.(_restrFrames).2 (prevRestrFrames.2 q.+1 (⇑ Hq) d) :=
+    rew [deps.(_paintings).2] cohFrame q Hq 0 leR_O d in
+    restrPainting q Hq _ l.
 
 (** Under previous assumptions, and, additionally:
     - {restrPainting(n,0);...;restrPainting(n,p-1)}
@@ -258,7 +258,7 @@ Fixpoint mkCohFrameTypesAndRestrFrames {p k}:
       let restrFrame q (Hq: q <= k)
         (d: mkFrame (toDepsRestr (restrFrames Q.1))) :=
           ((restrFrames Q.1).2 q.+1 (⇑ Hq) d.1;
-           mkRestrLayer restrPaintings Q q _ d.1 d.2)
+           mkRestrLayer restrPaintings.2 Q.2 q _ d.1 d.2)
       in (restrFrames Q.1; restrFrame)
     |}
   end.
@@ -380,17 +380,13 @@ Fixpoint mkRestrPainting `(extraDepsCohs: DepsCohsExtension p k depsCohs)
   forall (Hq: q <= k) (d: mkFrame mkDepsRestr.(1)),
     (mkPaintings (mkDepsRestr; mkExtraDeps extraDepsCohs)).2 d ->
     mkDepsRestr.(_paintings).2 (mkDepsRestr.(_restrFrames).2 q Hq d).
-(** Unlike the vector-based construction, where a layer is a [vec] and the two
-    components of the successor case can be paired directly, here a layer is the
-    bare painting; the [existT] type family no longer gets inferred by the
-    term-mode [(_; _)] notation, so we build the pair goal-directed. *)
 Proof.
   destruct q as [|q]; intros Hq d [l c].
   - exact l.
   - destruct extraDepsCohs as [|k0 depsCohs0 extraDepsCohs0].
     + now destruct (leR_O_contra Hq).
     + unshelve eapply existT.
-      * exact (mkRestrLayer depsCohs0.(_restrPaintings) depsCohs0.(_cohs)
+      * exact (mkRestrLayer depsCohs0.(_restrPaintings).2 depsCohs0.(_cohs).2
           q (⇓ Hq) d l).
       * exact (mkRestrPainting _ _ _ extraDepsCohs0 q (⇓ Hq) (d; l) c).
 Defined.
@@ -465,22 +461,22 @@ Definition mkCohLayerType `{extraDepsCohs: DepsCohsExtension p.+1 k depsCohs}
     (mkRestrPaintings extraDepsCohs).1}
   q (Hq: q <= k) r (Hr: r <= q)
   (d: mkFrame (mkDepsRestr (depsCohs := toDepsCohs prevCohFrames.1)).(1))
-  (l: mkLayer mkRestrFrames d): Type :=
+  (l: mkLayer mkRestrFrame d): Type :=
   rew [mkLayer _] prevCohFrames.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) d in
-  mkRestrLayer depsCohs.(_restrPaintings) depsCohs.(_cohs) q Hq _
-    (mkRestrLayer (mkRestrPaintings extraDepsCohs).1 _ r (Hr ↕ ↑ Hq) d l) =
-  mkRestrLayer depsCohs.(_restrPaintings) depsCohs.(_cohs) r (Hr ↕ Hq) _
-    (mkRestrLayer (mkRestrPaintings extraDepsCohs).1 _ q.+1 (⇑ Hq) d l).
+  mkRestrLayer depsCohs.(_restrPaintings).2 depsCohs.(_cohs).2 q Hq _
+    (mkRestrLayer (mkRestrPaintings extraDepsCohs).1.2 prevCohFrames.2 r (Hr ↕ ↑ Hq) d l) =
+  mkRestrLayer depsCohs.(_restrPaintings).2 depsCohs.(_cohs).2 r (Hr ↕ Hq) _
+    (mkRestrLayer (mkRestrPaintings extraDepsCohs).1.2 prevCohFrames.2 q.+1 (⇑ Hq) d l).
 
 Definition mkCohLayer `{extraDepsCohs: DepsCohsExtension p.+1 k depsCohs}
-  (cohPaintings: mkCohPaintingTypes extraDepsCohs)
   {prevCohFrames: mkCohFrameTypes
     (extraDeps := (mkDepsRestr; mkExtraDeps extraDepsCohs))
     (mkRestrPaintings extraDepsCohs).1}
+  (cohPainting: mkCohPaintingType extraDepsCohs)
   (coh2Frame: mkCoh2FrameType extraDepsCohs prevCohFrames)
   q (Hq: q <= k) r (Hr: r <= q)
   (d: mkFrame (mkDepsRestr (depsCohs := toDepsCohs prevCohFrames.1)).(1))
-  (l: mkLayer mkRestrFrames d):
+  (l: mkLayer mkRestrFrame d):
   mkCohLayerType q Hq r Hr d l.
 Proof.
   unfold mkCohLayerType.
@@ -488,7 +484,7 @@ Proof.
   rewrite
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 q Hq x),
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 r (Hr ↕ Hq) x).
-  rewrite <- cohPaintings.2.
+  rewrite <- cohPainting.
   rewrite
     rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
       (f := fun x => depsCohs.(_deps).(_restrFrames).2 O leR_O x),
@@ -500,8 +496,7 @@ Proof.
   now rewrite (coh2Frame q Hq r Hr 0 leR_O d).
 Defined.
 
-Class Coh2FrameTypeBlock `{extraDepsCohs: DepsCohsExtension p k depsCohs}
-  (cohPaintings: mkCohPaintingTypes extraDepsCohs) := {
+Class Coh2FrameTypeBlock `{extraDepsCohs: DepsCohsExtension p k depsCohs} := {
   Coh2FrameTypesDef: Type;
   CohFramesDef: Coh2FrameTypesDef -> mkCohFrameTypes (mkRestrPaintings extraDepsCohs);
 }.
@@ -510,14 +505,14 @@ Definition mkCoh2FrameTypesStep
   `{extraDepsCohs: DepsCohsExtension p.+1 k depsCohs}
   (cohPaintings: mkCohPaintingTypes extraDepsCohs)
   (prev: Coh2FrameTypeBlock
-    (extraDepsCohs := (depsCohs; extraDepsCohs)%extradepscohs)
-    cohPaintings.1): Type :=
+    (extraDepsCohs := (depsCohs; extraDepsCohs)%extradepscohs)): Type :=
   { R: prev.(Coh2FrameTypesDef) &T
     mkCoh2FrameType extraDepsCohs (prev.(CohFramesDef) R) }.
 
 Fixpoint mkCoh2FrameTypesAndCohFrames {p k}:
   forall `{extraDepsCohs: DepsCohsExtension p k depsCohs}
-  (cohPaintings: mkCohPaintingTypes extraDepsCohs), Coh2FrameTypeBlock cohPaintings.
+  (cohPaintings: mkCohPaintingTypes extraDepsCohs),
+  Coh2FrameTypeBlock (extraDepsCohs := extraDepsCohs).
 Proof.
   destruct p.
   - intros depsCohs extraDepsCohs cohPaintings.
@@ -536,7 +531,7 @@ Proof.
       intros q Hq r Hr d.
       unshelve eapply eq_existT_curried.
       * now exact (h.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) d.1).
-      * now exact (mkCohLayer cohPaintings Q.2 q Hq r Hr d.1 d.2).
+      * now exact (mkCohLayer cohPaintings.2 Q.2 q Hq r Hr d.1 d.2).
 Defined.
 
 Definition mkCoh2FrameTypes `{extraDepsCohs: DepsCohsExtension p k depsCohs}
@@ -548,6 +543,13 @@ Definition mkCohFrames `{extraDepsCohs: DepsCohsExtension p k depsCohs}
   (coh2Frames: mkCoh2FrameTypes cohPaintings):
   mkCohFrameTypes (mkRestrPaintings extraDepsCohs) :=
   (mkCoh2FrameTypesAndCohFrames cohPaintings).(CohFramesDef) coh2Frames.
+
+Definition mkCohFrame `{extraDepsCohs: DepsCohsExtension p k depsCohs}
+  (cohPaintings: mkCohPaintingTypes extraDepsCohs)
+  (coh2Frames: mkCoh2FrameTypes cohPaintings):
+  mkCohFrameType (mkRestrFrames (depsCohs :=
+    toDepsCohs (mkCohFrames cohPaintings coh2Frames).1)) :=
+  (mkCohFrames cohPaintings coh2Frames).2.
 
 Class DepsCohs2 p k := {
   _depsCohs: DepsCohs p k;
@@ -588,8 +590,8 @@ Instance mkDepsCohs `(depsCohs2: DepsCohs2 p k): DepsCohs p.+1 k :=
 
 Inductive DepsCohs2Extension p: forall k (depsCohs2: DepsCohs2 p k), Type :=
 | TopCoh2Dep `{depsCohs2: DepsCohs2 p 0}
-  (E: mkFrame (mkDepsRestr (depsCohs := mkDepsCohs depsCohs2)) -> HGpd)
-  : DepsCohs2Extension p 0 depsCohs2
+  (E: mkFrame (mkDepsRestr (depsCohs := mkDepsCohs depsCohs2)) -> HGpd):
+  DepsCohs2Extension p 0 depsCohs2
 | AddCoh2Dep {k} (depsCohs2: DepsCohs2 p.+1 k):
   DepsCohs2Extension p.+1 k depsCohs2 ->
   DepsCohs2Extension p k.+1 depsCohs2.(1).
@@ -622,15 +624,14 @@ Proof.
   generalize dependent k.
   generalize dependent p.
   induction r as [|r mkCohPainting].
-  - intros p k depsCohs2 extraDepsCohs2 q Hq Hr d c.
-    cbn. reflexivity.
+  - now intros.
   - intros p k depsCohs2 extraDepsCohs2 q Hq Hr d c.
     destruct q; [now contradict Hq |].
     destruct extraDepsCohs2; [now contradict Hq |].
     destruct c as [l c].
     unshelve eapply (eq_existT_curried_dep
       (Q := mkPainting depsCohs2.(_depsCohs).(_extraDeps))).
-    + now exact (mkCohLayer depsCohs2.(_cohPaintings) depsCohs2.(_coh2Frames).2
+    + now exact (mkCohLayer depsCohs2.(_cohPaintings).2 depsCohs2.(_coh2Frames).2
         q (⇓ Hq) r (⇓ Hr) d l).
     + now exact (mkCohPainting p.+1 k depsCohs2 extraDepsCohs2
         q (⇓ Hq) (⇓ Hr) (d; l) c).
@@ -792,74 +793,74 @@ Definition mkCoh2LayerFrameEndpointType {p k}
 Definition mkCoh2LayerEndpointType {p k}
   (depsCohs2: DepsCohs2 p.+1 k)
   (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2)
-  (coh2Frames: mkCoh2FrameTypes (mkCohPaintings (depsCohs2; extraDepsCohs2)))
+  (prevCoh2Frames: mkCoh2FrameTypes (mkCohPaintings (depsCohs2; extraDepsCohs2)))
   q (Hq: q <= k) r (Hr: r <= q) s (Hs: s <= r)
   (d: mkFrame (mkDepsRestr (depsCohs := toDepsCohs (mkCohFrames
-    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 coh2Frames.1).1)).(1))
+    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 prevCoh2Frames.1).1)).(1))
   (l: mkLayer (mkDepsRestr (depsCohs := toDepsCohs (mkCohFrames
-    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 coh2Frames.1).1)).(_restrFrames) d)
+    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 prevCoh2Frames.1).1)).(_restrFrames).2 d)
   (coh2FrameEndpoint: mkCoh2LayerFrameEndpointType depsCohs2
-    extraDepsCohs2 coh2Frames q Hq r Hr s Hs d): Type :=
+    extraDepsCohs2 prevCoh2Frames q Hq r Hr s Hs d): Type :=
   let depsCohs := depsCohs2.(_depsCohs) in
-  let cohFrames1 := mkCohFrames depsCohs2.(_cohPaintings).1 depsCohs2.(_coh2Frames).1 in
-  let restrPaintings1 := mkRestrPaintings (depsCohs; depsCohs2.(_extraDepsCohs)) in
-  let cohFrames2 := mkCohFrames (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 coh2Frames.1 in
-  let restrPaintings2 := mkRestrPaintings ((mkDepsCohs depsCohs2).(1);
+  let cohFrame1 := mkCohFrame depsCohs2.(_cohPaintings).1 depsCohs2.(_coh2Frames).1 in
+  let restrPainting1 := mkRestrPainting (depsCohs; depsCohs2.(_extraDepsCohs)) in
+  let cohFrame2 := mkCohFrame (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 prevCoh2Frames.1 in
+  let restrPainting2 := mkRestrPainting ((mkDepsCohs depsCohs2).(1);
     (mkDepsCohs depsCohs2; mkExtraCohs extraDepsCohs2)) in
-  rew [mkLayer depsCohs.(_deps).(_restrFrames)] coh2FrameEndpoint in
-  mkRestrLayer depsCohs.(_restrPaintings) depsCohs.(_cohs) q Hq
+  rew [mkLayer depsCohs.(_deps).(_restrFrames).2] coh2FrameEndpoint in
+  mkRestrLayer depsCohs.(_restrPaintings).2 depsCohs.(_cohs).2 q Hq
     (mkRestrFrame r.+1 (⇑ (Hr ↕ ↑ Hq))
       (mkRestrFrame s.+1 (⇑ (Hs ↕ ↑ (Hr ↕ ↑ Hq))) d))
-    (mkRestrLayer restrPaintings1 cohFrames1 r (Hr ↕ ↑ Hq)
+    (mkRestrLayer restrPainting1 cohFrame1 r (Hr ↕ ↑ Hq)
       (mkRestrFrame s.+1 (⇑ (Hs ↕ ↑ (Hr ↕ ↑ Hq))) d)
-      (mkRestrLayer restrPaintings2 cohFrames2 s (Hs ↕ ↑ (Hr ↕ ↑ Hq)) d l)) =
-  mkRestrLayer depsCohs.(_restrPaintings) depsCohs.(_cohs) s (Hs ↕ (Hr ↕ Hq))
+      (mkRestrLayer restrPainting2 cohFrame2 s (Hs ↕ ↑ (Hr ↕ ↑ Hq)) d l)) =
+  mkRestrLayer depsCohs.(_restrPaintings).2 depsCohs.(_cohs).2 s (Hs ↕ (Hr ↕ Hq))
     (mkRestrFrame r.+2 (⇑ (⇑ Hr ↕ ⇑ Hq))
       (mkRestrFrame q.+3 (⇑ (⇑ (⇑ Hq))) d))
-    (mkRestrLayer restrPaintings1 cohFrames1 r.+1 (⇑ Hr ↕ ⇑ Hq)
+    (mkRestrLayer restrPainting1 cohFrame1 r.+1 (⇑ Hr ↕ ⇑ Hq)
       (mkRestrFrame q.+3 (⇑ (⇑ (⇑ Hq))) d)
-      (mkRestrLayer restrPaintings2 cohFrames2 q.+2 (⇑ (⇑ Hq)) d l)).
+      (mkRestrLayer restrPainting2 cohFrame2 q.+2 (⇑ (⇑ Hq)) d l)).
 
 Definition mkCoh2LayerType {p k}
   (depsCohs2: DepsCohs2 p.+1 k)
   (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2)
-  (coh2Frames: mkCoh2FrameTypes (mkCohPaintings (depsCohs2;extraDepsCohs2)))
+  (prevCoh2Frames: mkCoh2FrameTypes (mkCohPaintings (depsCohs2;extraDepsCohs2)))
   q (Hq: q <= k) r (Hr: r <= q) s (Hs: s <= r)
   (d: mkFrame (mkDepsRestr (depsCohs := toDepsCohs (mkCohFrames
-    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 coh2Frames.1).1)).(1))
+    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 prevCoh2Frames.1).1)).(1))
   (l: mkLayer (mkDepsRestr (depsCohs := toDepsCohs (mkCohFrames (mkCohPaintings
-    (depsCohs2; extraDepsCohs2)).1 coh2Frames.1).1)).(_restrFrames) d): Type :=
+    (depsCohs2; extraDepsCohs2)).1 prevCoh2Frames.1).1)).(_restrFrames).2 d): Type :=
   let depsCohs := depsCohs2.(_depsCohs) in
   let depsCohs' := toDepsCohs (mkCohFrames
-    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 coh2Frames.1) in
-  rew [mkCoh2LayerEndpointType depsCohs2 extraDepsCohs2 coh2Frames q Hq r Hr s Hs d l]
-    coh2Frames.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) s.+1 (⇑ Hs) d in
-  (sigT_map_eq (Q := fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames) x))
-    (mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings)
-      depsCohs2.(_depsCohs).(_cohs) q Hq)
-    (mkCohLayer (mkCohPaintings extraDepsCohs2).1
-      coh2Frames.2 r (Hr ↕ ↑ Hq) s Hs d l)
-  ⊙ (mkCohLayer depsCohs2.(_cohPaintings)
+    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 prevCoh2Frames.1) in
+  rew [mkCoh2LayerEndpointType depsCohs2 extraDepsCohs2 prevCoh2Frames q Hq r Hr s Hs d l]
+    prevCoh2Frames.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) s.+1 (⇑ Hs) d in
+  (sigT_map_eq (Q := fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames).2 x))
+    (mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings).2
+      depsCohs2.(_depsCohs).(_cohs).2 q Hq)
+    (mkCohLayer (mkCohPaintings extraDepsCohs2).1.2
+      prevCoh2Frames.2 r (Hr ↕ ↑ Hq) s Hs d l)
+  ⊙ (mkCohLayer depsCohs2.(_cohPaintings).2
     depsCohs2.(_coh2Frames).2 q Hq s (Hs ↕ Hr)
       (mkRestrFrame (depsCohs := depsCohs') r.+1 (⇑ (Hr ↕ ↑ Hq)) (d; l)).1
       (mkRestrFrame (depsCohs := depsCohs') r.+1 (⇑ (Hr ↕ ↑ Hq)) (d; l)).2
-  ⊙[fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames) x)]
-    sigT_map_eq (Q := fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames) x))
-      (mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings)
-        depsCohs2.(_depsCohs).(_cohs) s (Hs ↕ (Hr ↕ Hq)))
-      (mkCohLayer (mkCohPaintings extraDepsCohs2).1 coh2Frames.2
+  ⊙[fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames).2 x)]
+    sigT_map_eq (Q := fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames).2 x))
+      (mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings).2
+        depsCohs2.(_depsCohs).(_cohs).2 s (Hs ↕ (Hr ↕ Hq)))
+      (mkCohLayer (mkCohPaintings extraDepsCohs2).1.2 prevCoh2Frames.2
         q.+1 (⇑ Hq) r.+1 (⇑ Hr) d l))) =
-  mkCohLayer depsCohs2.(_cohPaintings)
+  mkCohLayer depsCohs2.(_cohPaintings).2
     depsCohs2.(_coh2Frames).2 q Hq r Hr
     (mkRestrFrame (depsCohs := depsCohs') s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) (d; l)).1
     (mkRestrFrame (depsCohs := depsCohs') s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) (d; l)).2
-  ⊙[fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames) x)]
-    (sigT_map_eq (Q := fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames) x))
-      (mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings)
-        depsCohs2.(_depsCohs).(_cohs) r (Hr ↕ Hq))
-      (mkCohLayer (mkCohPaintings extraDepsCohs2).1
-        coh2Frames.2 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) d l)
-  ⊙ mkCohLayer depsCohs2.(_cohPaintings)
+  ⊙[fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames).2 x)]
+    (sigT_map_eq (Q := fun x => GDom (mkLayer depsCohs.(_deps).(_restrFrames).2 x))
+      (mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings).2
+        depsCohs2.(_depsCohs).(_cohs).2 r (Hr ↕ Hq))  
+      (mkCohLayer (mkCohPaintings extraDepsCohs2).1.2 
+        prevCoh2Frames.2 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) d l)
+  ⊙ mkCohLayer depsCohs2.(_cohPaintings).2
       depsCohs2.(_coh2Frames).2 r (Hr ↕ Hq) s Hs
       (mkRestrFrame (depsCohs := depsCohs') q.+2 (⇑ (⇑ Hq)) (d; l)).1
       (mkRestrFrame (depsCohs := depsCohs') q.+2 (⇑ (⇑ Hq)) (d; l)).2).
@@ -867,14 +868,15 @@ Definition mkCoh2LayerType {p k}
 Definition mkCoh2Layer {p k}
   (depsCohs2: DepsCohs2 p.+1 k)
   (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2)
-  (coh2Paintings: mkCoh2PaintingTypes extraDepsCohs2)
-  (coh2Frames: mkCoh2FrameTypes (mkCohPaintings (depsCohs2;extraDepsCohs2)))
+  (prevCoh2Frames: mkCoh2FrameTypes (mkCohPaintings (depsCohs2;extraDepsCohs2)))
+  (coh2Painting: mkCoh2PaintingType depsCohs2 extraDepsCohs2)
+  (* coh3Frame: mkCoh3FrameType ... - not needed as for HGpd is given by GUIP *)
   q (Hq: q <= k) r (Hr: r <= q) s (Hs: s <= r)
   (d: mkFrame (mkDepsRestr (depsCohs := toDepsCohs (mkCohFrames
-    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 coh2Frames.1).1)).(1))
+    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 prevCoh2Frames.1).1)).(1))
   (l: mkLayer (mkDepsRestr (depsCohs := toDepsCohs (mkCohFrames
-    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 coh2Frames.1).1)).(_restrFrames) d):
-  mkCoh2LayerType depsCohs2 extraDepsCohs2 coh2Frames q Hq r Hr s Hs d l.
+    (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 prevCoh2Frames.1).1)).(_restrFrames).2 d):
+  mkCoh2LayerType depsCohs2 extraDepsCohs2 prevCoh2Frames q Hq r Hr s Hs d l.
 Proof.
   unfold mkCoh2LayerType.
   admit.
@@ -899,8 +901,8 @@ Proof.
       rewrite 4 eq_trans_eq_existT_curried.
       unshelve eapply eq_existT_curried_eq.
       * now exact (h.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) s.+1 (⇑ Hs) d).
-      * now exact (mkCoh2Layer depsCohs2 extraDepsCohs2
-          coh2Paintings h q Hq r Hr s Hs d l).
+      * now exact (mkCoh2Layer depsCohs2 extraDepsCohs2 h
+          coh2Paintings.2 q Hq r Hr s Hs d l).
 Defined.
 
 Class DepsCohs3 p k := {
@@ -934,8 +936,7 @@ Instance mkDepsCohs2 `(depsCohs3: DepsCohs3 p k): DepsCohs2 p.+1 k :=
   _depsCohs := mkDepsCohs depsCohs3.(_depsCohs2);
   _extraDepsCohs := mkExtraCohs depsCohs3.(_extraDepsCohs2);
   _cohPaintings := mkCohPaintings depsCohs3.(_extraDepsCohs2);
-  _coh2Frames := mkCoh2Frames depsCohs3.(_extraDepsCohs2)
-    depsCohs3.(_coh2Paintings);
+  _coh2Frames := mkCoh2Frames depsCohs3.(_extraDepsCohs2) depsCohs3.(_coh2Paintings);
 |}.
 
 Inductive DepsCohs3Extension p: forall k (depsCohs3: DepsCohs3 p k), Type :=
@@ -965,44 +966,6 @@ Proof.
     now exact (mkExtraCohs2 p.+1 k depsCohs3 extraDepsCohs3).
 Defined.
 
-Definition sigT_map_eq_mkRestrPainting
-  `{depsCohs2: DepsCohs2 p.+1 k}
-  q (Hq: q.+1 <= k.+1) :=
-  @sigT_map_eq_existT_curried_dep_curried
-    _ _ _ _
-    (fun d => mkLayer depsCohs2.(_depsCohs).(_deps).(_restrFrames) d)
-    (fun d l =>
-      (mkDepsRestr (depsCohs := depsCohs2.(_depsCohs))).(_paintings).2
-        (d; l))
-    ((mkDepsCohs depsCohs2.(1)).(_deps).(_restrFrames).2 q.+1 Hq)
-    (fun d l =>
-      mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings)
-        depsCohs2.(_depsCohs).(_cohs) q (⇓ Hq) d l)
-    (fun d l c =>
-      mkRestrPainting depsCohs2.(_extraDepsCohs)
-        q (⇓ Hq) (d; l) c).
-
-Definition sigT_trans_eq_mkRestrPainting
-  `{depsCohs2: DepsCohs2 p.+1 k} :=
-  @sigT_trans_eq_existT_curried_dep
-    (((mkRestrFrameTypesAndFrames
-        (mkDepsCohs depsCohs2.(1)).(_deps).(_paintings).1)
-      .(FrameDef)
-        (mkDepsCohs depsCohs2.(1)).(_deps).(_restrFrames).1).2)
-    (fun d =>
-      mkLayer
-        ((mkCohFrameTypesAndRestrFrames
-            depsCohs2.(_depsCohs).(_restrPaintings).1)
-          .(RestrFramesDef) depsCohs2.(_depsCohs).(_cohs).1)
-        d)
-    (fun z =>
-      (mkPaintings
-        (mkDepsRestr; mkExtraDeps depsCohs2.(_extraDepsCohs))).2
-        (z.1; z.2)).
-
-Arguments sigT_trans_eq_mkRestrPainting
-  {p k depsCohs2 x y z u v u' v' u'' v''} H Hu Hv H' Hu' Hv'.
-
 Definition mkCoh2Painting `{depsCohs3: DepsCohs3 p k}
   (extraDepsCohs3: DepsCohs3Extension p k depsCohs3):
   mkCoh2PaintingType (mkDepsCohs2 depsCohs3) (mkExtraCohs2 extraDepsCohs3).
@@ -1015,7 +978,8 @@ Proof.
   set (H := (mkDepsCohs2 depsCohs3).(_coh2Frames).2 q Hq r Hr s Hs d).
   destruct s.
   - destruct r.
-    + Local Transparent mkCohPainting.
+    + (*
+      Local Transparent mkCohPainting.
       Local Opaque sigT_map_eq sigT_trans_eq.
       cbn.
       lazymatch goal with
@@ -1060,9 +1024,11 @@ Proof.
       rewrite (rew_eq_dep_l
         (B := fun x : (mkDepsCohs2 depsCohs3).(_depsCohs).(_deps).(_frames).2 =>
                 (mkDepsCohs2 depsCohs3).(_depsCohs).(_deps).(_paintings).2 x)).
+      Local Transparent mkCohLayer.
+      unfold mkCohLayer. *)
       admit.
     + admit.
-  - destruct r; [now contradiction |].
+  - (* destruct r; [now contradiction |].
     destruct q; [now contradiction |].
     destruct extraDepsCohs3; [now contradiction |].
     destruct depsCohs3 as [depsCohs2 extraDepsCohs2 coh2Paintings].
@@ -1075,7 +1041,7 @@ Proof.
     rewrite 3 sigT_map_eq_mkRestrPainting.
     unfold mkCohPaintings; cbn [projT2].
     unfold mkCohPainting; cbn [nat_ind].
-    unfold proj1DepsCohs3; cbn [_extraDepsCohs2].
+    unfold proj1DepsCohs3; cbn [_extraDepsCohs2]. *)
     admit.
 Admitted.
 
