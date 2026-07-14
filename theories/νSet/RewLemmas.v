@@ -54,3 +54,15 @@ Lemma rew_eq_dep_l {A: Type} {B: A -> Type} {a b: A} {C1: B a} {C2: B b}
 Proof.
   now destruct e, q.
 Defined.
+
+(** Naturality of a family of paths: a pointwise equality [h] between two
+    functions commutes with the transport of any path [p] along either
+    function.  This is the source of every [δ-δ-sq]-shaped coherence: a swap
+    at one depth is a family over the frame, so it commutes with any
+    disjoint (deeper) swap for free. *)
+Lemma f_equal_naturality {A B: Type} {f g: A -> B} (h: forall a, f a = g a)
+  {x y: A} (p: x = y):
+  h x • f_equal g p = f_equal f p • h y.
+Proof.
+  destruct p. now rewrite eq_trans_refl_l.
+Defined.

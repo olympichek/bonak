@@ -691,6 +691,43 @@ Definition mkCoh2SqFrameType {p k}
       (mkRestrFrame (depsCohs := depsCohs2'.(_depsCohs).(1).(1)) t (Ht ↕ (Hs ↕ ↑ (Hr ↕ ↑ Hq)))
         (mkRestrFrame s.+1 (⇑ (Hs ↕ ↑ (Hr ↕ ↑ Hq))) d)).
 
+Definition mkCoh2SqFrame {p k}
+  (depsCohs2: DepsCohs2 p.+1 k)
+  (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2)
+  (coh2Frames: mkCoh2FrameTypes (mkCohPaintings extraDepsCohs2)):
+  mkCoh2SqFrameType depsCohs2 extraDepsCohs2 coh2Frames.
+Proof.
+  intros q Hq r Hr s Hs t Ht d.
+  apply (f_equal_naturality (depsCohs2.(_depsCohs).(_cohs).2 q Hq r Hr)).
+Defined.
+
+Fixpoint mkCoh2SqFrameTypes {p}:
+  forall `{extraDepsCohs2: DepsCohs2Extension p k depsCohs2}
+  (coh2Frames: mkCoh2FrameTypes (mkCohPaintings extraDepsCohs2)), Type :=
+  match p with
+  | 0 => fun _ _ _ _ => unit
+  | S p =>
+    fun k depsCohs2 extraDepsCohs2 coh2Frames =>
+    { R: @mkCoh2SqFrameTypes p k.+1 depsCohs2.(1)%depscohs2
+        (depsCohs2; extraDepsCohs2)%extradepscohs2 coh2Frames.1 &T
+      mkCoh2SqFrameType depsCohs2 extraDepsCohs2 coh2Frames }
+  end.
+
+
+Fixpoint mkCoh2SqFrames {p}:
+  forall `{extraDepsCohs2: DepsCohs2Extension p k depsCohs2}
+  (coh2Frames: mkCoh2FrameTypes (mkCohPaintings extraDepsCohs2)),
+  mkCoh2SqFrameTypes coh2Frames :=
+  match p with
+  | 0 => fun _ _ _ _ => tt
+  | S p =>
+    fun k depsCohs2 extraDepsCohs2 coh2Frames =>
+    (@mkCoh2SqFrames p k.+1 depsCohs2.(1)%depscohs2
+       (depsCohs2; extraDepsCohs2)%extradepscohs2 coh2Frames.1;
+     mkCoh2SqFrame depsCohs2 extraDepsCohs2 coh2Frames)
+  end.
+
+
 Definition mkCoh2PaintingSourcePainting {p k}
   (depsCohs2: DepsCohs2 p.+1 k)
   (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2)
