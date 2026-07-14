@@ -655,6 +655,72 @@ Definition mkCohPaintings `{depsCohs2: DepsCohs2 p k}
   mkCohPaintingTypes (mkExtraCohs extraDepsCohs2) :=
   (mkCohPaintingsPrefix extraDepsCohs2; mkCohPainting extraDepsCohs2).
 
+(** * Abstract coherence shapes
+
+    The two 2-coherence shapes at fully abstract arguments.  The square
+    is always provable; a generic proof of the hexagon is equivalent to
+    UIP ([hexagon_iff_UIP]) — which is why hexagons are data
+    ([_coh2Frames]) and squares are not. *)
+Module AbstractShapes.
+
+(** The abstract *square*: two maps [σ1], [σ2], a homotopy [h] between
+    them, and a path [p] whiskering into the other two sides.  Always
+    provable ([square]): the two [h]-paths are one homotopy at the
+    endpoints of [p], so path induction applies ([f_equal_naturality]). *)
+Definition SquareType: Prop :=
+  forall (C D: Type) (σ1 σ2: C -> D) (h: forall c, σ1 c = σ2 c)
+    (c1 c2: C) (p: c1 = c2),
+  h c1 • f_equal σ2 p = f_equal σ1 p • h c2.
+
+Definition square: SquareType :=
+  fun C D σ1 σ2 h c1 c2 p => f_equal_naturality h p.
+
+(** The abstract *hexagon*: three maps [σ1], [σ2], [σ3], three whiskered
+    inner paths [g1], [g2], [g3] and three outer paths [h1], [h2], [h3],
+    chained as in [mkCoh2FrameType].  Its six paths are independent, so
+    path induction does not apply: [hexagon_iff_UIP] below shows that a
+    generic proof is exactly UIP. *)
+Definition HexagonType: Prop :=
+  forall (C D: Type) (σ1 σ2 σ3: C -> D) (c1 c2 c3 c4 c5 c6: C)
+    (g1: c1 = c2) (g2: c3 = c4) (g3: c5 = c6)
+    (h1: σ1 c2 = σ3 c3) (h2: σ1 c1 = σ2 c5) (h3: σ2 c6 = σ3 c4),
+  f_equal σ1 g1 • (h1 • f_equal σ3 g2) = h2 • (f_equal σ2 g3 • h3).
+
+Definition UIP: Prop :=
+  forall (X: Type) (x y: X) (e e': x = y), e = e'.
+
+Definition hexagon_of_UIP (uip: UIP): HexagonType :=
+  fun C D σ1 σ2 σ3 c1 c2 c3 c4 c5 c6 g1 g2 g3 h1 h2 h3 =>
+  uip _ _ _ _ _.
+
+(** Conversely, a generic hexagon proof forces every loop to be
+    trivial: take all six paths [eq_refl] except one, which becomes an
+    arbitrary loop. *)
+Lemma UIP_of_hexagon (hex: HexagonType): UIP.
+Proof.
+  assert (loop_trivial: forall (X: Type) (x: X) (l: x = x), l = eq_refl).
+  { intros X x l.
+    pose proof (hex unit X (fun _ => x) (fun _ => x) (fun _ => x)
+      tt tt tt tt tt tt
+      eq_refl eq_refl eq_refl
+      l eq_refl eq_refl) as E.
+    cbn in E.
+    now rewrite eq_trans_refl_l in E. }
+  intros X x y e e'.
+  destruct e'.
+  now apply loop_trivial.
+Qed.
+
+Corollary hexagon_iff_UIP: HexagonType <-> UIP.
+Proof.
+  split.
+  - now exact UIP_of_hexagon.
+  - now exact hexagon_of_UIP.
+Qed.
+
+End AbstractShapes.
+Import AbstractShapes.
+
 Definition mkCoh2SqFrameEndpointType {p k}
   (depsCohs2: DepsCohs2 p.+1 k)
   (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2)
@@ -691,6 +757,7 @@ Definition mkCoh2SqFrameType {p k}
       (mkRestrFrame (depsCohs := depsCohs2'.(_depsCohs).(1).(1)) t (Ht ↕ (Hs ↕ ↑ (Hr ↕ ↑ Hq)))
         (mkRestrFrame s.+1 (⇑ (Hs ↕ ↑ (Hr ↕ ↑ Hq))) d)).
 
+(** The square 2-coherence closes generically: one [square] instance. *)
 Definition mkCoh2SqFrame {p k}
   (depsCohs2: DepsCohs2 p.+1 k)
   (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2)
@@ -698,7 +765,7 @@ Definition mkCoh2SqFrame {p k}
   mkCoh2SqFrameType depsCohs2 extraDepsCohs2 coh2Frames.
 Proof.
   intros q Hq r Hr s Hs t Ht d.
-  apply (f_equal_naturality (depsCohs2.(_depsCohs).(_cohs).2 q Hq r Hr)).
+  now apply (square _ _ _ _ (depsCohs2.(_depsCohs).(_cohs).2 q Hq r Hr)).
 Defined.
 
 Fixpoint mkCoh2SqFrameTypes {p}:
@@ -727,6 +794,22 @@ Fixpoint mkCoh2SqFrames {p}:
      mkCoh2SqFrame depsCohs2 extraDepsCohs2 coh2Frames)
   end.
 
+
+(** The hexagon 2-coherence, by contrast, has no generic proof —
+    [hexagon_iff_UIP] shows that one is exactly UIP.  Under an explicit
+    UIP hypothesis it closes as one [hexagon_of_UIP] instance, as at the
+    HSet level; without UIP, [mkCoh2Frames] below builds it by recursion
+    on the frame structure. *)
+Definition mkCoh2FrameFromUIP {p k} (uip: UIP)
+  (depsCohs: DepsCohs p.+1 k)
+  (extraDepsCohs: DepsCohsExtension p.+1 k depsCohs)
+  (cohPaintings: mkCohPaintingTypes (depsCohs; extraDepsCohs))
+  (coh2Frames: mkCoh2FrameTypes cohPaintings):
+  mkCoh2FrameType extraDepsCohs (mkCohFrames cohPaintings coh2Frames).
+Proof.
+  intros q Hq r Hr s Hs d.
+  now apply (hexagon_of_UIP uip).
+Defined.
 
 Definition mkCoh2PaintingSourcePainting {p k}
   (depsCohs2: DepsCohs2 p.+1 k)
