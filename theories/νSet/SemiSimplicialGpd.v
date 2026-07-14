@@ -767,13 +767,17 @@ Definition mkCoh2PaintingEndpointType {p k}
     (restrPainting1 r.+1 (⇑ Hr ↕ ⇑ Hq) _
       (restrPainting2 q.+2 (⇑ (⇑ Hq)) d c)).
 
-Definition mkCoh2PaintingType {p k}
+(** The instance body is a named definition so that goals stay one line:
+    tactics like [destruct] re-typecheck their motive, which is
+    prohibitive over the unfolded body (observed: ~28s for
+    [destruct c] in [mkCoh2Painting] on the raw body, negligible once
+    folded). *)
+Definition mkCoh2PaintingInstanceType {p k}
   (depsCohs2: DepsCohs2 p.+1 k)
-  (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2): Type :=
-  forall
+  (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2)
   q (Hq: q <= k) r (Hr: r <= q) s (Hs: s <= r)
   (d: mkFrame (mkDepsRestr (depsCohs := (mkDepsCohs depsCohs2).(1).(1))).(1))
-  (c: mkCoh2PaintingSourcePainting depsCohs2 extraDepsCohs2 d),
+  (c: mkCoh2PaintingSourcePainting depsCohs2 extraDepsCohs2 d): Type :=
   let depsCohs := depsCohs2.(_depsCohs) in
   let restrPainting2 := mkRestrPainting ((mkDepsCohs depsCohs2).(1);
     (mkDepsCohs depsCohs2; mkExtraCohs extraDepsCohs2)) in
@@ -799,6 +803,15 @@ Definition mkCoh2PaintingType {p k}
   ⊙ depsCohs2.(_cohPaintings).2 r (Hr ↕ Hq) s Hs
       (mkRestrFrame q.+2 (⇑ (⇑ Hq)) d)
       (restrPainting2 q.+2 (⇑ (⇑ Hq)) d c)).
+
+Definition mkCoh2PaintingType {p k}
+  (depsCohs2: DepsCohs2 p.+1 k)
+  (extraDepsCohs2: DepsCohs2Extension p.+1 k depsCohs2): Type :=
+  forall
+  q (Hq: q <= k) r (Hr: r <= q) s (Hs: s <= r)
+  (d: mkFrame (mkDepsRestr (depsCohs := (mkDepsCohs depsCohs2).(1).(1))).(1))
+  (c: mkCoh2PaintingSourcePainting depsCohs2 extraDepsCohs2 d),
+  mkCoh2PaintingInstanceType depsCohs2 extraDepsCohs2 q Hq r Hr s Hs d c.
 
 Fixpoint mkCoh2PaintingTypes {p}:
   forall `{extraDepsCohs2: DepsCohs2Extension p k depsCohs2}, Type :=
@@ -1053,7 +1066,11 @@ Proof.
   set (H := (mkDepsCohs2 depsCohs3).(_coh2Frames).2 q Hq r Hr s Hs d).
   destruct s.
   - destruct r.
-    + Local Transparent mkCohPainting.
+    + unfold mkCoh2PaintingInstanceType; cbv zeta;
+      lazymatch goal with
+      | |- (rew [?P] ?E in _) = _ => change P with Q; change E with H
+      end.
+      Local Transparent mkCohPainting.
       Local Opaque sigT_map_eq sigT_trans_eq.
       cbn.
       lazymatch goal with
@@ -1110,6 +1127,10 @@ Proof.
     destruct extraDepsCohs3; [now contradiction |].
     destruct depsCohs3 as [depsCohs2 extraDepsCohs2 coh2Paintings].
     destruct c as [l c].
+    unfold mkCoh2PaintingInstanceType; cbv zeta;
+      lazymatch goal with
+      | |- (rew [?P] ?E in _) = _ => change P with Q; change E with H
+      end.
     unfold mkDepsCohs2, mkDepsCohs.
     cbn [_cohPaintings _depsCohs _restrPaintings].
     cbn [mkRestrPaintings projT2].
