@@ -900,8 +900,8 @@ Proof.
       rewrite 3 f_equal_eq_existT_curried.
       rewrite 4 eq_trans_eq_existT_curried.
       unshelve eapply eq_existT_curried_eq.
-      * now exact (h.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) s.+1 (⇑ Hs) d).
-      * now exact (mkCoh2Layer depsCohs2 extraDepsCohs2 h
+      * now exact_no_check (h.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) s.+1 (⇑ Hs) d).
+      * now exact_no_check (mkCoh2Layer depsCohs2 extraDepsCohs2 h
           coh2Paintings.2 q Hq r Hr s Hs d l).
 Defined.
 
