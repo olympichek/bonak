@@ -1024,9 +1024,7 @@ Proof.
     Local Transparent mkCohPainting.
     unfold mkCohPainting; cbn [nat_ind].
     rewrite 3 sigT_map_eq_mkRestrPainting.
-    unfold mkCohPaintings; cbn [projT2].
-    unfold mkCohPainting; cbn [nat_ind].
-    unfold proj1DepsCohs3; cbn [_extraDepsCohs2].
+    cbn [mkCohPaintings projT2 mkCohPainting nat_ind proj1DepsCohs3 _extraDepsCohs2].
     admit.
 Admitted.
 
