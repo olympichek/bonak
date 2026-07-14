@@ -1003,6 +1003,44 @@ Proof.
     now exact (mkExtraCohs2 p.+1 k depsCohs3 extraDepsCohs3).
 Defined.
 
+Definition sigT_map_eq_mkRestrPainting
+  `{depsCohs2: DepsCohs2 p.+1 k}
+  q (Hq: q.+1 <= k.+1) :=
+  @sigT_map_eq_existT_curried_dep_curried
+    _ _ _ _
+    (fun d => mkLayer depsCohs2.(_depsCohs).(_deps).(_restrFrames).2 d)
+    (fun d l =>
+      (mkDepsRestr (depsCohs := depsCohs2.(_depsCohs))).(_paintings).2
+        (d; l))
+    ((mkDepsCohs depsCohs2.(1)).(_deps).(_restrFrames).2 q.+1 Hq)
+    (fun d l =>
+      mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings).2
+        depsCohs2.(_depsCohs).(_cohs).2 q (⇓ Hq) d l)
+    (fun d l c =>
+      mkRestrPainting depsCohs2.(_extraDepsCohs)
+        q (⇓ Hq) (d; l) c).
+
+Definition sigT_trans_eq_mkRestrPainting
+  `{depsCohs2: DepsCohs2 p.+1 k} :=
+  @sigT_trans_eq_existT_curried_dep
+    (((mkRestrFrameTypesAndFrames
+        (mkDepsCohs depsCohs2.(1)).(_deps).(_paintings).1)
+      .(FrameDef)
+        (mkDepsCohs depsCohs2.(1)).(_deps).(_restrFrames).1).2)
+    (fun d =>
+      mkLayer
+        ((mkCohFrameTypesAndRestrFrames
+            depsCohs2.(_depsCohs).(_restrPaintings).1)
+          .(RestrFramesDef) depsCohs2.(_depsCohs).(_cohs).1).2
+        d)
+    (fun z =>
+      (mkPaintings
+        (mkDepsRestr; mkExtraDeps depsCohs2.(_extraDepsCohs))).2
+        (z.1; z.2)).
+
+Arguments sigT_trans_eq_mkRestrPainting
+  {p k depsCohs2 x y z u v u' v' u'' v''} H Hu Hv H' Hu' Hv'.
+
 Definition mkCoh2Painting `{depsCohs3: DepsCohs3 p k}
   (extraDepsCohs3: DepsCohs3Extension p k depsCohs3):
   mkCoh2PaintingType (mkDepsCohs2 depsCohs3) (mkExtraCohs2 extraDepsCohs3).
@@ -1015,8 +1053,7 @@ Proof.
   set (H := (mkDepsCohs2 depsCohs3).(_coh2Frames).2 q Hq r Hr s Hs d).
   destruct s.
   - destruct r.
-    + (*
-      Local Transparent mkCohPainting.
+    + Local Transparent mkCohPainting.
       Local Opaque sigT_map_eq sigT_trans_eq.
       cbn.
       lazymatch goal with
@@ -1062,10 +1099,13 @@ Proof.
         (B := fun x : (mkDepsCohs2 depsCohs3).(_depsCohs).(_deps).(_frames).2 =>
                 (mkDepsCohs2 depsCohs3).(_depsCohs).(_deps).(_paintings).2 x)).
       Local Transparent mkCohLayer.
-      unfold mkCohLayer. *)
+      unfold mkCohLayer.
+      unfold eq_ind.
+      unfold mkRestrPaintings, mkRestrPaintingsPrefix.
+      cbn.
       admit.
     + admit.
-  - (* destruct r; [now contradiction |].
+  - destruct r; [now contradiction |].
     destruct q; [now contradiction |].
     destruct extraDepsCohs3; [now contradiction |].
     destruct depsCohs3 as [depsCohs2 extraDepsCohs2 coh2Paintings].
@@ -1076,9 +1116,7 @@ Proof.
     Local Transparent mkCohPainting.
     unfold mkCohPainting; cbn [nat_ind].
     rewrite 3 sigT_map_eq_mkRestrPainting.
-    unfold mkCohPaintings; cbn [projT2].
-    unfold mkCohPainting; cbn [nat_ind].
-    unfold proj1DepsCohs3; cbn [_extraDepsCohs2]. *)
+    cbn [mkCohPaintings projT2 mkCohPainting nat_ind proj1DepsCohs3 _extraDepsCohs2].
     admit.
 Admitted.
 
