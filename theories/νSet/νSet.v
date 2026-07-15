@@ -463,18 +463,14 @@ Proof.
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 q Hq ε x),
     <- map_subst with
         (f := fun x => depsCohs.(_restrPaintings).2 r (Hr ↕ Hq) ω x),
-    -> rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-        (f := fun x => depsCohs.(_deps).(_restrFrames).2 O leR_O 𝛉 x),
-    -> rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-        (f := fun x => depsCohs.(_deps).(_restrFrames).2 r
-          (Hr ↕ Hq) ω x),
-    -> rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-        (f := fun x => depsCohs.(_deps).(_restrFrames).2 q _ ε x),
     <- cohPaintings.2.
-  repeat rewrite rew_compose.
-  apply rew_swap with (P := fun x => depsCohs.(_deps).(_paintings).2 x).
-  rewrite rew_app_rl. now trivial.
-  now apply mkCoh2Frame.
+  apply rew_chain33 with
+    (P := fun x => depsCohs.(_deps).(_paintings).2 x)
+    (f1 := fun x => depsCohs.(_deps).(_restrFrames).2 0 leR_O 𝛉 x)
+    (f2 := fun x => depsCohs.(_deps).(_restrFrames).2 q Hq ε x)
+    (g := fun x => depsCohs.(_deps).(_restrFrames).2 r (Hr ↕ Hq) ω x).
+  now trivial.
+  now exact (mkCoh2Frame extraDepsCohs prevCohFrames q Hq r Hr ε ω d 𝛉).
 Defined.
 
 Fixpoint mkCohFrames `{extraDepsCohs: DepsCohsExtension p k depsCohs}
