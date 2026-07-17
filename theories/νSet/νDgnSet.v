@@ -1116,7 +1116,7 @@ Proof.
   intros θ.
   unfold mkRestrLayer, mkReflLayerBelow.
   rewrite <- map_subst_app, <- !map_subst.
-  simpl ((mkDepsCohs (Cohs2OfReflCohs2 deps)).(1).(_restrPaintings).2 r (Hr ↕ ↑ Hq) ε _ _).
+  simpl.
   rewrite <- (deps.(_cohReflRestrPaintingsBelowInf).2 q r Hq Hr ε _ (l θ)).
   rewrite rew_map with
     (P := fun b => (mkDepsRestr (CohsOfReflCohs2 deps).(1)).(_paintings).2 b)
@@ -1290,7 +1290,7 @@ Proof.
   set (c0 := (CohsOfReflCohsInf (mkDepsReflCohsInf deps).(1)).(_restrPaintings).2
     0 leR_O θ d (l; c)).
 
-  simpl ((CohsOfReflCohsInf (mkDepsReflCohsInf deps)).(_restrPaintings).2 r Hr ε _ _).
+  simpl.
   rewrite <- (deps.(_cohReflRestrPaintingsAboveSup).2 q r Hq Hr ε d0 c0).
 
   eassert (coh_pair_eq: (_;_) = (_;_)).
@@ -1447,7 +1447,7 @@ Proof.
     .(_restrFrames).2 0 leR_O θ d).
   set (deps' := mkDepsRestr (CohsOfReflCohsInf (mkDepsReflCohsInf deps).(1))).
   set (deps'' := mkDepsReflCohsInf deps.(1)).
-  simpl ((mkDepsReflCohsInf deps).(1).(_reflPaintingsBelow).2 r.+1 (⇑ Hr) _ _).
+  simpl.
   rewrite <- (deps.(_cohReflBelowBelowPaintings).2 q r Hq Hr d0 (l θ)).
   rewrite rew_map with
     (P := fun b => deps'.(1).(_paintings).2 b)
@@ -1528,7 +1528,8 @@ Proof.
     (mkDepsReflCohsInf deps).(_reflPaintingsBelow).2 r Hr x.1 x.2)
     coh_above_sup_pair_eq tt).
 
-  simpl ((mkDepsReflCohsInf deps).(_reflPaintingsBelow).2 r Hr _ _).
+  change_no_check ((mkDepsReflCohsInf deps).(_reflPaintingsBelow).2)
+    with (mkReflPaintingBelow deps.(_depsReflCohsSup) deps.(_extraDepsReflCohsSup)).
   rewrite <- (deps.(_cohReflAboveBelowPaintings).2 q r Hq Hr d0 c0).
 
   rewrite rew_map with
@@ -1671,7 +1672,8 @@ Proof.
     (mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 r.+1 (⇑ Hr) x.1 x.2)
     coh_above_sup_q_pair_eq tt).
 
-  simpl ((mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 q (Hq ↕ ↑ Hr) _ _).
+  change_no_check ((mkDepsReflCohsSup deps).(_reflPaintingsAbove).2)
+    with (mkReflPaintingAbove deps.(_depsReflCohsSup) deps.(_extraDepsReflCohsSup)).
   rewrite <- (deps.(_cohReflAboveAbovePaintings).2 q r Hq Hr d0 c0).
 
   set (deps' := mkDepsRestr (CohsOfReflCohsInf (mkDepsReflCohsInf deps))).
