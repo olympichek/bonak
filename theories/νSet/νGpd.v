@@ -482,16 +482,12 @@ Proof.
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 q Hq ε x),
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 r (Hr ↕ Hq) ω x).
   rewrite <- cohPaintings.2.
-  rewrite
-    rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-      (f := fun x => depsCohs.(_deps).(_restrFrames).2 O leR_O θ x),
-    rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-      (f := fun x => depsCohs.(_deps).(_restrFrames).2 r (Hr ↕ Hq) ω x),
-    rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-      (f := fun x => depsCohs.(_deps).(_restrFrames).2 q _ ε x).
-  rewrite 4 rew_compose.
-  apply rew_swap with (P := fun x => depsCohs.(_deps).(_paintings).2 x).
-  rewrite rew_app_rl. now trivial.
+  apply rew_chain33 with
+    (P := fun x => depsCohs.(_deps).(_paintings).2 x)
+    (f1 := fun x => depsCohs.(_deps).(_restrFrames).2 O leR_O θ x)
+    (f2 := fun x => depsCohs.(_deps).(_restrFrames).2 q Hq ε x)
+    (g := fun x => depsCohs.(_deps).(_restrFrames).2 r (Hr ↕ Hq) ω x).
+  now trivial.
   now apply (coh2Frame q Hq r Hr 0 leR_O ε ω θ d).
 Defined.
 

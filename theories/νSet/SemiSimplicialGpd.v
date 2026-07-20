@@ -485,15 +485,13 @@ Proof.
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 q Hq x),
     <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 r (Hr ↕ Hq) x).
   rewrite <- cohPainting.
-  rewrite
-    rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-      (f := fun x => depsCohs.(_deps).(_restrFrames).2 O leR_O x),
-    rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-      (f := fun x => depsCohs.(_deps).(_restrFrames).2 r (Hr ↕ Hq) x),
-    rew_map with (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-      (f := fun x => depsCohs.(_deps).(_restrFrames).2 q _ x).
-  rewrite 4 rew_compose.
-  now rewrite (coh2Frame q Hq r Hr 0 leR_O d).
+  apply rew_chain33 with
+    (P := fun x => depsCohs.(_deps).(_paintings).2 x)
+    (f1 := fun x => depsCohs.(_deps).(_restrFrames).2 O leR_O x)
+    (f2 := fun x => depsCohs.(_deps).(_restrFrames).2 q Hq x)
+    (g := fun x => depsCohs.(_deps).(_restrFrames).2 r (Hr ↕ Hq) x).
+  now trivial.
+  now apply (coh2Frame q Hq r Hr 0 leR_O d).
 Defined.
 
 Class Coh2FrameTypeBlock `{extraDepsCohs: DepsCohsExtension p k depsCohs} := {
