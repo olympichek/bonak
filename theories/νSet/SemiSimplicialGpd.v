@@ -1223,10 +1223,13 @@ Proof.
     unfold mkCoh2PaintingInstanceType; cbv zeta.
     set (Q := mkCoh2PaintingEndpointType _ _ q.+1 Hq r.+1 Hr s.+1 Hs d (l; c)).
     set (H := (mkDepsCohs2 depsCohs3.(1)).(_coh2Frames).2 q.+1 Hq r.+1 Hr s.+1 Hs d).
-    unfold mkDepsCohs2, mkDepsCohs.
-    cbn [_cohPaintings _depsCohs _restrPaintings mkRestrPaintings projT2].
+    cbn [mkDepsCohs2 _cohPaintings].
     Local Transparent mkCohPainting.
+    cbn [mkCohPaintings projT2].
     unfold mkCohPainting; cbn [nat_ind].
+    change (depsCohs3.(1).(_extraDepsCohs2)) with
+      (AddCoh2Dep depsCohs3.(_depsCohs2) depsCohs3.(_extraDepsCohs2)).
+    lazy beta iota.
     rewrite 3 (sigT_map_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
     rewrite 4 (sigT_trans_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
     unshelve eapply (eq_existT_curried_dep_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
