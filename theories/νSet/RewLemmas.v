@@ -39,6 +39,82 @@ Proof.
   now destruct H.
 Defined.
 
+(** Fused transport-chain lemmas.
+
+    Each lemma equates, in one step, two forward chains of transports of the
+    same element — the goal shape of the layer coherence proofs after
+    [map_subst]. The digits name the number of transports on each side of
+    the equation. The premises are an equation between the transported
+    elements ([reflexivity] at the use sites) and an equation between the two
+    composite paths: the higher coherence, which every caller exhibits
+    explicitly — [UIP] in an HSet development. *)
+
+Lemma rew_chain13 {X B1 B2: Type} (P: X -> Type)
+  (f: B1 -> X) (g: B2 -> X)
+  {u1 v1: B1} {u3 v3: B2}
+  (E1: u1 = v1)
+  (F1: g v3 = f v1) (F2: u3 = v3) (F3: f u1 = g u3)
+  (aL aR: P (f u1)):
+  aL = aR ->
+  f_equal f E1 = F3 • (f_equal g F2 • F1) ->
+  rew [fun x => P (f x)] E1 in aL
+  = rew [P] F1 in rew [fun x => P (g x)] F2 in rew [P] F3 in aR.
+Proof.
+  intros base coh2. destruct base, E1, F2. cbn in coh2 |- *.
+  rewrite rew_compose.
+  rewrite eq_trans_refl_l in coh2.
+  now rewrite <- coh2.
+Qed.
+
+Lemma rew_chain31 {X B1 B2: Type} (P: X -> Type)
+  (f1: B1 -> X) (f2: B2 -> X)
+  {u1 v1: B1} {u2 v2: B2}
+  (E1: u1 = v1) (E2: f2 v2 = f1 u1) (E3: u2 = v2)
+  (F1: f2 u2 = f1 v1)
+  (aL aR: P (f2 u2)):
+  aL = aR ->
+  f_equal f2 E3 • (E2 • f_equal f1 E1) = F1 ->
+  rew [fun x => P (f1 x)] E1 in rew [P] E2 in rew [fun x => P (f2 x)] E3 in aL
+  = rew [P] F1 in aR.
+Proof.
+  intros base coh2. destruct base, E1, E3. cbn in coh2 |- *.
+  rewrite eq_trans_refl_l in coh2.
+  now rewrite coh2.
+Qed.
+
+Lemma rew_chain22 {X B1 B2: Type} (P: X -> Type)
+  (f: B1 -> X) (g: B2 -> X)
+  {u v: B1} {w w': B2}
+  (E1: u = v) (E0: g w = f u)
+  (F1: g w' = f v) (F2: w = w')
+  (aL aR: P (g w)):
+  aL = aR ->
+  E0 • f_equal f E1 = f_equal g F2 • F1 ->
+  rew [fun x => P (f x)] E1 in rew [P] E0 in aL
+  = rew [P] F1 in rew [fun x => P (g x)] F2 in aR.
+Proof.
+  intros base coh2. destruct base, E1, F2. cbn in coh2 |- *.
+  rewrite eq_trans_refl_l in coh2.
+  now rewrite coh2.
+Qed.
+
+Lemma rew_chain33 {X B1 B2 B3: Type} (P: X -> Type)
+  (f1: B1 -> X) (f2: B2 -> X) (g: B3 -> X)
+  {u1 v1: B1} {u2 v2: B2} {u3 v3: B3}
+  (E1: u1 = v1) (E2: f2 v2 = f1 u1) (E3: u2 = v2)
+  (F1: g v3 = f1 v1) (F2: u3 = v3) (F3: f2 u2 = g u3)
+  (aL aR: P (f2 u2)):
+  aL = aR ->
+  f_equal f2 E3 • (E2 • f_equal f1 E1) = F3 • (f_equal g F2 • F1) ->
+  rew [fun x => P (f1 x)] E1 in rew [P] E2 in rew [fun x => P (f2 x)] E3 in aL
+  = rew [P] F1 in rew [fun x => P (g x)] F2 in rew [P] F3 in aR.
+Proof.
+  intros base coh2. destruct base, E1, E3, F2. cbn in coh2 |- *.
+  rewrite rew_compose.
+  rewrite !eq_trans_refl_l in coh2.
+  now rewrite coh2.
+Qed.
+
 (** Transport in an equality type whose left-hand side is itself a transport of
     a fixed [C1] along the index, and whose right-hand side is fixed.  This is
     the cancellation used by [mkCoh2Painting]: the outer
