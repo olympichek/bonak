@@ -1120,19 +1120,14 @@ Definition sigT_trans_eq_mkRestrPainting {p k}
   (depsCohs2: DepsCohs2 p.+1 k) :=
   @sigT_trans_eq_existT_curried_dep
     (((mkRestrFrameTypesAndFrames
-        (mkDepsCohs depsCohs2.(1)).(_deps).(_paintings).1)
+        depsCohs2.(_depsCohs).(_deps).(_paintings).1)
       .(FrameDef)
-        (mkDepsCohs depsCohs2.(1)).(_deps).(_restrFrames).1).2)
+        depsCohs2.(_depsCohs).(_deps).(_restrFrames).1).2)
     (fun d =>
-      mkLayer
-        ((mkCohFrameTypesAndRestrFrames
-            depsCohs2.(_depsCohs).(_restrPaintings).1)
-          .(RestrFramesDef) depsCohs2.(_depsCohs).(_cohs).1).2
-        d)
+      mkLayer (painting := depsCohs2.(_depsCohs).(_deps).(_paintings).2)
+        depsCohs2.(_depsCohs).(_deps).(_restrFrames).2 d)
     (fun z =>
-      (mkPaintings
-        (mkDepsRestr; mkExtraDeps depsCohs2.(_extraDepsCohs))).2
-        (z.1; z.2)).
+      mkPainting depsCohs2.(_depsCohs).(_extraDeps) (z.1; z.2)).
 
 Definition mkCoh2Painting `{depsCohs3: DepsCohs3 p k}
   (extraDepsCohs3: DepsCohs3Extension p k depsCohs3):
@@ -1211,13 +1206,12 @@ Proof.
     | |- (rew [?P] ?E in _) = _ => change P with Q; change E with H
     end.
     unfold mkDepsCohs2, mkDepsCohs.
-    cbn [_cohPaintings _depsCohs _restrPaintings].
-    cbn [mkRestrPaintings projT2].
+    cbn [_cohPaintings _depsCohs _restrPaintings mkRestrPaintings projT2].
     Local Transparent mkCohPainting.
     unfold mkCohPainting; cbn [nat_ind].
     rewrite 3 (sigT_map_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
     cbn [mkCohPaintings projT2 mkCohPainting nat_ind proj1DepsCohs3 _extraDepsCohs2].
-    Fail rewrite (sigT_trans_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
+    rewrite 4 (sigT_trans_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
     admit.
 Admitted.
 
