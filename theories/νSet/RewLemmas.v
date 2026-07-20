@@ -64,7 +64,7 @@ Proof.
   rewrite rew_compose.
   rewrite eq_trans_refl_l in coh2.
   now rewrite <- coh2.
-Qed.
+Defined.
 
 Lemma rew_chain31 {X B1 B2: Type} (P: X -> Type)
   (f1: B1 -> X) (f2: B2 -> X)
@@ -80,7 +80,7 @@ Proof.
   intros base coh2. destruct base, E1, E3. cbn in coh2 |- *.
   rewrite eq_trans_refl_l in coh2.
   now rewrite coh2.
-Qed.
+Defined.
 
 Lemma rew_chain22 {X B1 B2: Type} (P: X -> Type)
   (f: B1 -> X) (g: B2 -> X)
@@ -96,7 +96,7 @@ Proof.
   intros base coh2. destruct base, E1, F2. cbn in coh2 |- *.
   rewrite eq_trans_refl_l in coh2.
   now rewrite coh2.
-Qed.
+Defined.
 
 Lemma rew_chain33 {X B1 B2 B3: Type} (P: X -> Type)
   (f1: B1 -> X) (f2: B2 -> X) (g: B3 -> X)
@@ -113,7 +113,7 @@ Proof.
   rewrite rew_compose.
   rewrite !eq_trans_refl_l in coh2.
   now rewrite coh2.
-Qed.
+Defined.
 
 (** Transport in an equality type whose left-hand side is itself a transport of
     a fixed [C1] along the index, and whose right-hand side is fixed.  This is
