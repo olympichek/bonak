@@ -70,7 +70,7 @@ Notation "x .(1)" := (proj1DepsReflBelow x%depsreflbelow)
 Definition mkIdRestrReflFrameBelowType {p k}
   (deps: DepsReflBelow p.+1 k): Type :=
   forall i (Hi: i <= k) ε (d: FramePrev deps.(_depsRestr)),
-  deps.(_depsRestr).(_restrFrames).2 i Hi ε (deps.(_reflFramesBelow).2 i Hi d) = d.
+  d = deps.(_depsRestr).(_restrFrames).2 i Hi ε (deps.(_reflFramesBelow).2 i Hi d).
 
 Fixpoint mkIdRestrReflFrameBelowTypes {p}:
   forall {k} (deps: DepsReflBelow p k), Type :=
@@ -187,9 +187,9 @@ Definition mkIdRestrReflPaintingBelowType {p k}
   forall i (Hi: i <= k) (ε: arity)
     (d: FramePrev deps.(_deps))
     (c: PaintingPrev deps.(_deps) d),
-  rew [PaintingPrev deps.(_deps)] idRestrReflFrames.2 i Hi ε d in
+  rew [PaintingPrev deps.(_deps)] idRestrReflFrames.2 i Hi ε d in c =
   deps.(_restrPaintings).2 i Hi ε
-    (reflFramesBelow.2 i Hi d) (reflPaintingsBelow.2 i Hi d c) = c.
+    (reflFramesBelow.2 i Hi d) (reflPaintingsBelow.2 i Hi d c).
 
 Fixpoint mkIdRestrReflPaintingBelowTypes {p}:
   forall {k} (deps: DepsCohs p k)
@@ -303,21 +303,20 @@ Definition mkIdRestrReflLayerBelow {p k}
   (d: FrameBase (RestrOfReflCohsInf deps))
   (l: mkLayer (RestrOfReflCohsInf deps).(_restrFrames) d)
   (prevIdRestrReflFrames: mkIdRestrReflFrameBelowTypes (mkDepsReflBelow deps.(1))):
-  rew [mkLayer _] prevIdRestrReflFrames.2 i.+1 (⇑ Hi) ε d in
+  rew [mkLayer _] prevIdRestrReflFrames.2 i.+1 (⇑ Hi) ε d in l =
   mkRestrLayer deps.(_depsCohs2).(_depsCohs).(_restrPaintings)
     (deps.(_depsCohs2).(_depsCohs).(_cohs)) i Hi ε _
       (mkReflLayerBelow deps.(_depsCohs2).(_depsCohs)
         ((ReflBelowOfReflCohsInf deps).(_reflFramesBelow)) deps.(_reflPaintingsBelow) _
-          deps.(_cohReflRestrFramesBelowInf) i Hi d l) = l.
+          deps.(_cohReflRestrFramesBelowInf) i Hi d l).
 Proof.
   apply HSetVec.vec_ext.
   intros θ.
   rewrite <- (map_subst (fun d0 l => HSetVec.vec_nth l θ) (P := mkLayer _)).
   unfold mkRestrLayer, mkReflLayerBelow.
   rewrite !HSetVec.vec_nth_map.
-  eapply eq_trans.
-  2: exact (deps.(_idRestrReflPaintingsBelow).2 i Hi ε _ (HSetVec.vec_nth l θ)).
   rewrite <- map_subst.
+  rewrite <- (deps.(_idRestrReflPaintingsBelow).2 i Hi ε _ (HSetVec.vec_nth l θ)).
   set (deps' := deps.(_depsCohs2).(_depsCohs).(_deps)).
   rewrite rew_map with
     (P := fun x => deps'.(_paintings).2 x)
@@ -404,7 +403,7 @@ Definition mkReflLayerAbove0 {p k} (deps: DepsReflCohsInf p k)
     (paintings := (mkDepsRestr (CohsOfReflCohsInf deps)).(_paintings))
     (mkDepsRestr (CohsOfReflCohsInf deps)).(_restrFrames)
     (mkReflFrameBelow deps 0 leR_O d) :=
-  HSetVec.vec_of_fun (fun ε => rew <- mkIdRestrReflFrameBelow deps 0 leR_O ε d in c).
+  HSetVec.vec_of_fun (fun ε => rew mkIdRestrReflFrameBelow deps 0 leR_O ε d in c).
 
 Definition mkReflFrameAbove0 {p k} (deps: DepsReflCohsInf p k)
   (d: FramePrev (mkDepsRestr (CohsOfReflCohsInf deps)))
@@ -817,7 +816,7 @@ Proof.
   destruct i.
   - unfold mkReflPaintingBelow, mkReflPaintingBelow1, mkReflLayerAbove0.
     cbn. rewrite HSetVec.vec_nth_of_fun.
-    now rewrite rew_compose, eq_trans_sym_inv_l.
+    now trivial.
   - destruct extraDeps; [now contradiction |].
     unshelve eapply (eq_existT_curried_dep (Q := mkPainting (RestrExtOfReflCohsSup deps))).
     + now apply (mkIdRestrReflLayerBelow deps.(_depsReflCohsInf) i Hi ε).
@@ -883,12 +882,12 @@ Definition mkCohReflAboveAboveFrameType {p k}
   forall q r (Hq: q <= r) (Hr: r <= p)
     (d: FramePrev (RestrOfReflCohsSup deps))
     (c: PaintingPrev (RestrOfReflCohsSup deps) d),
-  mkReflFrameAbove deps q (Hq ↕ (↑ Hr))
-    (deps.(_depsReflCohsInf).(_reflFramesAbove).2 r Hr d c)
-    (deps.(_reflPaintingsAbove).2 r Hr d c) =
   mkReflFrameAbove deps r.+1 (⇑ Hr)
     (deps.(_depsReflCohsInf).(_reflFramesAbove).2 q (Hq ↕ Hr) d c)
-    (deps.(_reflPaintingsAbove).2 q (Hq ↕ Hr) d c).
+    (deps.(_reflPaintingsAbove).2 q (Hq ↕ Hr) d c) =
+  mkReflFrameAbove deps q (Hq ↕ (↑ Hr))
+    (deps.(_depsReflCohsInf).(_reflFramesAbove).2 r Hr d c)
+    (deps.(_reflPaintingsAbove).2 r Hr d c).
 
 Fixpoint mkCohReflAboveAboveFrameTypes {p}:
   forall {k} (deps: DepsReflCohsSup p k), Type :=
@@ -971,12 +970,12 @@ Definition mkCohReflAboveAbovePaintingType {p k}
     (d: FramePrev (RestrOfReflCohsSup deps))
     (c: PaintingPrev (RestrOfReflCohsSup deps) d),
   rew [mkPainting _] cohReflAboveAboveFrames.2 q r Hq Hr d c in
-  mkReflPaintingAbove deps extraDeps q (Hq ↕ ↑ Hr)
-    (deps.(_depsReflCohsInf).(_reflFramesAbove).2 r Hr d c)
-    (deps.(_reflPaintingsAbove).2 r Hr d c) =
   mkReflPaintingAbove deps extraDeps r.+1 (⇑ Hr)
     (deps.(_depsReflCohsInf).(_reflFramesAbove).2 q (Hq ↕ Hr) d c)
-    (deps.(_reflPaintingsAbove).2 q (Hq ↕ Hr) d c).
+    (deps.(_reflPaintingsAbove).2 q (Hq ↕ Hr) d c) =
+  mkReflPaintingAbove deps extraDeps q (Hq ↕ ↑ Hr)
+    (deps.(_depsReflCohsInf).(_reflFramesAbove).2 r Hr d c)
+    (deps.(_reflPaintingsAbove).2 r Hr d c).
 
 Fixpoint mkCohReflAboveAbovePaintingTypes {p}:
   forall {k}
@@ -1529,10 +1528,6 @@ Proof.
 
   set (d0 := (RestrOfReflCohs2 deps).(_restrFrames).2 0 leR_O θ d).
   set (c0 := (CohsOfReflCohs2 deps).(_restrPaintings).2 0 leR_O θ d (l; c)).
-  set (x0 := (
-    (ReflCohsInfOfReflCohs2 deps).(_reflFramesBelow').2 r Hr d0;
-    (ReflCohsInfOfReflCohs2 deps).(_reflPaintingsBelow).2 r Hr d0 c0)).
-
   eassert (coh_below_inf_pair_eq: (_;_) = (_;_)).
   { unshelve eapply eq_existT_curried.
     - now exact ((ReflCohsInfOfReflCohs2 deps).(_cohReflRestrFramesBelowInf).2 r 0 Hr leR_O θ d).
@@ -1541,10 +1536,6 @@ Proof.
     (mkDepsReflCohsSup deps).(1).(_reflPaintingsAbove).2 q Hq x.1 x.2)
     coh_below_inf_pair_eq tt).
 
-  rewrite (proj2 (@rew_swap _ _ _ _ (deps.(_cohReflAboveBelowFrames).2 q r Hq Hr d0 c0)
-    ((mkDepsReflCohsSup deps).(1).(_reflPaintingsAbove).2 q Hq x0.1 x0.2) _)
-    (deps.(_cohReflAboveBelowPaintings).2 q r Hq Hr d0 c0)).
-
   eassert (coh_above_sup_pair_eq: (_;_) = (_;_)).
   { unshelve eapply eq_existT_curried.
     - now exact (deps.(_depsReflCohsSup).(_cohReflRestrFramesAboveSup).2 q 0 Hq leR_O θ d (l; c)).
@@ -1552,6 +1543,10 @@ Proof.
   rewrite <- (map_subst (P := fun _ => unit) (fun x _ =>
     (mkDepsReflCohsInf deps).(_reflPaintingsBelow).2 r Hr x.1 x.2)
     coh_above_sup_pair_eq tt).
+
+  change_no_check ((mkDepsReflCohsInf deps).(_reflPaintingsBelow).2)
+    with (mkReflPaintingBelow deps.(_depsReflCohsSup) deps.(_extraDepsReflCohsSup)).
+  rewrite <- (deps.(_cohReflAboveBelowPaintings).2 q r Hq Hr d0 c0).
 
   rewrite rew_map with
     (P := fun b => mkPainting
@@ -1663,16 +1658,16 @@ Definition mkCohReflAboveAboveLayer {p k}
   rew [mkLayer _] prevCohReflAboveAboveFrames.2 q r Hq Hr d (l; c) in
   mkReflLayerAbove (mkDepsReflCohsInf deps)
     (mkDepsReflCohsSup deps).(_reflPaintingsAbove) _
-    (mkDepsReflCohsSup deps).(_cohReflRestrFramesAboveSup) q (Hq ↕ ↑ Hr)
-    ((mkDepsReflCohsInf deps).(_reflFramesAbove).2 r.+1 (⇑ Hr) (d; l) c).1
-    (((mkDepsReflCohsInf deps).(_reflFramesAbove).2 r.+1 (⇑ Hr) (d; l) c).2;
-     (mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 r.+1 (⇑ Hr) (d; l) c) =
-  mkReflLayerAbove (mkDepsReflCohsInf deps)
-    (mkDepsReflCohsSup deps).(_reflPaintingsAbove) _
     (mkDepsReflCohsSup deps).(_cohReflRestrFramesAboveSup) r.+1 (⇑ Hr)
     ((mkDepsReflCohsInf deps).(_reflFramesAbove).2 q.+1 (⇑ (Hq ↕ Hr)) (d; l) c).1
     (((mkDepsReflCohsInf deps).(_reflFramesAbove).2 q.+1 (⇑ (Hq ↕ Hr)) (d; l) c).2;
-     (mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 q.+1 (⇑ (Hq ↕ Hr)) (d; l) c).
+     (mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 q.+1 (⇑ (Hq ↕ Hr)) (d; l) c) =
+  mkReflLayerAbove (mkDepsReflCohsInf deps)
+    (mkDepsReflCohsSup deps).(_reflPaintingsAbove) _
+    (mkDepsReflCohsSup deps).(_cohReflRestrFramesAboveSup) q (Hq ↕ ↑ Hr)
+    ((mkDepsReflCohsInf deps).(_reflFramesAbove).2 r.+1 (⇑ Hr) (d; l) c).1
+    (((mkDepsReflCohsInf deps).(_reflFramesAbove).2 r.+1 (⇑ Hr) (d; l) c).2;
+     (mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 r.+1 (⇑ Hr) (d; l) c).
 Proof.
   apply HSetVec.vec_ext; intro θ.
   rewrite <- (map_subst (fun d0 l => HSetVec.vec_nth l θ) (P := mkLayer _)).
@@ -1698,9 +1693,9 @@ Proof.
     (mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 r.+1 (⇑ Hr) x.1 x.2)
     coh_above_sup_q_pair_eq tt).
 
-  rewrite (proj2 (@rew_swap _ _ _ _ (deps.(_cohReflAboveAboveFrames).2 q r Hq Hr d0 c0)
-    ((mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 q (Hq ↕ ↑ Hr) _ _) _)
-    (deps.(_cohReflAboveAbovePaintings).2 q r Hq Hr d0 c0)).
+  change_no_check ((mkDepsReflCohsSup deps).(_reflPaintingsAbove).2)
+    with (mkReflPaintingAbove deps.(_depsReflCohsSup) deps.(_extraDepsReflCohsSup)).
+  rewrite <- (deps.(_cohReflAboveAbovePaintings).2 q r Hq Hr d0 c0).
 
   set (deps' := mkDepsRestr (CohsOfReflCohsInf (mkDepsReflCohsInf deps))).
   set (deps'' := RestrExtOfReflCohsInf (mkDepsReflCohsInf deps)).
@@ -1723,18 +1718,18 @@ Definition mkCohReflAboveAboveLayer0 {p k}
   (deps: DepsReflCohs2 p k) r (Hr: r <= p)
   (d: FramePrev (RestrOfReflCohsSup (mkDepsReflCohsSup deps)))
   (c: PaintingPrev (RestrOfReflCohsSup (mkDepsReflCohsSup deps)) d):
-  rew <- [mkLayer _] ((mkCohReflAboveBelowFrames deps).2 r 0 Hr leR_O d c) in
-  mkReflLayerAbove0
-    (mkDepsReflCohsInf deps)
-    ((mkDepsReflCohsInf deps).(_reflFramesAbove).2 r Hr d c)
-    ((mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 r Hr d c) =
+  rew [mkLayer _] ((mkCohReflAboveBelowFrames deps).2 r 0 Hr leR_O d c) in
   mkReflLayerAbove
     (mkDepsReflCohsSup deps).(_depsReflCohsInf)
     (mkDepsReflCohsSup deps).(_reflPaintingsAbove) _
     (mkDepsReflCohsSup deps).(_cohReflRestrFramesAboveSup) r Hr
     ((mkDepsReflCohsInf deps).(_reflFramesAbove).2 0 leR_O d c).1
     (((mkDepsReflCohsInf deps).(_reflFramesAbove).2 0 leR_O d c).2;
-     (mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 0 leR_O d c).
+     (mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 0 leR_O d c) =
+  mkReflLayerAbove0
+    (mkDepsReflCohsInf deps)
+    ((mkDepsReflCohsInf deps).(_reflFramesAbove).2 r Hr d c)
+    ((mkDepsReflCohsSup deps).(_reflPaintingsAbove).2 r Hr d c).
 Proof.
   set (deps' := mkDepsRestr (CohsOfReflCohsSup (mkDepsReflCohsSup deps))).
   apply HSetVec.vec_ext; intro θ.
@@ -1769,8 +1764,7 @@ Proof.
   intros q r Hq Hr d c.
   destruct q.
   - unshelve eapply eq_existT_curried.
-    + symmetry.
-      now exact ((mkCohReflAboveBelowFrames deps).2 r 0 Hr leR_O d c).
+    + now exact ((mkCohReflAboveBelowFrames deps).2 r 0 Hr leR_O d c).
     + now exact (mkCohReflAboveAboveLayer0 deps r Hr d c).
   - destruct r; [now contradiction |].
     destruct p; [now contradiction |].
@@ -2002,8 +1996,7 @@ Fixpoint mkCohReflAboveBelowPainting {p k} (deps: DepsReflCohs2 p k)
 Proof.
   intros q r Hq Hr d c.
   destruct r.
-  - apply rew_swap with (P := mkPainting _), eq_sym.
-    unshelve eapply (eq_existT_curried_dep (Q := mkPainting
+  - unshelve eapply (eq_existT_curried_dep (Q := mkPainting
       (mkExtraDeps (CohsExtOfReflCohsSup (mkDepsReflCohsSup deps))))).
     + now exact (mkCohReflAboveAboveLayer0 deps q Hq d c).
     + now exact (mkCohReflAboveAbovePainting deps extraDeps 0 q leR_O Hq d c).
