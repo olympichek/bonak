@@ -1028,12 +1028,10 @@ Proof.
     unshelve esplit.
     + now exact h.
     + intros q Hq r Hr s Hs [d l].
-      rewrite 3 f_equal_eq_existT_curried.
-      rewrite 4 eq_trans_eq_existT_curried.
-      unshelve eapply eq_existT_curried_eq.
-      * now exact_no_check (h.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) s.+1 (⇑ Hs) d).
+      unshelve eapply eq_existT_curried_hex.
+      * now exact (h.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) s.+1 (⇑ Hs) d).
       * now exact_no_check (mkCoh2Layer depsCohs2 extraDepsCohs2 h
-          coh2Paintings.2 q Hq r Hr s Hs d l).
+        coh2Paintings.2 q Hq r Hr s Hs d l).
 Defined.
 
 Class DepsCohs3 p k := {
@@ -1097,54 +1095,10 @@ Proof.
     now exact (mkExtraCohs2 p.+1 k depsCohs3 extraDepsCohs3).
 Defined.
 
-Definition sigT_map_eq_mkRestrPainting {p k}
-  (depsCohs2: DepsCohs2 p.+1 k)
-  q (Hq: q.+1 <= k.+1) :=
-  @sigT_map_eq_existT_curried_dep_curried
-    _ _ _ _
-    (fun d => mkLayer depsCohs2.(_depsCohs).(_deps).(_restrFrames).2 d)
-    (fun d l =>
-      (mkDepsRestr (depsCohs := depsCohs2.(_depsCohs))).(_paintings).2
-        (d; l))
-    ((mkDepsCohs depsCohs2.(1)).(_deps).(_restrFrames).2 q.+1 Hq)
-    (fun d l =>
-      mkRestrLayer depsCohs2.(_depsCohs).(_restrPaintings).2
-        depsCohs2.(_depsCohs).(_cohs).2 q (⇓ Hq) d l)
-    (fun d l c =>
-      mkRestrPainting depsCohs2.(_extraDepsCohs)
-        q (⇓ Hq) (d; l) c).
-
-Definition sigT_trans_eq_mkRestrPainting {p k}
-  (depsCohs2: DepsCohs2 p.+1 k) :=
-  @sigT_trans_eq_existT_curried_dep
-    (((mkRestrFrameTypesAndFrames
-        depsCohs2.(_depsCohs).(_deps).(_paintings).1)
-      .(FrameDef)
-        depsCohs2.(_depsCohs).(_deps).(_restrFrames).1).2)
-    (fun d =>
-      mkLayer (painting := depsCohs2.(_depsCohs).(_deps).(_paintings).2)
-        depsCohs2.(_depsCohs).(_deps).(_restrFrames).2 d)
-    (fun z =>
-      mkPainting depsCohs2.(_depsCohs).(_extraDeps) (z.1; z.2)).
-
-Definition eq_existT_curried_dep_eq_mkRestrPainting {p k}
-  (depsCohs2: DepsCohs2 p.+1 k)
-  {x y:
-    (((mkRestrFrameTypesAndFrames
-        depsCohs2.(_depsCohs).(_deps).(_paintings).1)
-      .(FrameDef)
-        depsCohs2.(_depsCohs).(_deps).(_restrFrames).1).2)} :=
-  @eq_existT_curried_dep_eq
-    (((mkRestrFrameTypesAndFrames
-        depsCohs2.(_depsCohs).(_deps).(_paintings).1)
-      .(FrameDef)
-        depsCohs2.(_depsCohs).(_deps).(_restrFrames).1).2)
-    x y
-    (fun d =>
-      mkLayer (painting := depsCohs2.(_depsCohs).(_deps).(_paintings).2)
-        depsCohs2.(_depsCohs).(_deps).(_restrFrames).2 d)
-    (fun z =>
-      mkPainting depsCohs2.(_depsCohs).(_extraDeps) (z.1; z.2)).
+(** Unlike [admit], allows to close proofs with [Qed] / [Defined] to run
+    kernel check. [Admitted] forces proofs to be opaque, while partial proofs
+    [Defined] with [my_admit] axiom still retain computational properties. *)
+Axiom my_admit : forall (A : Type), A.
 
 Definition mkCoh2Painting `{depsCohs3: DepsCohs3 p k}
   (extraDepsCohs3: DepsCohs3Extension p k depsCohs3):
@@ -1211,8 +1165,8 @@ Proof.
       Local Transparent mkCohLayer.
       unfold mkCohLayer, eq_ind, mkRestrPaintings, mkRestrPaintingsPrefix.
       cbn.
-      admit.
-    + admit.
+      now apply my_admit.
+    + now apply my_admit.
   - intros p k depsCohs3 extraDepsCohs3 q Hq r Hr Hs d c.
     destruct r; [now contradiction |].
     destruct q; [now contradiction |].
@@ -1228,17 +1182,54 @@ Proof.
     change (depsCohs3.(1).(_extraDepsCohs2)) with
       (AddCoh2Dep depsCohs3.(_depsCohs2) depsCohs3.(_extraDepsCohs2)).
     lazy beta iota.
-    rewrite 3 (sigT_map_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
-    rewrite 4 (sigT_trans_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
-    unshelve eapply (eq_existT_curried_dep_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
-    + exact (mkCoh2Layer depsCohs3.(_depsCohs2) depsCohs3.(_extraDepsCohs2)
+    unshelve eapply (eq_existT_curried_dep_hex
+      (A0 := ((mkRestrFrameTypesAndFrames
+          (mkDepsCohs2 depsCohs3.(1)).(_depsCohs).(_deps).(_paintings).1)
+        .(FrameDef)
+          (mkDepsCohs2 depsCohs3.(1)).(_depsCohs).(_deps).(_restrFrames).1).2)
+      (B := ((mkRestrFrameTypesAndFrames
+          depsCohs3.(_depsCohs2).(_depsCohs).(_deps).(_paintings).1)
+        .(FrameDef)
+          depsCohs3.(_depsCohs2).(_depsCohs).(_deps).(_restrFrames).1).2)
+      (P0 := fun a => (mkLayer
+        (mkDepsCohs2 depsCohs3.(1)).(_depsCohs).(_deps).(_restrFrames).2
+        a).(GDom))
+      (R0 := fun a u => (mkPainting
+        (mkDepsCohs2 depsCohs3.(1)).(_depsCohs).(_extraDeps) (a; u)).(GDom))
+      (P' := fun b => (mkLayer
+        depsCohs3.(_depsCohs2).(_depsCohs).(_deps).(_restrFrames).2 b).(GDom))
+      (R' := fun b u => (mkPainting
+        depsCohs3.(_depsCohs2).(_depsCohs).(_extraDeps) (b; u)).(GDom))
+      ((mkDepsCohs2 depsCohs3.(1)).(_depsCohs).(_deps).(_restrFrames).2
+        q.+1 Hq)
+      (fun d0 l0 => mkRestrLayer
+        depsCohs3.(_depsCohs2).(_depsCohs).(_restrPaintings).2
+        depsCohs3.(_depsCohs2).(_depsCohs).(_cohs).2 q (⇓ Hq) d0 l0)
+      (fun d0 l0 c0 => mkRestrPainting
+        depsCohs3.(_depsCohs2).(_extraDepsCohs) q (⇓ Hq) (d0; l0) c0)
+      ((mkDepsCohs2 depsCohs3.(1)).(_depsCohs).(_deps).(_restrFrames).2
+        s.+1 (Hs ↕ (Hr ↕ Hq)))
+      (fun d0 l0 => mkRestrLayer
+        depsCohs3.(_depsCohs2).(_depsCohs).(_restrPaintings).2
+        depsCohs3.(_depsCohs2).(_depsCohs).(_cohs).2
+        s (⇓ (Hs ↕ (Hr ↕ Hq))) d0 l0)
+      (fun d0 l0 c0 => mkRestrPainting
+        depsCohs3.(_depsCohs2).(_extraDepsCohs)
+        s (⇓ (Hs ↕ (Hr ↕ Hq))) (d0; l0) c0)
+      ((mkDepsCohs2 depsCohs3.(1)).(_depsCohs).(_deps).(_restrFrames).2
+        r.+1 (Hr ↕ Hq))
+      (fun d0 l0 => mkRestrLayer
+        depsCohs3.(_depsCohs2).(_depsCohs).(_restrPaintings).2
+        depsCohs3.(_depsCohs2).(_depsCohs).(_cohs).2 r (⇓ (Hr ↕ Hq)) d0 l0)
+      (fun d0 l0 c0 => mkRestrPainting
+        depsCohs3.(_depsCohs2).(_extraDepsCohs) r (⇓ (Hr ↕ Hq)) (d0; l0) c0)).
+    + now exact (mkCoh2Layer depsCohs3.(_depsCohs2) depsCohs3.(_extraDepsCohs2)
         (mkCoh2Frames (depsCohs3.(_depsCohs2); depsCohs3.(_extraDepsCohs2))
           depsCohs3.(1).(_coh2Paintings))
         depsCohs3.(_coh2Paintings).2 q (⇓ Hq) r (⇓ Hr) s (⇓ Hs) d l).
-    + Fail exact (mkCoh2Painting p.+1 k depsCohs3 extraDepsCohs3
+    + now exact_no_check (mkCoh2Painting p.+1 k depsCohs3 extraDepsCohs3
         q (⇓ Hq) r (⇓ Hr) (⇓ Hs) (d; l) c).
-      admit.
-Admitted.
+Defined.
 
 Fixpoint mkCoh2Paintings `{depsCohs3: DepsCohs3 p k}
   (extraDepsCohs3: DepsCohs3Extension p k depsCohs3) {struct p}:
