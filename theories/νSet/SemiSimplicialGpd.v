@@ -1129,22 +1129,42 @@ Definition sigT_trans_eq_mkRestrPainting {p k}
     (fun z =>
       mkPainting depsCohs2.(_depsCohs).(_extraDeps) (z.1; z.2)).
 
+Definition eq_existT_curried_dep_eq_mkRestrPainting {p k}
+  (depsCohs2: DepsCohs2 p.+1 k)
+  {x y:
+    (((mkRestrFrameTypesAndFrames
+        depsCohs2.(_depsCohs).(_deps).(_paintings).1)
+      .(FrameDef)
+        depsCohs2.(_depsCohs).(_deps).(_restrFrames).1).2)} :=
+  @eq_existT_curried_dep_eq
+    (((mkRestrFrameTypesAndFrames
+        depsCohs2.(_depsCohs).(_deps).(_paintings).1)
+      .(FrameDef)
+        depsCohs2.(_depsCohs).(_deps).(_restrFrames).1).2)
+    x y
+    (fun d =>
+      mkLayer (painting := depsCohs2.(_depsCohs).(_deps).(_paintings).2)
+        depsCohs2.(_depsCohs).(_deps).(_restrFrames).2 d)
+    (fun z =>
+      mkPainting depsCohs2.(_depsCohs).(_extraDeps) (z.1; z.2)).
+
 Definition mkCoh2Painting `{depsCohs3: DepsCohs3 p k}
   (extraDepsCohs3: DepsCohs3Extension p k depsCohs3):
   mkCoh2PaintingType (mkDepsCohs2 depsCohs3) (mkExtraCohs2 extraDepsCohs3).
 Proof.
-  intros q Hq r Hr s Hs d c.
-  cbv zeta.
+  intros q Hq r Hr s.
+  generalize dependent r.
+  generalize dependent q.
+  generalize dependent k.
+  generalize dependent p.
   Local Opaque mkCoh2Frames mkCoh2Layer.
   Local Opaque mkCohFrames mkCohLayer mkCohPainting.
-  set (Q := mkCoh2PaintingEndpointType _ _ q Hq r Hr s Hs d c).
-  set (H := (mkDepsCohs2 depsCohs3).(_coh2Frames).2 q Hq r Hr s Hs d).
-  destruct s.
-  - destruct r.
-    + unfold mkCoh2PaintingInstanceType; cbv zeta;
-      lazymatch goal with
-      | |- (rew [?P] ?E in _) = _ => change P with Q; change E with H
-      end.
+  induction s as [|s mkCoh2Painting].
+  - intros p k depsCohs3 extraDepsCohs3 q Hq r Hr Hs d c; cbv zeta.
+    destruct r.
+    + unfold mkCoh2PaintingInstanceType; cbv zeta.
+      set (Q := mkCoh2PaintingEndpointType _ _ q Hq 0 Hr 0 Hs d c).
+      set (H := (mkDepsCohs2 depsCohs3).(_coh2Frames).2 q Hq 0 Hr 0 Hs d).
       Local Transparent mkCohPainting.
       Local Opaque sigT_map_eq sigT_trans_eq.
       cbn.
@@ -1191,28 +1211,32 @@ Proof.
         (B := fun x : (mkDepsCohs2 depsCohs3).(_depsCohs).(_deps).(_frames).2 =>
                 (mkDepsCohs2 depsCohs3).(_depsCohs).(_deps).(_paintings).2 x)).
       Local Transparent mkCohLayer.
-      unfold mkCohLayer.
-      unfold eq_ind.
-      unfold mkRestrPaintings, mkRestrPaintingsPrefix.
+      unfold mkCohLayer, eq_ind, mkRestrPaintings, mkRestrPaintingsPrefix.
       cbn.
       admit.
     + admit.
-  - destruct r; [now contradiction |].
+  - intros p k depsCohs3 extraDepsCohs3 q Hq r Hr Hs d c.
+    destruct r; [now contradiction |].
     destruct q; [now contradiction |].
     destruct extraDepsCohs3; [now contradiction |].
     destruct c as [l c].
     unfold mkCoh2PaintingInstanceType; cbv zeta.
-    lazymatch goal with
-    | |- (rew [?P] ?E in _) = _ => change P with Q; change E with H
-    end.
+    set (Q := mkCoh2PaintingEndpointType _ _ q.+1 Hq r.+1 Hr s.+1 Hs d (l; c)).
+    set (H := (mkDepsCohs2 depsCohs3.(1)).(_coh2Frames).2 q.+1 Hq r.+1 Hr s.+1 Hs d).
     unfold mkDepsCohs2, mkDepsCohs.
     cbn [_cohPaintings _depsCohs _restrPaintings mkRestrPaintings projT2].
     Local Transparent mkCohPainting.
     unfold mkCohPainting; cbn [nat_ind].
     rewrite 3 (sigT_map_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
-    cbn [mkCohPaintings projT2 mkCohPainting nat_ind proj1DepsCohs3 _extraDepsCohs2].
     rewrite 4 (sigT_trans_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
-    admit.
+    unshelve eapply (eq_existT_curried_dep_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
+    + exact (mkCoh2Layer depsCohs3.(_depsCohs2) depsCohs3.(_extraDepsCohs2)
+        (mkCoh2Frames (depsCohs3.(_depsCohs2); depsCohs3.(_extraDepsCohs2))
+          depsCohs3.(1).(_coh2Paintings))
+        depsCohs3.(_coh2Paintings).2 q (⇓ Hq) r (⇓ Hr) s (⇓ Hs) d l).
+    + Fail exact (mkCoh2Painting p.+1 k depsCohs3 extraDepsCohs3
+        q (⇓ Hq) r (⇓ Hr) (⇓ Hs) (d; l) c).
+      admit.
 Admitted.
 
 Fixpoint mkCoh2Paintings `{depsCohs3: DepsCohs3 p k}
