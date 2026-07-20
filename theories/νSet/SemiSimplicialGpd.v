@@ -1099,8 +1099,8 @@ Proof.
     now exact (mkExtraCohs2 p.+1 k depsCohs3 extraDepsCohs3).
 Defined.
 
-Definition sigT_map_eq_mkRestrPainting
-  `{depsCohs2: DepsCohs2 p.+1 k}
+Definition sigT_map_eq_mkRestrPainting {p k}
+  (depsCohs2: DepsCohs2 p.+1 k)
   q (Hq: q.+1 <= k.+1) :=
   @sigT_map_eq_existT_curried_dep_curried
     _ _ _ _
@@ -1116,8 +1116,8 @@ Definition sigT_map_eq_mkRestrPainting
       mkRestrPainting depsCohs2.(_extraDepsCohs)
         q (⇓ Hq) (d; l) c).
 
-Definition sigT_trans_eq_mkRestrPainting
-  `{depsCohs2: DepsCohs2 p.+1 k} :=
+Definition sigT_trans_eq_mkRestrPainting {p k}
+  (depsCohs2: DepsCohs2 p.+1 k) :=
   @sigT_trans_eq_existT_curried_dep
     (((mkRestrFrameTypesAndFrames
         (mkDepsCohs depsCohs2.(1)).(_deps).(_paintings).1)
@@ -1133,9 +1133,6 @@ Definition sigT_trans_eq_mkRestrPainting
       (mkPaintings
         (mkDepsRestr; mkExtraDeps depsCohs2.(_extraDepsCohs))).2
         (z.1; z.2)).
-
-Arguments sigT_trans_eq_mkRestrPainting
-  {p k depsCohs2 x y z u v u' v' u'' v''} H Hu Hv H' Hu' Hv'.
 
 Definition mkCoh2Painting `{depsCohs3: DepsCohs3 p k}
   (extraDepsCohs3: DepsCohs3Extension p k depsCohs3):
@@ -1208,19 +1205,19 @@ Proof.
   - destruct r; [now contradiction |].
     destruct q; [now contradiction |].
     destruct extraDepsCohs3; [now contradiction |].
-    destruct depsCohs3 as [depsCohs2 extraDepsCohs2 coh2Paintings].
     destruct c as [l c].
-    unfold mkCoh2PaintingInstanceType; cbv zeta;
-      lazymatch goal with
-      | |- (rew [?P] ?E in _) = _ => change P with Q; change E with H
-      end.
+    unfold mkCoh2PaintingInstanceType; cbv zeta.
+    lazymatch goal with
+    | |- (rew [?P] ?E in _) = _ => change P with Q; change E with H
+    end.
     unfold mkDepsCohs2, mkDepsCohs.
     cbn [_cohPaintings _depsCohs _restrPaintings].
     cbn [mkRestrPaintings projT2].
     Local Transparent mkCohPainting.
     unfold mkCohPainting; cbn [nat_ind].
-    rewrite 3 sigT_map_eq_mkRestrPainting.
+    rewrite 3 (sigT_map_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
     cbn [mkCohPaintings projT2 mkCohPainting nat_ind proj1DepsCohs3 _extraDepsCohs2].
+    Fail rewrite (sigT_trans_eq_mkRestrPainting depsCohs3.(_depsCohs2)).
     admit.
 Admitted.
 
