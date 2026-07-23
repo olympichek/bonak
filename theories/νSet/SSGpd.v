@@ -1219,4 +1219,89 @@ Proof.
     now exact (mkCoh2Painting extraDepsCohs3).
 Defined.
 
+(** The data of a semi-simplicial groupoid truncated in dimension p,
+    as in νSet, with the two additional levels of coherence data ([coh2Frames],
+    [coh2Paintings]) that UIP provided for free at the [HSet] level *)
+
+Class SSGpdData p := {
+  frames: mkFrameTypes p 0;
+  paintings: mkPaintingTypes p 0 frames;
+  restrFrames: mkRestrFrameTypes paintings;
+  restrPaintings E: mkRestrPaintingTypes (TopRestrDep E);
+  cohFrames E: mkCohFrameTypes (restrPaintings E);
+  cohPaintings E E': mkCohPaintingTypes
+    (depsCohs := toDepsCohs (deps := toDepsRestr restrFrames) (cohFrames E))
+    (TopCohDep E');
+  coh2Frames E E': mkCoh2FrameTypes (cohPaintings E E');
+  coh2Paintings E E' E'': mkCoh2PaintingTypes
+    (depsCohs2 := toDepsCohs2 (coh2Frames E E'))
+    (TopCoh2Dep E'');
+}.
+
+Section SSGpdData.
+Variable p: nat.
+Variable C: SSGpdData p.
+Variable E: mkFrame (toDepsRestr C.(restrFrames)) -> HGpd.
+
+#[local]
+Instance mkSSGpdData: SSGpdData p.+1 :=
+{|
+  frames := mkFrames _;
+  paintings := mkPaintings _;
+  restrFrames := mkRestrFrames;
+  restrPaintings E' := mkRestrPaintings (TopCohDep E');
+  cohFrames E' := mkCohFrames (C.(cohPaintings) E E') (C.(coh2Frames) E E');
+  cohPaintings E' E'' := mkCohPaintings
+    (TopCoh2Dep (depsCohs2 := toDepsCohs2 (C.(coh2Frames) E E')) E'');
+  coh2Frames E' E'' := mkCoh2Frames
+    (TopCoh2Dep (depsCohs2 := toDepsCohs2 (C.(coh2Frames) E E')) E'')
+    (C.(coh2Paintings) E E' E'');
+  coh2Paintings E' E'' E''' := mkCoh2Paintings
+    (TopCoh3Dep (depsCohs3 := toDepsCohs3 (C.(coh2Paintings) E E' E'')) E''');
+|}.
+End SSGpdData.
+
+Class SSGpd p := {
+  prefix: Type;
+  data: prefix -> SSGpdData p;
+}.
+
+(** ************************************************)
+(** The construction of [SSGpd n+1] from [SSGpd n] *)
+
+(** Extending the initial prefix *)
+Definition mkPrefix p {C: SSGpd p}: Type :=
+  { D: C.(prefix) &T mkFrame (toDepsRestr (C.(data) D).(restrFrames)) -> HGpd }.
+
+#[local]
+Instance mkSSGpd0: SSGpd 0.
+Proof.
+  unshelve esplit.
+  - now exact gunit.
+  - unshelve esplit; try now trivial.
+Defined.
+
+#[local]
+Instance mkSSGpd {p} (C: SSGpd p): SSGpd p.+1 :=
+{|
+  prefix := mkPrefix p;
+  data := fun D: mkPrefix p => mkSSGpdData p (C.(data) D.1) D.2;
+|}.
+
+(** An [SSGpd] truncated up to dimension [n] *)
+Fixpoint SSGpdAt n: SSGpd n :=
+  match n with
+  | O => mkSSGpd0
+  | n.+1 => mkSSGpd (SSGpdAt n)
+  end.
+
+CoInductive SSGpdFrom n (X: (SSGpdAt n).(prefix)): Type := cons {
+  this: mkFrame (toDepsRestr ((SSGpdAt n).(data) X).(restrFrames)) -> HGpd;
+  next: SSGpdFrom n.+1 (X; this);
+}.
+
+(** The final construction *)
+Definition SSGpds := SSGpdFrom 0 tt.
+
 End SSGpd.
+
