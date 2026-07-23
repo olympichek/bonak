@@ -10,13 +10,13 @@
     [δ_q : frame(n+1) -> frame(n)] with no face index. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT RewLemmas HSet HGpd Notation LeSProp.
+From Bonak Require Import SigT RewLemmas HSet HGpd Notation LeSProp SSLemmas.
 
 Set Primitive Projections.
 Set Printing Projections.
 Set Keyed Unification.
 
-Module SemiSimplicialGpd.
+Module SSGpd.
 
 (** The type of lists {frame(n,0);...;frame(n,p-1)} for arbitrary k := n-p
     (the non-mandatory dependency in k is useful for type inference) *)
@@ -480,7 +480,7 @@ Definition mkCohLayer `{extraDepsCohs: DepsCohsExtension p.+1 k depsCohs}
   mkCohLayerType q Hq r Hr d l.
 Proof.
   unfold mkCohLayerType, mkRestrLayer, mkLayer.
-  eapply rew_layer33 with
+  eapply rew_cohLayer with
     (P := fun x => depsCohs.(_deps).(_paintings).2 x)
     (rf0 := fun x => depsCohs.(_deps).(_restrFrames).2 0 leR_O x)
     (F := depsCohs.(_restrPaintings).2 q Hq)
@@ -1105,7 +1105,7 @@ Proof.
   - intros p k depsCohs3 extraDepsCohs3 q Hq r Hr Hs d c.
     unfold mkCoh2PaintingInstanceType; cbn.
     unfold mkCohLayer.
-    now apply rew_layer33_restr0 with
+    now apply rew_coh2Painting_restr0 with
       (P := fun x : (mkDepsCohs depsCohs3.(_depsCohs2)).(_deps).(_frames).2 =>
         (mkDepsCohs depsCohs3.(_depsCohs2)).(_deps).(_paintings).2 x)
       (rf0 := fun x =>
@@ -1190,4 +1190,4 @@ Proof.
     now exact (mkCoh2Painting extraDepsCohs3).
 Defined.
 
-End SemiSimplicialGpd.
+End SSGpd.
