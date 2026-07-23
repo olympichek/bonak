@@ -1305,3 +1305,7 @@ Definition SSGpds := SSGpdFrom 0 tt.
 
 End SSGpd.
 
+(** Some example *)
+
+Example SemiSimplicial5 := Eval lazy in (SSGpd.SSGpdAt 5).(SSGpd.prefix _).
+Print SemiSimplicial5.
