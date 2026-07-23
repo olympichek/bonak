@@ -3,7 +3,6 @@
 Set Warnings "-stdlib-vector".
 From Stdlib Require Import Vectors.Fin.
 From Stdlib Require Import Logic.FunctionalExtensionality.
-From Stdlib Require Import Logic.Eqdep_dec.
 
 Import Logic.EqNotations.
 
@@ -31,7 +30,7 @@ Lemma retract_eq {A B: Type} (f: A -> B) (g: B -> A)
   p = eq_trans (eq_sym (H x)) (eq_trans (f_equal g (f_equal f p)) (H y)).
 Proof.
   destruct p; simpl. destruct (H x). reflexivity.
-Qed.
+Defined.
 
 Lemma retract_UIP {A: Type} {B: HSet} (f: A -> B) (g: B -> A)
   (H: forall x, g (f x) = x) (x y: A) (p q: x = y): p = q.
@@ -39,7 +38,66 @@ Proof.
   rewrite (retract_eq f g H p).
   rewrite (retract_eq f g H q).
   now rewrite (@UIP B (f x) (f y) (f_equal f p) (f_equal f q)).
-Qed.
+Defined.
+
+(** A transparent copy of Stdlib's [Eqdep_dec.UIP_dec] (Hedberg's
+    theorem): the stdlib proof chain is [Qed]-opaque, which would leave
+    normal forms of groupoid-level coherences stuck on it. *)
+
+Section EqdepDec.
+
+Variable A: Type.
+
+Let comp {x y y': A} (eq1: x = y) (eq2: x = y'): y = y' :=
+  eq_ind _ (fun a => a = y') eq2 _ eq1.
+
+Remark trans_sym_eq {x y: A} (u: x = y): comp u u = eq_refl y.
+Proof.
+  case u; trivial.
+Defined.
+
+Variable x: A.
+Variable eq_dec: forall y: A, x = y \/ x <> y.
+
+Let nu {y: A} (u: x = y): x = y :=
+  match eq_dec y with
+  | or_introl eqxy => eqxy
+  | or_intror neqxy => False_ind _ (neqxy u)
+  end.
+
+#[local]
+Lemma nu_constant {y: A} (u v: x = y): nu u = nu v.
+Proof.
+  unfold nu.
+  destruct (eq_dec y) as [Heq|Hneq].
+  - reflexivity.
+  - case Hneq; trivial.
+Defined.
+
+Let nu_inv {y: A} (v: x = y): x = y := comp (nu (eq_refl x)) v.
+
+Remark nu_left_inv_on {y: A} (u: x = y): nu_inv (nu u) = u.
+Proof.
+  case u; unfold nu_inv.
+  apply trans_sym_eq.
+Defined.
+
+Theorem eq_proofs_unicity_on (y: A) (p1 p2: x = y): p1 = p2.
+Proof.
+  elim (nu_left_inv_on p1).
+  elim (nu_left_inv_on p2).
+  elim (nu_constant p1 p2).
+  reflexivity.
+Defined.
+
+End EqdepDec.
+
+Theorem UIP_dec (A: Type) (eq_dec: forall x y: A, {x = y} + {x <> y})
+  (x y: A) (p1 p2: x = y): p1 = p2.
+Proof.
+  apply eq_proofs_unicity_on.
+  intros y'; destruct (eq_dec x y'); [now left | now right].
+Defined.
 
 Lemma unit_GUIP (x y: unit) (h g: x = y) (p q: h = g): p = q.
 Proof.

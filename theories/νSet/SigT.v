@@ -120,7 +120,7 @@ Lemma eq_existT_curried_dep_eq {A x y} {P: A -> Type}
 Proof.
   destruct HH; cbn in HHu. destruct HHu; cbn in HHv.
   now destruct HHv.
-Qed.
+Defined.
 
 Definition sigT_map_eq {A B: Type} {P: A -> Type} {Q: B -> Type}
   {f: A -> B} (g: forall a, P a -> Q (f a))
@@ -205,7 +205,7 @@ Lemma sigT_map_eq_existT_curried_dep_fst {A B: Type} {P: A -> Type}
   sigT_map_eq g Hu.
 Proof.
   now destruct Hv, Hu, H.
-Qed.
+Defined.
 
 Lemma sigT_map_eq_existT_curried_dep_eta {A B: Type} {P: A -> Type}
   {P': B -> Type} {Q: {a: A &T P a} -> Type}
@@ -259,7 +259,7 @@ Lemma sigT_map_eq_existT_curried_dep_curried {A B: Type} {P: A -> Type}
         (fun z => h z.1 z.2) (x; u) (y; u') v v' (=H; Hu) Hv).
 Proof.
   now destruct Hv, Hu, H.
-Qed.
+Defined.
 
 Definition sigT_trans_eq {A: Type} {P: A -> Type}
   {x y z: A} {u: P x} {v: P y} {w: P z}
@@ -389,4 +389,4 @@ Lemma sigT_trans_eq_existT_curried_dep {A: Type} {P: A -> Type}
       eq_trans_eq_existT_curried H Hu H' Hu' in (Hv ⊙ Hv')).
 Proof.
   now destruct Hv', Hu', H', Hv, Hu, H.
-Qed.
+Defined.

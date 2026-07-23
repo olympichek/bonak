@@ -136,7 +136,7 @@ Proof.
   intros qR qL q23' q23 q2' q3 q1 e e0 e1 e2 e3 e4 e5 e6.
   destruct e, e0, e1, e2, e3, e4, e5.
   intros HHv'; exact HHv'.
-Qed.
+Defined.
 
 Lemma rew_cohLayer {T1 T2 T3 X: Type} (P: X -> Type)
   {S2: T2 -> Type} {S3: T3 -> Type}
