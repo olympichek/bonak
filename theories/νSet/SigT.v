@@ -139,6 +139,13 @@ Proof.
   reflexivity.
 Defined.
 
+Lemma sigT_map_eq_id_refl {A B: Type} {Q: B -> Type} (f: A -> B)
+  {x: A} {u v: Q (f x)} (q: u = v):
+  @sigT_map_eq A B (fun a => Q (f a)) Q f (fun a u => u) x x u v eq_refl q = q.
+Proof.
+  now destruct q.
+Defined.
+
 Lemma sigT_map_eq_transport_refl {A B: Type}
   {P: A -> Type} {Q: B -> Type}
   {f: A -> B} (g: forall a, P a -> Q (f a))
@@ -547,4 +554,62 @@ Proof.
   rewrite rew_compose.
   rewrite !eq_trans_refl_l in Hpath.
   now rewrite Hpath.
+Defined.
+
+Lemma rew_layer33_restr0 {Tp Td: Type} {S: Tp -> Type} (P: Td -> Type)
+  (rf0: Tp -> Td) {rfF rfG: Tp -> Td}
+  (F: forall m, S m -> P (rfF m))
+  (G: forall n, S n -> P (rfG n))
+  {d1 d2: Tp} (E1: d1 = d2)
+  {m1 m2: Tp} (C2: m1 = m2)
+  {n1 n2: Tp} (D2: n1 = n2)
+  (C1: rfF m2 = rf0 d1) (D1: rfG n2 = rf0 d2)
+  (K: rfF m1 = rfG n1)
+  (aL: S m1) (aR: S n1)
+  (HK: rew [P] K in F m1 aL = G n1 aR)
+  (HH: eq_trans (f_equal rfF C2) (eq_trans C1 (f_equal rf0 E1)) =
+       eq_trans K (eq_trans (f_equal rfG D2) D1))
+  (R0: {a: Tp &T P (rf0 a)} -> Type)
+  {v0: R0 (d1; rew [P] C1 in F m2 (rew [S] C2 in aL))}
+  {v1: R0 (d2; rew [P] D1 in G n2 (rew [S] D2 in aR))}
+  (Hv: rew [R0] (= E1; rew_layer33 P rf0 F G E1 C2 D2 C1 D1 K aL aR HK HH)
+    in v0 = v1):
+  rew [fun π: rfF m1 = rf0 d2 =>
+      rew [P] π in F m1 aL = rew [P] D1 in G n2 (rew [S] D2 in aR)] HH in
+  (sigT_map_eq (Q := P) F (eq_refl (x := rew [S] C2 in aL))
+   ⊙ ((eq_refl : rew [P] C1 in F m2 (rew [S] C2 in aL)
+       = rew [P] C1 in F m2 (rew [S] C2 in aL))
+      ⊙ sigT_map_eq (P := fun a => {u: P (rf0 a) &T R0 (a; u)}) (Q := P)
+          (f := rf0) (fun a uv => uv.1)
+          (eq_existT_curried_dep (Q := R0) (H := E1)
+            (Hu := rew_layer33 P rf0 F G E1 C2 D2 C1 D1 K aL aR HK HH)
+            (Hv := Hv)))) =
+  HK ⊙ (sigT_map_eq (Q := P) G (eq_refl (x := rew [S] D2 in aR)) ⊙ eq_refl).
+Proof.
+  rewrite (sigT_map_eq_existT_curried_dep_fst rf0 (fun a u => u) E1
+    (rew_layer33 P rf0 F G E1 C2 D2 C1 D1 K aL aR HK HH) Hv).
+  cbn [projT1].
+  clear Hv v0 v1 R0.
+  destruct E1, C2, D2.
+  cbn in HH |- *.
+  revert HH. revert HK. revert C1. revert D1.
+  generalize (G n1 aR) as gb.
+  intros gb D1 C1 HK HH.
+  rewrite (sigT_map_eq_id_refl rf0).
+  revert HH. revert HK. revert C1. revert D1.
+  generalize (rf0 d1) as X.
+  intros X D1.
+  destruct D1.
+  intros C1 HK HH.
+  cbn in HH.
+  revert HK.
+  destruct HH.
+  intros HK.
+  cbn in HK |- *.
+  destruct HK.
+  revert C1.
+  generalize (rfG n1) as Y.
+  intros Y C1.
+  destruct C1.
+  reflexivity.
 Defined.
