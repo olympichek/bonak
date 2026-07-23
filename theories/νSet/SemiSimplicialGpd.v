@@ -479,19 +479,16 @@ Definition mkCohLayer `{extraDepsCohs: DepsCohsExtension p.+1 k depsCohs}
   (l: mkLayer mkRestrFrame d):
   mkCohLayerType q Hq r Hr d l.
 Proof.
-  unfold mkCohLayerType.
-  unfold mkRestrLayer, mkLayer.
-  rewrite
-    <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 q Hq x),
-    <- map_subst with (f := fun x => depsCohs.(_restrPaintings).2 r (Hr ↕ Hq) x).
-  rewrite <- cohPainting.
-  apply rew_chain33 with
+  unfold mkCohLayerType, mkRestrLayer, mkLayer.
+  eapply rew_layer33 with
     (P := fun x => depsCohs.(_deps).(_paintings).2 x)
-    (f1 := fun x => depsCohs.(_deps).(_restrFrames).2 O leR_O x)
-    (f2 := fun x => depsCohs.(_deps).(_restrFrames).2 q Hq x)
-    (g := fun x => depsCohs.(_deps).(_restrFrames).2 r (Hr ↕ Hq) x).
-  now trivial.
-  now apply (coh2Frame q Hq r Hr 0 leR_O d).
+    (rf0 := fun x => depsCohs.(_deps).(_restrFrames).2 0 leR_O x)
+    (F := depsCohs.(_restrPaintings).2 q Hq)
+    (G := depsCohs.(_restrPaintings).2 r (Hr ↕ Hq)).
+  - now exact (cohPainting q Hq r Hr
+      (((mkCohFrameTypesAndRestrFrames (mkRestrPaintings extraDepsCohs).1.1)
+        .(RestrFramesDef) prevCohFrames.1).2 0 leR_O d) l).
+  - now apply (coh2Frame q Hq r Hr 0 leR_O d).
 Defined.
 
 Class Coh2FrameTypeBlock `{extraDepsCohs: DepsCohsExtension p k depsCohs} := {

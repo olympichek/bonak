@@ -523,3 +523,28 @@ Proof.
   destruct e, e0, e1, e2, e3, e4, e5.
   intros HHv'; exact HHv'.
 Qed.
+
+Lemma rew_layer33 {T1 T2 T3 X: Type} (P: X -> Type)
+  {S2: T2 -> Type} {S3: T3 -> Type}
+  (rf0: T1 -> X) {rfF: T2 -> X} {rfG: T3 -> X}
+  (F: forall m, S2 m -> P (rfF m))
+  (G: forall n, S3 n -> P (rfG n))
+  {d1 d2: T1} (E1: d1 = d2)
+  {m1 m2: T2} (C2: m1 = m2)
+  {n1 n2: T3} (D2: n1 = n2)
+  (C1: rfF m2 = rf0 d1) (D1: rfG n2 = rf0 d2)
+  (K: rfF m1 = rfG n1)
+  (aL: S2 m1) (aR: S3 n1):
+  rew [P] K in F m1 aL = G n1 aR ->
+  eq_trans (f_equal rfF C2) (eq_trans C1 (f_equal rf0 E1)) =
+  eq_trans K (eq_trans (f_equal rfG D2) D1) ->
+  rew [fun d => P (rf0 d)] E1 in rew [P] C1 in F m2 (rew [S2] C2 in aL)
+  = rew [P] D1 in G n2 (rew [S3] D2 in aR).
+Proof.
+  intros HC Hpath.
+  destruct E1, C2, D2. cbn in *.
+  rewrite <- HC.
+  rewrite rew_compose.
+  rewrite !eq_trans_refl_l in Hpath.
+  now rewrite Hpath.
+Defined.
