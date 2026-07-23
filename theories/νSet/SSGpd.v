@@ -1006,9 +1006,38 @@ Definition mkCoh2Layer {p k}
     (mkCohPaintings (depsCohs2; extraDepsCohs2)).1 prevCoh2Frames.1).1)).(_restrFrames).2 d):
   mkCoh2LayerType depsCohs2 extraDepsCohs2 prevCoh2Frames q Hq r Hr s Hs d l.
 Proof.
-  unfold mkCoh2LayerType.
-  admit.
-Admitted.
+  unfold mkCoh2LayerType, mkCohLayer.
+  eapply rew_coh2Layer with
+    (S1 := fun x => (mkDepsRestr (depsCohs := (mkDepsCohs depsCohs2).(1).(1))).(_paintings).2 x)
+    (S0 := fun x => (mkDepsCohs depsCohs2).(1).(_deps).(_paintings).2 x)
+    (PA := fun x => depsCohs2.(_depsCohs).(_deps).(_paintings).2 x)
+    (g0 := fun x => (mkDepsCohs depsCohs2).(1).(_deps).(_restrFrames).2 0 leR_O x)
+    (f0 := fun x => depsCohs2.(_depsCohs).(_deps).(_restrFrames).2 0 leR_O x)
+    (Rr := (mkDepsCohs depsCohs2).(1).(_restrPaintings).2 r (Hr ↕ ↑ Hq))
+    (Rs := (mkDepsCohs depsCohs2).(1).(_restrPaintings).2 s (Hs ↕ (Hr ↕ ↑ Hq)))
+    (Rq1 := (mkDepsCohs depsCohs2).(1).(_restrPaintings).2 q.+1 (⇑ Hq))
+    (Rr1 := (mkDepsCohs depsCohs2).(1).(_restrPaintings).2 r.+1 (⇑ Hr ↕ ⇑ Hq))
+    (Fq := depsCohs2.(_depsCohs).(_restrPaintings).2 q Hq)
+    (Fr := depsCohs2.(_depsCohs).(_restrPaintings).2 r (Hr ↕ Hq))
+    (Fs := depsCohs2.(_depsCohs).(_restrPaintings).2 s ((Hs ↕ Hr) ↕ Hq))
+    (gq := fun x => depsCohs2.(_depsCohs).(_cohs).2 q Hq 0 leR_O x)
+    (gr := fun x => depsCohs2.(_depsCohs).(_cohs).2 r (Hr ↕ Hq) 0 leR_O x)
+    (gs := fun x => depsCohs2.(_depsCohs).(_cohs).2 s ((Hs ↕ Hr) ↕ Hq) 0 leR_O x)
+    (KA2 := fun x => depsCohs2.(_depsCohs).(_cohs).2 q Hq s (Hs ↕ Hr) x)
+    (KA4 := fun x => depsCohs2.(_depsCohs).(_cohs).2 q Hq r Hr x)
+    (KA6 := fun x => depsCohs2.(_depsCohs).(_cohs).2 r (Hr ↕ Hq) s Hs x)
+    (HKA2 := fun x c => depsCohs2.(_cohPaintings).2 q Hq s (Hs ↕ Hr) x c)
+    (HKA4 := fun x c => depsCohs2.(_cohPaintings).2 q Hq r Hr x c)
+    (HKA6 := fun x c => depsCohs2.(_cohPaintings).2 r (Hr ↕ Hq) s Hs x c).
+  - now trivial.
+  - now exact (coh2Painting q Hq r Hr s Hs
+      (((mkCohFrameTypesAndRestrFrames
+          (mkRestrPaintings (mkDepsCohs depsCohs2; mkExtraCohs extraDepsCohs2)).1.1)
+        .(RestrFramesDef) ((mkCoh2FrameTypesAndCohFrames
+            (mkCohPaintings (depsCohs2; extraDepsCohs2)).1)
+          .(CohFramesDef) prevCoh2Frames.1).1).2 0 leR_O d) l).
+  - now apply depsCohs2.(_depsCohs).(_deps).(_frames).2.(GUIP).
+Defined.
 
 Fixpoint mkCoh2Frames `{depsCohs2: DepsCohs2 p k}
   (extraDepsCohs2: DepsCohs2Extension p k depsCohs2)

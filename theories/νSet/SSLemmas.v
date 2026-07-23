@@ -220,3 +220,257 @@ Proof.
   destruct C1.
   reflexivity.
 Defined.
+
+Section Coh2Layer.
+
+Variables (T1 T0 XA: Type).
+Variable S1: T1 -> Type.
+Variable S0: T0 -> Type.
+Variable PA: XA -> Type.
+
+Variables (g0 uq1 ur ur1 us hq hr hs: T1 -> T0).
+Variables (f0 fq fr fs: T0 -> XA).
+
+Variable Rr: forall x, S1 x -> S0 (ur x).
+Variable Rs: forall x, S1 x -> S0 (us x).
+Variable Rq1: forall x, S1 x -> S0 (uq1 x).
+Variable Rr1: forall x, S1 x -> S0 (ur1 x).
+Variable Fq: forall y, S0 y -> PA (fq y).
+Variable Fr: forall y, S0 y -> PA (fr y).
+Variable Fs: forall y, S0 y -> PA (fs y).
+
+Variable gq: forall x, fq (g0 x) = f0 (hq x).
+Variable gr: forall x, fr (g0 x) = f0 (hr x).
+Variable gs: forall x, fs (g0 x) = f0 (hs x).
+
+Variable KA2: forall x, fq (us x) = fs (uq1 x).
+Variable KA4: forall x, fq (ur x) = fr (uq1 x).
+Variable KA6: forall x, fr (us x) = fs (ur1 x).
+
+Variable HKA2: forall x (c: S1 x),
+  rew [PA] KA2 x in Fq (us x) (Rs x c) = Fs (uq1 x) (Rq1 x c).
+Variable HKA4: forall x (c: S1 x),
+  rew [PA] KA4 x in Fq (ur x) (Rr x c) = Fr (uq1 x) (Rq1 x c).
+Variable HKA6: forall x (c: S1 x),
+  rew [PA] KA6 x in Fr (us x) (Rs x c) = Fs (ur1 x) (Rr1 x c).
+
+(** The permutahedral coherence of frames: the hexagon proved as a
+    compostition of the seven other hexagons of the permutahedron. The six
+    squares hold by naturality and don't appear here explicitly. *)
+Lemma permutahedral_coherence
+  (n1 n2 n3 m1 m2 m3 dd11 dd21 dd13 dd23 dd15 dd25: T1)
+  (b1: n1 = m1) (b2: n2 = m2) (b3: n3 = m3)
+  (KB1: ur n1 = us n2) (KB3: uq1 n2 = ur1 n3) (KB5: uq1 n1 = us n3)
+  (E11: dd11 = dd21) (E13: dd13 = dd23) (E15: dd15 = dd25)
+  (C11: ur m1 = g0 dd11) (D11: us m2 = g0 dd21)
+  (C13: uq1 m2 = g0 dd13) (D13: ur1 m3 = g0 dd23)
+  (C15: uq1 m1 = g0 dd15) (D15: us m3 = g0 dd25)
+  (E12: hq dd21 = hs dd13) (E14: hq dd11 = hr dd15)
+  (E16: hr dd25 = hs dd23)
+  (HHB1: f_equal ur b1 • (C11 • f_equal g0 E11) =
+         KB1 • (f_equal us b2 • D11))
+  (HHB3: f_equal uq1 b2 • (C13 • f_equal g0 E13) =
+         KB3 • (f_equal ur1 b3 • D13))
+  (HHB5: f_equal uq1 b1 • (C15 • f_equal g0 E15) =
+         KB5 • (f_equal us b3 • D15))
+  (HH2: f_equal fq D11 • (gq dd21 • f_equal f0 E12) =
+        KA2 m2 • (f_equal fs C13 • gs dd13))
+  (HH4: f_equal fq C11 • (gq dd11 • f_equal f0 E14) =
+        KA4 m1 • (f_equal fr C15 • gr dd15))
+  (HH6: f_equal fr D15 • (gr dd25 • f_equal f0 E16) =
+        KA6 m3 • (f_equal fs D13 • gs dd23))
+  (HHs: f_equal hq E11 • (E12 • f_equal hs E13) =
+        E14 • (f_equal hr E15 • E16)):
+  f_equal fq KB1 • (KA2 n2 • f_equal fs KB3) =
+  KA4 n1 • (f_equal fr KB5 • KA6 n3).
+Proof.
+  destruct b1, b2, b3, E11, E13, E15.
+  cbn in HHB1, HHB3, HHB5, HHs.
+  revert KB1 KB3 KB5 D11 D13 D15 C11 C13 C15 HHB1 HHB3 HHB5
+    E16 E12 E14 HHs HH2 HH4 HH6.
+  generalize (KA2 n2). generalize (KA4 n1). generalize (KA6 n3).
+  generalize (gq dd11). generalize (gs dd13). generalize (gr dd15).
+  generalize (hq dd11). generalize (hs dd13). generalize (hr dd15).
+  generalize (g0 dd11). generalize (g0 dd13). generalize (g0 dd15).
+  generalize (ur n1). generalize (us n2). generalize (uq1 n2).
+  generalize (ur1 n3). generalize (uq1 n1). generalize (us n3).
+  intros t t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 ge gs0 gq0 k6 k4 k2
+    KB1 KB3 KB5 D11 D13 D15 C11 C13 C15 HHB1 HHB3 HHB5
+    E16 E12 E14 HHs HH2 HH4 HH6.
+  revert ge gs0 gq0 C11 C13 C15 HHB1 HHB3 HHB5 E16 E12 E14 HHs HH2 HH4 HH6.
+  destruct D11, D13, D15.
+  intros ge gs0 gq0 C11 C13 C15 HHB1 HHB3 HHB5.
+  cbn in HHB1, HHB3, HHB5.
+  destruct HHB1, HHB3, HHB5.
+  revert ge gs0 gq0.
+  destruct C11, C13, C15.
+  intros ge gs0 gq0 E16 E12 E14 HHs.
+  revert E12 E14 HHs ge gs0 gq0.
+  destruct E16.
+  destruct E12.
+  intros E14 HHs. cbn in HHs. destruct HHs.
+  intros ge gs0 gq0.
+  revert k2 k4 k6.
+  revert gs0 ge gq0.
+  cbn.
+  generalize (fq t4). generalize (fs t2). generalize (fr t0).
+  generalize (f0 t10).
+  destruct gs0.
+  destruct ge.
+  destruct gq0.
+  intros k2 k4 k6 HH2 HH4 HH6.
+  cbn in HH2, HH4, HH6.
+  destruct HH2, HH4, HH6.
+  reflexivity.
+Defined.
+
+Lemma rew_coh2Layer
+  (n1 n2 n3 m1 m2 m3 dd11 dd21 dd13 dd23 dd15 dd25: T1)
+  (a1: S1 n1) (a2: S1 n2) (a3: S1 n3)
+  (b1: n1 = m1) (b2: n2 = m2) (b3: n3 = m3)
+  (KB1: ur n1 = us n2) (KB3: uq1 n2 = ur1 n3) (KB5: uq1 n1 = us n3)
+  (E11: dd11 = dd21) (E13: dd13 = dd23) (E15: dd15 = dd25)
+  (C11: ur m1 = g0 dd11) (D11: us m2 = g0 dd21)
+  (C13: uq1 m2 = g0 dd13) (D13: ur1 m3 = g0 dd23)
+  (C15: uq1 m1 = g0 dd15) (D15: us m3 = g0 dd25)
+  (E12: hq dd21 = hs dd13) (E14: hq dd11 = hr dd15)
+  (E16: hr dd25 = hs dd23)
+  (HKB1: rew [S0] KB1 in Rr n1 a1 = Rs n2 a2)
+  (HKB3: rew [S0] KB3 in Rq1 n2 a2 = Rr1 n3 a3)
+  (HKB5: rew [S0] KB5 in Rq1 n1 a1 = Rs n3 a3)
+  (HHB1: f_equal ur b1 • (C11 • f_equal g0 E11) =
+         KB1 • (f_equal us b2 • D11))
+  (HHB3: f_equal uq1 b2 • (C13 • f_equal g0 E13) =
+         KB3 • (f_equal ur1 b3 • D13))
+  (HHB5: f_equal uq1 b1 • (C15 • f_equal g0 E15) =
+         KB5 • (f_equal us b3 • D15))
+  (HH2: f_equal fq D11 • (gq dd21 • f_equal f0 E12) =
+        KA2 m2 • (f_equal fs C13 • gs dd13))
+  (HH4: f_equal fq C11 • (gq dd11 • f_equal f0 E14) =
+        KA4 m1 • (f_equal fr C15 • gr dd15))
+  (HH6: f_equal fr D15 • (gr dd25 • f_equal f0 E16) =
+        KA6 m3 • (f_equal fs D13 • gs dd23))
+  (HHA HHA': f_equal fq KB1 • (KA2 n2 • f_equal fs KB3) =
+        KA4 n1 • (f_equal fr KB5 • KA6 n3))
+  (HHs: f_equal hq E11 • (E12 • f_equal hs E13) =
+        E14 • (f_equal hr E15 • E16))
+  (Hred: permutahedral_coherence n1 n2 n3 m1 m2 m3 dd11 dd21 dd13 dd23 dd15 dd25
+    b1 b2 b3 KB1 KB3 KB5 E11 E13 E15 C11 D11 C13 D13 C15 D15 E12 E14 E16
+    HHB1 HHB3 HHB5 HH2 HH4 HH6 HHs = HHA')
+  (Hcoh2Painting:
+    rew [fun pi: fq (ur n1) = fs (ur1 n3) =>
+        rew [PA] pi in Fq (ur n1) (Rr n1 a1) = Fs (ur1 n3) (Rr1 n3 a3)]
+      HHA in
+    (sigT_map_eq Fq HKB1 ⊙ (HKA2 n2 a2 ⊙ sigT_map_eq Fs HKB3)) =
+    HKA4 n1 a1 ⊙ (sigT_map_eq Fr HKB5 ⊙ HKA6 n3 a3))
+  (Hcoh3Frame: HHA = HHA'):
+  rew [fun pi: hq dd11 = hs dd23 =>
+      rew [fun y => PA (f0 y)] pi in
+      rew [PA] gq dd11 in
+        Fq (g0 dd11) (rew [S0] C11 in Rr m1 (rew [S1] b1 in a1)) =
+      rew [PA] gs dd23 in
+        Fs (g0 dd23) (rew [S0] D13 in Rr1 m3 (rew [S1] b3 in a3))]
+    HHs in
+  (sigT_map_eq (fun x v => rew [PA] gq x in Fq (g0 x) v)
+     (rew_cohLayer S0 g0 Rr Rs E11 b1 b2 C11 D11 KB1 a1 a2 HKB1 HHB1)
+   ⊙ (rew_cohLayer PA f0 Fq Fs E12 D11 C13 (gq dd21) (gs dd13) (KA2 m2)
+        (Rs m2 (rew [S1] b2 in a2)) (Rq1 m2 (rew [S1] b2 in a2))
+        (HKA2 m2 (rew [S1] b2 in a2)) HH2
+      ⊙ sigT_map_eq (fun x v => rew [PA] gs x in Fs (g0 x) v)
+          (rew_cohLayer S0 g0 Rq1 Rr1 E13 b2 b3 C13 D13 KB3 a2 a3
+             HKB3 HHB3))) =
+  rew_cohLayer PA f0 Fq Fr E14 C11 C15 (gq dd11) (gr dd15) (KA4 m1)
+    (Rr m1 (rew [S1] b1 in a1)) (Rq1 m1 (rew [S1] b1 in a1))
+    (HKA4 m1 (rew [S1] b1 in a1)) HH4
+  ⊙ (sigT_map_eq (fun x v => rew [PA] gr x in Fr (g0 x) v)
+       (rew_cohLayer S0 g0 Rq1 Rs E15 b1 b3 C15 D15 KB5 a1 a3 HKB5 HHB5)
+     ⊙ rew_cohLayer PA f0 Fr Fs E16 D15 D13 (gr dd25) (gs dd23) (KA6 m3)
+         (Rs m3 (rew [S1] b3 in a3)) (Rr1 m3 (rew [S1] b3 in a3))
+         (HKA6 m3 (rew [S1] b3 in a3)) HH6).
+Proof.
+  destruct Hred.
+  assert (SMR: forall (A B: Type) (P: A -> Type) (Q: B -> Type) (f: A -> B)
+    (g: forall a, P a -> Q (f a)) (x: A) (u v: P x) (q9: u = v),
+    @sigT_map_eq A B P Q f g x x u v eq_refl q9 = f_equal (g x) q9).
+  { intros; now destruct q9. }
+  assert (STR: forall (A: Type) (P: A -> Type) (x: A) (u v w: P x)
+    (q: u = v) (q': v = w),
+    @sigT_trans_eq A P x x x u v w eq_refl q eq_refl q' = q • q').
+  { intros; now destruct q', q. }
+  assert (REI: forall (A: Type) (a b: A) (h: a = b),
+    eq_ind a (fun p => a = p) eq_refl b h = h).
+  { intros; now destruct h. }
+  destruct b1, b2, b3, E11, E13, E15.
+  unfold permutahedral_coherence in Hcoh3Frame.
+  lazy beta iota delta [f_equal].
+  change (rew [S1] eq_refl in a1) with a1.
+  change (rew [S1] eq_refl in a2) with a2.
+  change (rew [S1] eq_refl in a3) with a3.
+  cbn in HHB1, HHB3, HHB5, HHs.
+  revert KB1 KB3 KB5 C11 D11 C13 D13 C15 D15 E12 E14 E16 HKB1 HKB3 HKB5
+    HHB1 HHB3 HHB5 HH2 HH4 HH6 HHA HHs Hcoh3Frame Hcoh2Painting.
+  generalize (HKA2 n2 a2). generalize (HKA4 n1 a1). generalize (HKA6 n3 a3).
+  generalize (KA2 n2). generalize (KA4 n1). generalize (KA6 n3).
+  intros k6 k4 k2 hk6 hk4 hk2 KB1 KB3 KB5 C11 D11 C13 D13 C15 D15
+    E12 E14 E16 HKB1 HKB3 HKB5 HHB1 HHB3 HHB5 HH2 HH4 HH6 HHA HHs
+    Hcoh3Frame Hcoh2Painting.
+  rewrite !SMR.
+  cbv beta.
+  revert KB1 KB3 KB5 D11 D13 D15 C11 C13 C15 HHB1 HHB3 HHB5 HKB1 HKB3 HKB5
+    E16 E12 E14 HHs k2 k4 k6 hk2 hk4 hk6 HH2 HH4 HH6 HHA Hcoh3Frame Hcoh2Painting.
+  generalize (gq dd11). generalize (gs dd13). generalize (gr dd15).
+  cbn.
+  generalize (Rr n1 a1). generalize (Rs n2 a2). generalize (Rq1 n2 a2).
+  generalize (Rr1 n3 a3). generalize (Rq1 n1 a1). generalize (Rs n3 a3).
+  generalize (hq dd11). generalize (hs dd13). generalize (hr dd15).
+  generalize (g0 dd11). generalize (g0 dd13). generalize (g0 dd15).
+  generalize (ur n1). generalize (us n2). generalize (uq1 n2).
+  generalize (ur1 n3). generalize (uq1 n1). generalize (us n3).
+  intros t t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 s s0 s1 s2 s3 s4 ge gs0 gq0
+    KB1 KB3 KB5 D11 D13 D15 C11 C13 C15 HHB1 HHB3 HHB5 HKB1 HKB3 HKB5
+    E16 E12 E14 HHs k2 k4 k6 hk2 hk4 hk6 HH2 HH4 HH6 HHA Hcoh3Frame Hcoh2Painting.
+  revert ge gs0 gq0 C11 C13 C15 HHB1 HHB3 HHB5 HKB1 HKB3 HKB5 E16 E12 E14
+    HHs k2 k4 k6 hk2 hk4 hk6 HH2 HH4 HH6 HHA Hcoh3Frame Hcoh2Painting.
+  destruct D11, D13, D15.
+  intros ge gs0 gq0 C11 C13 C15 HHB1 HHB3 HHB5.
+  cbn in HHB1, HHB3, HHB5.
+  destruct HHB1, HHB3, HHB5.
+  intros HKB1 HKB3 HKB5.
+  destruct HKB1, HKB3, HKB5.
+  revert ge gs0 gq0.
+  destruct C11, C13, C15.
+  intros ge gs0 gq0 E16 E12 E14 HHs.
+  revert E12 E14 HHs ge gs0 gq0.
+  destruct E16.
+  destruct E12.
+  intros E14 HHs. cbn in HHs. destruct HHs.
+  intros ge gs0 gq0.
+  cbn.
+  generalize (Fq t4 s4). generalize (Fs t2 s2). generalize (Fr t0 s0).
+  revert gq0 gs0 ge.
+  generalize (fq t4). generalize (fs t2). generalize (fr t0).
+  intros x x0 x1 gq0 gs0 ge p0 p2 p4 k2 k4 k6 hk2 hk4 hk6
+    HH2 HH4 HH6 HHA Hcoh3Frame Hcoh2Painting.
+  rewrite !STR.
+  revert Hcoh2Painting. revert Hcoh3Frame. revert HH2 HH4 HH6. revert HHA.
+  revert hk2 hk4 hk6. revert k2 k4 k6. revert p0 p2 p4. revert gs0 ge gq0.
+  generalize (f0 t10).
+  destruct gs0.
+  destruct ge.
+  destruct gq0.
+  intros p0 p2 p4 k2 k4 k6 hk2 hk4 hk6 HHA HH2 HH4 HH6 Hcoh3Frame Hcoh2Painting.
+  cbn in HH2, HH4, HH6.
+  revert hk2 hk4 hk6 HHA Hcoh3Frame Hcoh2Painting.
+  destruct HH2, HH4, HH6.
+  intros hk2 hk4.
+  destruct hk2, hk4.
+  intros hk6 HHA Hcoh3Frame Hcoh2Painting.
+  cbn in hk6, HHA, Hcoh3Frame, Hcoh2Painting |- *.
+  rewrite Hcoh3Frame in Hcoh2Painting.
+  cbn in Hcoh2Painting.
+  rewrite !STR in Hcoh2Painting.
+  rewrite REI.
+  exact Hcoh2Painting.
+Defined.
+
+End Coh2Layer.
