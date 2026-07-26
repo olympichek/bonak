@@ -109,8 +109,8 @@ Lemma eq_existT_curried_dep_hex
      ⊙ eq_existT_curried_dep (Q := fun z => R' z.1 z.2)
          (H := H3') (Hu := Hu3') (Hv := Hv3')).
 Proof.
-  rewrite !sigT_map_eq_existT_curried_dep_curried.
-  rewrite !(sigT_trans_eq_existT_curried_dep (Q := fun z => R' z.1 z.2)).
+  rewrite 3 sigT_map_eq_existT_curried_dep_curried.
+  rewrite 4 (sigT_trans_eq_existT_curried_dep (Q := fun z => R' z.1 z.2)).
   refine (eq_existT_curried_dep_eq (Q := fun z => R' z.1 z.2) HH HHu _).
   unfold eq_existT_curried_hex in HHv.
   cbn [projT1 projT2] in HHv |- *.
@@ -135,7 +135,7 @@ Proof.
     Hu1' ⊙ (sigT_map_eq g2 Hu2' ⊙ Hu3')).
   intros qR qL q23' q23 q2' q3 q1 e e0 e1 e2 e3 e4 e5 e6.
   destruct e, e0, e1, e2, e3, e4, e5.
-  intros HHv'; exact HHv'.
+  intros HHv'; now exact HHv'.
 Defined.
 
 Lemma rew_cohLayer {T1 T2 T3 X: Type} (P: X -> Type)
@@ -156,11 +156,11 @@ Lemma rew_cohLayer {T1 T2 T3 X: Type} (P: X -> Type)
   = rew [P] D1 in G n2 (rew [S3] D2 in aR).
 Proof.
   intros HC Hpath.
-  destruct E1, C2, D2. cbn in *.
+  rewrite <- (map_subst F C2 aL), <- (map_subst G D2 aR).
   rewrite <- HC.
-  rewrite rew_compose.
-  rewrite !eq_trans_refl_l in Hpath.
-  now rewrite Hpath.
+  rewrite (rew_map P rf0 E1), (rew_map P rfF C2), (rew_map P rfG D2).
+  rewrite 4 rew_compose.
+  now exact (f_equal (fun h => rew [P] h in F m1 aL) Hpath).
 Defined.
 
 Lemma rew_coh2Painting_restr0 {Tp Td: Type} {S: Tp -> Type} (P: Td -> Type)
@@ -218,7 +218,7 @@ Proof.
   generalize (rfG n1) as Y.
   intros Y C1.
   destruct C1.
-  reflexivity.
+  now reflexivity.
 Defined.
 
 Section Coh2Layer.
@@ -255,7 +255,7 @@ Variable HKA6: forall x (c: S1 x),
   rew [PA] KA6 x in Fr (us x) (Rs x c) = Fs (ur1 x) (Rr1 x c).
 
 (** The permutahedral coherence of frames: the hexagon proved as a
-    compostition of the seven other hexagons of the permutahedron. The six
+    composition of the seven other hexagons of the permutahedron. The six
     squares hold by naturality and don't appear here explicitly. *)
 Lemma permutahedral_coherence
   (n1 n2 n3 m1 m2 m3 dd11 dd21 dd13 dd23 dd15 dd25: T1)
@@ -321,7 +321,7 @@ Proof.
   intros k2 k4 k6 HH2 HH4 HH6.
   cbn in HH2, HH4, HH6.
   destruct HH2, HH4, HH6.
-  reflexivity.
+  now reflexivity.
 Defined.
 
 Lemma rew_coh2Layer
@@ -350,20 +350,20 @@ Lemma rew_coh2Layer
         KA4 m1 • (f_equal fr C15 • gr dd15))
   (HH6: f_equal fr D15 • (gr dd25 • f_equal f0 E16) =
         KA6 m3 • (f_equal fs D13 • gs dd23))
-  (HHA HHA': f_equal fq KB1 • (KA2 n2 • f_equal fs KB3) =
+  (HHA: f_equal fq KB1 • (KA2 n2 • f_equal fs KB3) =
         KA4 n1 • (f_equal fr KB5 • KA6 n3))
   (HHs: f_equal hq E11 • (E12 • f_equal hs E13) =
         E14 • (f_equal hr E15 • E16))
-  (Hred: permutahedral_coherence n1 n2 n3 m1 m2 m3 dd11 dd21 dd13 dd23 dd15 dd25
-    b1 b2 b3 KB1 KB3 KB5 E11 E13 E15 C11 D11 C13 D13 C15 D15 E12 E14 E16
-    HHB1 HHB3 HHB5 HH2 HH4 HH6 HHs = HHA')
   (Hcoh2Painting:
     rew [fun pi: fq (ur n1) = fs (ur1 n3) =>
         rew [PA] pi in Fq (ur n1) (Rr n1 a1) = Fs (ur1 n3) (Rr1 n3 a3)]
       HHA in
     (sigT_map_eq Fq HKB1 ⊙ (HKA2 n2 a2 ⊙ sigT_map_eq Fs HKB3)) =
     HKA4 n1 a1 ⊙ (sigT_map_eq Fr HKB5 ⊙ HKA6 n3 a3))
-  (Hcoh3Frame: HHA = HHA'):
+  (Hcoh3Frame: HHA =
+    permutahedral_coherence n1 n2 n3 m1 m2 m3 dd11 dd21 dd13 dd23 dd15 dd25
+      b1 b2 b3 KB1 KB3 KB5 E11 E13 E15 C11 D11 C13 D13 C15 D15 E12 E14 E16
+      HHB1 HHB3 HHB5 HH2 HH4 HH6 HHs):
   rew [fun pi: hq dd11 = hs dd23 =>
       rew [fun y => PA (f0 y)] pi in
       rew [PA] gq dd11 in
@@ -388,20 +388,8 @@ Lemma rew_coh2Layer
          (Rs m3 (rew [S1] b3 in a3)) (Rr1 m3 (rew [S1] b3 in a3))
          (HKA6 m3 (rew [S1] b3 in a3)) HH6).
 Proof.
-  destruct Hred.
-  assert (SMR: forall (A B: Type) (P: A -> Type) (Q: B -> Type) (f: A -> B)
-    (g: forall a, P a -> Q (f a)) (x: A) (u v: P x) (q9: u = v),
-    @sigT_map_eq A B P Q f g x x u v eq_refl q9 = f_equal (g x) q9).
-  { intros; now destruct q9. }
-  assert (STR: forall (A: Type) (P: A -> Type) (x: A) (u v w: P x)
-    (q: u = v) (q': v = w),
-    @sigT_trans_eq A P x x x u v w eq_refl q eq_refl q' = q • q').
-  { intros; now destruct q', q. }
-  assert (REI: forall (A: Type) (a b: A) (h: a = b),
-    eq_ind a (fun p => a = p) eq_refl b h = h).
-  { intros; now destruct h. }
-  destruct b1, b2, b3, E11, E13, E15.
   unfold permutahedral_coherence in Hcoh3Frame.
+  destruct b1, b2, b3, E11, E13, E15.
   lazy beta iota delta [f_equal].
   change (rew [S1] eq_refl in a1) with a1.
   change (rew [S1] eq_refl in a2) with a2.
@@ -414,7 +402,7 @@ Proof.
   intros k6 k4 k2 hk6 hk4 hk2 KB1 KB3 KB5 C11 D11 C13 D13 C15 D15
     E12 E14 E16 HKB1 HKB3 HKB5 HHB1 HHB3 HHB5 HH2 HH4 HH6 HHA HHs
     Hcoh3Frame Hcoh2Painting.
-  rewrite !SMR.
+  rewrite 3 sigT_map_eq_refl.
   cbv beta.
   revert KB1 KB3 KB5 D11 D13 D15 C11 C13 C15 HHB1 HHB3 HHB5 HKB1 HKB3 HKB5
     E16 E12 E14 HHs k2 k4 k6 hk2 hk4 hk6 HH2 HH4 HH6 HHA Hcoh3Frame Hcoh2Painting.
@@ -451,7 +439,7 @@ Proof.
   generalize (fq t4). generalize (fs t2). generalize (fr t0).
   intros x x0 x1 gq0 gs0 ge p0 p2 p4 k2 k4 k6 hk2 hk4 hk6
     HH2 HH4 HH6 HHA Hcoh3Frame Hcoh2Painting.
-  rewrite !STR.
+  rewrite 3 sigT_trans_eq_refl.
   revert Hcoh2Painting. revert Hcoh3Frame. revert HH2 HH4 HH6. revert HHA.
   revert hk2 hk4 hk6. revert k2 k4 k6. revert p0 p2 p4. revert gs0 ge gq0.
   generalize (f0 t10).
@@ -468,9 +456,10 @@ Proof.
   cbn in hk6, HHA, Hcoh3Frame, Hcoh2Painting |- *.
   rewrite Hcoh3Frame in Hcoh2Painting.
   cbn in Hcoh2Painting.
-  rewrite !STR in Hcoh2Painting.
-  rewrite REI.
-  exact Hcoh2Painting.
+  rewrite 2 sigT_trans_eq_refl in Hcoh2Painting.
+  change (eq_ind p4 (fun p: PA x1 => p4 = p) eq_refl p4 hk6) with (eq_refl • hk6).
+  rewrite eq_trans_refl_l.
+  now exact Hcoh2Painting.
 Defined.
 
 End Coh2Layer.

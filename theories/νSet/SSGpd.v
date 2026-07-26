@@ -1,16 +1,5 @@
-(** Semi-simplicial variant of the νGpd construction.
-
-    This is the [νGpd] construction specialised to the semi-simplicial case,
-    where the arity has length 1.  With a single face there is no choice of
-    face to make, so the construction carries no arity at all: a layer over an
-    arity of length 1 is a one-element vector, hence we drop the [HGpdVec]
-    abstraction entirely (a layer is just the single painting itself), and the
-    face arguments [ε ω θ ζ] of the restriction and coherence maps are removed.
-    The frame restrictions are therefore the semi-simplicial face maps
-    [δ_q : frame(n+1) -> frame(n)] with no face index. *)
-
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT RewLemmas HSet HGpd Notation LeSProp SSLemmas.
+From Bonak Require Import SigT RewLemmas HSet HGpd Notation LeSProp SSGpdLemmas.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -1029,7 +1018,6 @@ Proof.
     (HKA2 := fun x c => depsCohs2.(_cohPaintings).2 q Hq s (Hs ↕ Hr) x c)
     (HKA4 := fun x c => depsCohs2.(_cohPaintings).2 q Hq r Hr x c)
     (HKA6 := fun x c => depsCohs2.(_cohPaintings).2 r (Hr ↕ Hq) s Hs x c).
-  - now trivial.
   - now exact (coh2Painting q Hq r Hr s Hs
       (((mkCohFrameTypesAndRestrFrames
           (mkRestrPaintings (mkDepsCohs depsCohs2; mkExtraCohs extraDepsCohs2)).1.1)
@@ -1278,7 +1266,7 @@ Instance mkSSGpd0: SSGpd 0.
 Proof.
   unshelve esplit.
   - now exact gunit.
-  - unshelve esplit; try now trivial.
+  - unshelve esplit; now trivial.
 Defined.
 
 #[local]

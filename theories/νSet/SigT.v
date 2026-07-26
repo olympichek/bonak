@@ -131,17 +131,17 @@ Proof.
   now destruct q, p.
 Defined.
 
-Lemma sigT_map_eq_refl {A B: Type} {P: A -> Type} {Q: B -> Type}
-  {f: A -> B} (g: forall a, P a -> Q (f a))
-  {x: A} {u: P x}:
-  @sigT_map_eq A B P Q f g x x u u eq_refl eq_refl = eq_refl.
-Proof.
-  reflexivity.
-Defined.
-
 Lemma sigT_map_eq_id_refl {A B: Type} {Q: B -> Type} (f: A -> B)
   {x: A} {u v: Q (f x)} (q: u = v):
   @sigT_map_eq A B (fun a => Q (f a)) Q f (fun a u => u) x x u v eq_refl q = q.
+Proof.
+  now destruct q.
+Defined.
+
+Lemma sigT_map_eq_refl {A B: Type} {P: A -> Type} {Q: B -> Type}
+  {f: A -> B} (g: forall a, P a -> Q (f a))
+  {x: A} {u v: P x} (q: u = v):
+  sigT_map_eq g (p := eq_refl) q = f_equal (g x) q.
 Proof.
   now destruct q.
 Defined.
@@ -274,6 +274,13 @@ Infix "⊙" := sigT_trans_eq (at level 65, left associativity).
 
 Notation "q ⊙[ P ] q'" := (@sigT_trans_eq _ P _ _ _ _ _ _ _ q _ q')
   (at level 65, left associativity, only parsing).
+
+Lemma sigT_trans_eq_refl {A: Type} {P: A -> Type} {x: A} {u v w: P x}
+  (q: u = v) (q': v = w):
+  sigT_trans_eq (p := eq_refl) q (p' := eq_refl) q' = eq_trans q q'.
+Proof.
+  now destruct q', q.
+Defined.
 
 Lemma sigT_trans_eq_refl_l {A: Type} {P: A -> Type}
   {x y: A} {u: P x} {v: P y}
