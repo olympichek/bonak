@@ -133,3 +133,52 @@ Proof.
       exact (IH n w (shiftStr P) (shiftStr Q) (fun n => T (S n))
         (fun n q Hq a x => H (S n) q (↑ Hq) a x) x).
 Defined.
+
+(** The recursion equations of [applyWNat] at the two word constructors. *)
+
+Lemma applyWNatSkip {A: HSet} m n (b: A) (w: Word A n m) (Q: FaceStr A)
+  T HT (ε: A) x:
+  applyWNat (S m) n (wskip b w) Q T HT ε x
+  = f_equal (applyW m w Q) (eq_sym (HT m m leR_refl ε b x))
+    • applyWNat m n w Q T HT ε (sTop (shiftStr Q) m b x).
+Proof. now reflexivity. Defined.
+
+Lemma applyWNatKeep {A: HSet} m n (w: Word A n m) (Q: FaceStr A)
+  T HT (ε: A) x:
+  applyWNat (S m) (S n) (wkeep w) Q T HT ε x
+  = applyWNat m n w (shiftStr Q) (fun k => T (S k))
+      (fun k q Hq ε ω X => HT (S k) q (↑ Hq) ε ω X) ε x.
+Proof. now reflexivity. Defined.
+
+(** An action on words is determined by its values on generating cofaces.
+    Only pointwise identity and composition comparisons are needed; no
+    coherence or truncation assumptions enter the induction. *)
+
+Lemma applyWCompare {A: HSet} (m: nat): forall n (w: Word A n m)
+  (ob: nat -> Type)
+  (act: forall p n, Word A n p -> ob p -> ob n)
+  (unit: forall n x, act n n (wid n) x = x)
+  (comp: forall p m n (g: Word A m p) (f: Word A n m) x,
+    act m n f (act p m g x) = act p n (wcomp g f) x)
+  (SF: forall k q (Hq: q <= k) (ε: A), ob (S k) -> ob k)
+  (HSF: forall k q (Hq: q <= k) (ε: A) x,
+    SF k q Hq ε x = act (S k) k (wgen k q ε) x) x,
+  applyW m w (Build_FaceStr A ob SF) x = act m n w x.
+Proof.
+  induction m as [|m IH]; intros n w ob act unit comp SF HSF x.
+  - destruct n as [|n]; [destruct w|destruct w].
+    exact (eq_sym (unit 0 x)).
+  - destruct w as [[ε w]|w].
+    + refine (IH n w ob act unit comp SF HSF (SF m m leR_refl ε x) • _).
+      refine (f_equal (act m n w) (HSF m m leR_refl ε x) • _).
+      refine (comp (S m) m n (wgen m m ε) w x • _).
+      exact (f_equal (fun v => act (S m) n v x) (wgenSkip ε w)).
+    + destruct n as [|n]; [destruct w|].
+      exact (IH n w (fun k => ob (S k))
+        (fun p n w => act (S p) (S n) (wkeep w))
+        (fun n x => unit (S n) x)
+        (fun p m n g f x => comp (S p) (S m) (S n) (wkeep g) (wkeep f) x)
+        (fun k q Hq ε => SF (S k) q (↑ Hq) ε)
+        (fun k q Hq ε x => HSF (S k) q (↑ Hq) ε x
+          • f_equal (fun v => act (S (S k)) (S k) v x) (wgenLift Hq ε)) x).
+Defined.

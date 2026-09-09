@@ -58,3 +58,11 @@ theories/Category/Bicategory/UnivGpd2Cat.v
 theories/Category/Bicategory/PseudofunctorPasting.v
 theories/Category/Bicategory/PathDiagramLemmas.v
 theories/Category/Bicategory/PathDiagramPasting.v
+theories/Presheaf/Gpd/Pseudofunctor.v
+theories/Presheaf/Gpd/Icon.v
+theories/Presheaf/Gpd/Roundtrip.v
+theories/Presheaf/Gpd/Correspondence.v
+theories/Lib/BoolLemmas.v
+theories/Presheaf/GeneratorCoherence.v
+theories/Presheaf/Gpd/Presentation.v
+theories/Presheaf/WordCoherence.v
