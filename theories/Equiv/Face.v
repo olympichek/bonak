@@ -15,16 +15,16 @@ Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT HSet LeSProp Notation νSet.Layer νSet.
-From Bonak Require νSetEquiv.
+From Bonak Require Equiv.νSetEquiv.
 
 Set Primitive Projections.
 Set Printing Projections.
 Set Keyed Unification.
 
-Module Face (A: LayerSig).
+Module FaceOn (A: LayerSig) (S: νSetSig A).
 Import A.
 
-Module Export νSetEquiv := Bonak.Equiv.νSetEquiv.νSetEquiv A.
+Module Export νSetEquiv := Bonak.Equiv.νSetEquiv.νSetEquivOn A S.
 
 (** Chains of projections between frame stages *)
 
@@ -576,6 +576,11 @@ Proof.
   now exact (hunit_ext _ _).
 Qed.
 
+End FaceOn.
+
+Module Face (A: LayerSig).
+Module Base := νSet.νSet A.
+Include FaceOn A Base.
 End Face.
 
 Module FaceSimplicial := Face SimplicialLayer.

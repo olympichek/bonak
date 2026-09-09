@@ -666,6 +666,10 @@ Definition νSets := νSetFrom 0 tt.
 
 End νSet.
 
+Module Type νSetSig (A: LayerSig).
+Include νSet A.
+End νSetSig.
+
 Module νSetSimplicial := νSet SimplicialLayer.
 Module νSetCubical := νSet CubicalLayer.
 

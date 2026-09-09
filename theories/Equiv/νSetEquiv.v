@@ -33,10 +33,10 @@ Set Primitive Projections.
 Set Printing Projections.
 Set Keyed Unification.
 
-Module νSetEquiv (A: LayerSig).
+Module νSetEquivOn (A: LayerSig) (S: νSetSig A).
 Import A.
 
-Module Export νSet := νSet.νSet A.
+Module Export νSet := S.
 
 Definition νDataAt {m} (Xpre: (νSetAt m).(prefix)): νSetData m :=
   (νSetAt m).(data) Xpre.
@@ -362,6 +362,11 @@ Definition νSetsEquivEq {SA SB: νSets} (E: νSetsEquiv SA SB): SA = SB :=
       • f_equal (@prefixEq m (νSetPack m SA).1 (νSetPack m SB).1)
           (E.(approxS) m leR_O leR_O)).
 
+End νSetEquivOn.
+
+Module νSetEquiv (A: LayerSig).
+Module Base := νSet.νSet A.
+Include νSetEquivOn A Base.
 End νSetEquiv.
 
 Module νSetEquivSimplicial := νSetEquiv SimplicialLayer.
