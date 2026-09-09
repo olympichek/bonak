@@ -229,3 +229,155 @@ Proof.
     (eq_sym (eq_trans_assoc _ _ _) • (Hpath • eq_sym (eq_trans_refl_l _)))
     (sigT_map_eq (Q := P) F (p := C2) (u := aL) eq_refl ⊙ eq_refl) HC eq_refl).
 Defined.
+
+(** Path composition and naturality of homotopies. *)
+
+Polymorphic Definition eqTransAssoc {T: Type} {x y z t: T} (p: x = y) (q: y = z) (r: z = t):
+  (p • q) • r = p • (q • r) := eq_sym (eq_trans_assoc p q r).
+
+Polymorphic Lemma homotopyNat {X Y: Type} (u v: X -> Y) (H: forall z, u z = v z)
+  {z1 z2: X} (p: z1 = z2): f_equal u p • H z2 = H z1 • f_equal v p.
+Proof. destruct p. now exact (eq_trans_refl_l (H z1)). Defined.
+
+(** The image of an inverse path, oriented for rewriting under [f_equal]. *)
+Polymorphic Definition fEqualSym {X Y: Type} (h: X -> Y) {x y: X} (p: x = y):
+  f_equal h (eq_sym p) = eq_sym (f_equal h p) :=
+  eq_sym (eq_sym_map_distr h p).
+
+Polymorphic Lemma fEqualConst {A B: Type} (b: B) {x y: A} (e: x = y):
+  f_equal (fun _ => b) e = eq_refl.
+Proof.
+  now destruct e.
+Qed.
+
+Polymorphic Lemma symTransCancel {Z: Type} {x y: Z} (a b: x = y)
+  (H: eq_sym a • (eq_refl • b) = eq_refl): a = b.
+Proof.
+  destruct b; simpl in H.
+  now exact (eq_sym (eq_sym_involutive a) • f_equal (@eq_sym _ _ _) H).
+Defined.
+
+Polymorphic Lemma transCancelL {T: Type} {x y z: T} (p: x = y) (q r: y = z)
+  (H: p • q = p • r): q = r.
+Proof.
+  destruct p. now exact (eq_sym (eq_trans_refl_l q) • (H • eq_trans_refl_l r)).
+Defined.
+
+Polymorphic Lemma transCongL {T: Type} {x y z: T} (p: x = y) {q r: y = z} (H: q = r):
+  p • q = p • r.
+Proof. now destruct H. Defined.
+
+Polymorphic Lemma transCongR {T: Type} {x y z: T} {p p': x = y} (H: p = p') (q: y = z):
+  p • q = p' • q.
+Proof. now destruct H. Defined.
+
+Polymorphic Lemma transSymCancelR {T: Type} {x y z: T} (p: x = y) (q: y = z):
+  (p • q) • eq_sym q = p.
+Proof. now destruct q. Defined.
+
+Polymorphic Lemma transCancelMid {T: Type} {x y z t: T} (p: x = y) (q: y = z) (r: y = t):
+  (p • q) • (eq_sym q • r) = p • r.
+Proof. now destruct q, r. Defined.
+
+Polymorphic Lemma transCancelMid2 {T: Type} {x y z t: T} (p: x = y) (q: z = y) (r: y = t):
+  (p • eq_sym q) • (q • r) = p • r.
+Proof. now destruct q, r. Defined.
+
+Polymorphic Lemma transCancelR {T: Type} {x y z: T} (p q: x = y) (s: y = z)
+  (H: p • s = q • s): p = q.
+Proof. now destruct s. Defined.
+
+Polymorphic Lemma transSymCancelR2 {T: Type} {x y z: T} (p: x = y) (q: z = y):
+  (p • eq_sym q) • q = p.
+Proof. now destruct q. Defined.
+
+Polymorphic Lemma transSymCancelL {T: Type} {x y z: T} (p: x = y) (q: x = z):
+  p • (eq_sym p • q) = q.
+Proof. now destruct p, q. Defined.
+
+Polymorphic Lemma eqIndRPath {W T: Type} (ψ: W -> T) {w w': W} (e: w = w') {t: T}
+  (body: ψ w' = t):
+  eq_ind_r (fun z => ψ z = t) body e = f_equal ψ e • body.
+Proof. destruct e. now exact (eq_sym (eq_trans_refl_l body)). Defined.
+
+Polymorphic Lemma fEqualCompEq {W1 W2 T: Type} (ϕ: W1 -> W2) (ψ: W2 -> T) {w w': W1}
+  (e: w = w') {t0: T} (Θ: t0 = ψ (ϕ w)) (R: t0 = ψ (ϕ w'))
+  (H: Θ • f_equal (fun z => ψ (ϕ z)) e = R):
+  Θ • f_equal ψ (f_equal ϕ e) = R.
+Proof. now rewrite f_equal_compose. Defined.
+
+
+Polymorphic Lemma symCancelF {X Y: Type} (F: X -> Y) {u v: X} (ι: u = v) {w: Y}
+  (Θ: F u = w) (τ: w = F v) (IH: Θ • τ = f_equal F ι):
+  (f_equal F (eq_sym ι) • Θ) • τ = eq_refl.
+Proof.
+  destruct ι. now exact (f_equal (fun z => z • τ) (eq_trans_refl_l Θ) • IH).
+Defined.
+
+Polymorphic Lemma assoc5S {T: Type} {y0 y1 y2 y3 y4 y5: T} (a: y0 = y1) (b: y1 = y2)
+  (c: y2 = y3) (d1: y4 = y3) (d2: y5 = y4):
+  a • ((b • (c • eq_sym d1)) • eq_sym d2) = (a • b) • (c • eq_sym (d2 • d1)).
+Proof. now destruct d1, d2, c, b, a. Defined.
+
+Polymorphic Lemma prependEq {T: Type} {x0 x1 x2 x2' x3: T} (a: x0 = x1) (u1: x1 = x2)
+  (u2: x2 = x3) (v1: x1 = x2') (v2: x2' = x3) (H: u1 • u2 = v1 • v2):
+  (a • u1) • u2 = (a • v1) • v2.
+Proof.
+  now exact (eqTransAssoc a u1 u2
+    • (f_equal (fun z => a • z) H • eq_sym (eqTransAssoc a v1 v2))).
+Defined.
+
+Polymorphic Lemma alphaTrans {S1 S2: Type} (Fv SF: S1 -> S2) (hv: forall z, Fv z = SF z)
+  {y Y z2: S1} (p: y = Y) (g2: Y = z2):
+  hv y • (f_equal SF p • f_equal SF g2)
+  = f_equal Fv p • (hv Y • f_equal SF g2).
+Proof. destruct g2, p. now exact (eq_sym (eq_trans_refl_l (hv y))). Defined.
+
+Polymorphic Lemma fEqualSkipSplit {W1 W2 T: Type} (ϕ: W1 -> W2) (ψ: W2 -> T) {w1 w2 w3: W1}
+  (p: w1 = w2) (q: w3 = w2):
+  f_equal ψ (f_equal ϕ (p • eq_sym q))
+  = f_equal (fun z => ψ (ϕ z)) p • eq_sym (f_equal (fun z => ψ (ϕ z)) q).
+Proof. now destruct q, p. Defined.
+
+Polymorphic Lemma movePath {T: Type} {x y z: T} (u: x = y) (c: z = y) (P: x = z)
+  (H: P = u • eq_sym c): P • c = u.
+Proof. now destruct c. Defined.
+
+Polymorphic Lemma conjTrans3 {T: Type} {y1 y2 y3 y4: T} (e1: y1 = y2) (e2: y2 = y3)
+  (e3: y3 = y4) {x1 x2 x3 x4: T} (t1: x1 = y1) (t2: x2 = y2) (t3: x3 = y3)
+  (t4: x4 = y4):
+  (t1 • (e1 • eq_sym t2))
+  • ((t2 • (e2 • eq_sym t3)) • (t3 • (e3 • eq_sym t4)))
+  = t1 • ((e1 • (e2 • e3)) • eq_sym t4).
+Proof. now destruct e1, e2, e3, t1, t2, t3, t4. Defined.
+
+Polymorphic Lemma conjCancel {T: Type} {x1 x4 y1 y4: T} (t1: x1 = y1) (t4: x4 = y4)
+  (M M': y1 = y4) (H: M = M'):
+  t1 • (M • eq_sym t4) = t1 • (M' • eq_sym t4).
+Proof. now destruct H. Defined.
+
+Polymorphic Lemma fEqualUIP {W T: Type}
+  (uip: forall (x y: W) (h g: x = y), h = g) (ϕ: W -> T)
+  {g1 g2 g3 g4 g2' g3': W}
+  (e1: g1 = g2) (e2: g2 = g3) (e3: g3 = g4)
+  (e1': g1 = g2') (e2': g2' = g3') (e3': g3' = g4):
+  f_equal ϕ e1 • (f_equal ϕ e2 • f_equal ϕ e3)
+  = f_equal ϕ e1' • (f_equal ϕ e2' • f_equal ϕ e3').
+Proof.
+  rewrite <- !eq_trans_map_distr.
+  now rewrite (uip _ _ (e1 • (e2 • e3)) (e1' • (e2' • e3'))).
+Defined.
+
+Polymorphic Lemma hexRotate {X: Type} {w0 w1 w2 w3 v1 v2: X}
+  (P1: w0 = w1) (P2: w1 = w2) (P3: w2 = w3)
+  (Q1: w0 = v1) (Q2: v1 = v2) (Q3: v2 = w3)
+  (h: P1 • (P2 • P3) = Q1 • (Q2 • Q3)):
+  Q2 • (Q3 • (eq_sym P3 • (eq_sym P2 • eq_sym P1))) = eq_sym Q1.
+Proof.
+  destruct P1, P2, P3, Q1. simpl in h |- *.
+  rewrite eq_trans_refl_l in h. now exact (eq_sym h).
+Defined.
+
+Polymorphic Lemma tailSubst {X: Type} {a b c d: X} (P: a = d) (Q1: a = b) (Q2: b = c)
+  (R1 R2: c = d) (e: R1 = R2) (ih: P = Q1 • (Q2 • R1)): P = Q1 • (Q2 • R2).
+Proof. now destruct e. Defined.
