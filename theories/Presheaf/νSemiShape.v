@@ -242,6 +242,12 @@ Definition νSemiShapeShift: Functor (Op νSemiShape) (Op νSemiShape) :=
   Build_Functor (Op νSemiShape) (Op νSemiShape) (fun n => S n) (fun a b w => wkeep w)
     (fun a => eq_refl) (fun a b c f g => eq_sym (wcomp_keep_keep f g)).
 
+Lemma wskipKeep {k l} (ε: A) (w: Word l k):
+  wcomp (wkeep w) (wgen l l ε) = wskip ε w.
+Proof.
+  rewrite (wgenTop l ε). now exact (f_equal (wskip ε) (wcompIdr w)).
+Defined.
+
 End νSemiShape.
 
 Arguments wnil {A}.
@@ -262,3 +268,5 @@ Arguments wcomp_skip {A m n p} ε g f.
 Arguments wcomp_keep_skip {A m n p} ε g f.
 Arguments wcomp_keep_keep {A m n p} g f.
 Arguments wordSet {A} n m.
+
+Arguments wskipKeep {A k l} ε w.
