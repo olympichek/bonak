@@ -14,10 +14,10 @@
     [νSetsEquivEq] from [Extensionality.v] on the indexed side. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import HSet Notation νSet.Layer Univalence
-  νSet Face PresheafEquiv νSetOfPresheaf PresheafOfνSet
-  νSetRoundtrip PresheafRoundtrip Limit.
+From Bonak Require Import νSet.Layer Univalence Presheaf.Presentation Equiv.PresheafRoundtrip.
 From Bonak.Lib Require Import Equiv.
+
+From Bonak.νSet Require Import νSet.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -41,12 +41,12 @@ Module Export PresheafRoundtrip := PresheafRoundtrip.PresheafRoundtrip A.
     [νSetsEquivEq] converts it into equality of the two towers by turning
     each level's relation into a path between the finite prefixes. *)
 
-Definition presheafνSetsEquiv: Equiv Presheaf νSets :=
+Definition presheafνSetsEquiv: Equiv (Presheaf arity) νSets :=
   qinvEquiv f g
     (fun psh => presheafEquivEq (gf psh))
     (fun X => νSetsEquivEq (fg X)).
 
-Definition presheafEqνSets: Presheaf = νSets := ua presheafνSetsEquiv.
+Definition presheafEqνSets: Presheaf arity = νSets := ua presheafνSetsEquiv.
 
 End Correspondence.
 
