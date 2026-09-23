@@ -74,6 +74,7 @@ theories/Equiv/Gpd/PathAlgebra.v
 theories/Equiv/Gpd/PathTactics.v
 theories/Equiv/Gpd/PresheafEquiv.v
 theories/Equiv/Gpd/PresheafOfνGpd.v
+theories/Equiv/Gpd/PresheafRoundtrip.v
 theories/Equiv/Gpd/Tower.v
 theories/Equiv/Gpd/νGpdEquiv.v
 theories/Equiv/Gpd/νGpdOfPresheaf.v
