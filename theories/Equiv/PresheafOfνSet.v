@@ -8,7 +8,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT HSet LeSProp NatLemmas Notation νSet.Layer
-  νSet Face Presheaf.Presentation Equiv.νSetOfPresheaf Limit.
+  νSet Equiv.Face Presheaf.Presentation Equiv.νSetOfPresheaf Limit.
 
 From Bonak.νSet Require Import νSet.
 
