@@ -78,4 +78,7 @@ theories/Equiv/Gpd/PresheafRoundtrip.v
 theories/Equiv/Gpd/Tower.v
 theories/Equiv/Gpd/νGpdEquiv.v
 theories/Equiv/Gpd/νGpdOfPresheaf.v
+theories/Equiv/Gpd/νGpdRoundtrip/Association.v
+theories/Equiv/Gpd/νGpdRoundtrip/Canonical.v
+theories/Equiv/Gpd/νGpdRoundtrip/Successor.v
 theories/Equiv/Gpd/νGpdRoundtrip/Translation.v
