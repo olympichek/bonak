@@ -68,3 +68,6 @@ theories/Presheaf/Gpd/Presentation.v
 theories/Presheaf/WordCoherence.v
 
 theories/νGpd/HGpdEq.v
+theories/Equiv/Gpd/Filler.v
+theories/Equiv/Gpd/PathAlgebra.v
+theories/Equiv/Gpd/PathTactics.v
