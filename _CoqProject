@@ -66,3 +66,5 @@ theories/Lib/BoolLemmas.v
 theories/Presheaf/GeneratorCoherence.v
 theories/Presheaf/Gpd/Presentation.v
 theories/Presheaf/WordCoherence.v
+
+theories/νGpd/HGpdEq.v
