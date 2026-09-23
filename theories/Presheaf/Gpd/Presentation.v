@@ -16,7 +16,7 @@ From Stdlib Require Import Logic.FunctionalExtensionality.
 Set Primitive Projections.
 Set Printing Projections.
 
-Record PresheafGpd (arity: HSet) := {
+Record νGpdPresentation (arity: HSet) := {
   G0: nat -> HGpd;
   GFace n q (Hq: q <= n) (ε: arity): G0 n.+1 -> G0 n;
   GFaceCoh n q (Hq: q <= n) r (Hr: r <= q) (ε ω: arity) (X: G0 n.+2):
@@ -40,8 +40,8 @@ Arguments GFace {arity} _ _ _ _ _.
 Arguments GFaceCoh {arity} _ _ _ _ _ _ _ _ _.
 Arguments GFaceCoh2 {arity} _ _ _ _ _ _ _ _ _ _ _ _.
 
-Definition AugmentedSemiSimplicialPresheafGpd := PresheafGpd hunit.
-Definition SemiCubicalPresheafGpd := PresheafGpd hbool.
+Definition AugmentedSemiSimplicialGpdPresentation := νGpdPresentation hunit.
+Definition SemiCubicalGpdPresentation := νGpdPresentation hbool.
 
 Section PresentationEq.
 Context (A: HSet).
@@ -80,7 +80,7 @@ Lemma gpdEqHom {G: nat -> HGpd} (Fa Fa': GFaceType G)
   (Da: GCoh2Type Ca) (Da': GCoh2Type Ca')
   (φ: forall n q (Hq: q <= n) (ε: A) x, Fa n q Hq ε x = Fa' n q Hq ε x)
   (Hsq: GSqType Ca Ca' φ):
-  Build_PresheafGpd A G Fa Ca Da = Build_PresheafGpd A G Fa' Ca' Da'.
+  Build_νGpdPresentation A G Fa Ca Da = Build_νGpdPresentation A G Fa' Ca' Da'.
 Proof.
   revert Ca' Da' Hsq.
   refine (homInd5S (I1 := nat) (I2 := fun _ => nat) (I3 := fun n q => q <= n)
@@ -88,7 +88,7 @@ Proof.
             (B := fun n _ _ _ _ => G n) Fa
             (fun Fb φb => forall (Cb: GCohType Fb) (Db: GCoh2Type Cb),
                GSqType Ca Cb φb ->
-               Build_PresheafGpd A G Fa Ca Da = Build_PresheafGpd A G Fb Cb Db)
+               Build_νGpdPresentation A G Fa Ca Da = Build_νGpdPresentation A G Fb Cb Db)
             _ Fa' φ).
   intros Cb Db Hsq.
   assert (e: Ca = Cb).
