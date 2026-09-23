@@ -83,5 +83,7 @@ theories/Equiv/Gpd/νGpdRoundtrip/Canonical.v
 theories/Equiv/Gpd/νGpdRoundtrip/SelectedNaturality.v
 theories/Equiv/Gpd/νGpdRoundtrip/Coherence.v
 theories/Equiv/Gpd/νGpdRoundtrip/Exchange.v
+theories/Equiv/Gpd/νGpdRoundtrip/Positive.v
 theories/Equiv/Gpd/νGpdRoundtrip/Successor.v
 theories/Equiv/Gpd/νGpdRoundtrip/Translation.v
+theories/Equiv/Gpd/νGpdRoundtrip.v
