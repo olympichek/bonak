@@ -23,7 +23,7 @@ From Bonak.Category.Bicategory Require Import HGpd2Cat.
 Set Primitive Projections.
 Set Printing Projections.
 
-Definition gpdStr {A: HSet} (P: PresheafGpd A): FaceStr A := {|
+Definition gpdStr {A: HSet} (P: νGpdPresentation A): FaceStr A := {|
   S0 n := P.(G0) n;
   SFace := P.(GFace);
 |}.
@@ -31,7 +31,7 @@ Definition gpdStr {A: HSet} (P: PresheafGpd A): FaceStr A := {|
 (** The face hexagon supplies associativity of the word compositor. *)
 
 Section PshGpdCoherence.
-Context {A: HSet} (P: PresheafGpd A).
+Context {A: HSet} (P: νGpdPresentation A).
 
 Definition gpdCoh: CohOf (gpdStr P) := P.(GFaceCoh).
 
@@ -80,7 +80,7 @@ Definition toPsfStr {ob: nat -> HGpd}
 
 (** The pseudofunctor structure of a groupoid-valued presheaf. *)
 
-Definition toPsfOn (P: PresheafGpd A):
+Definition toPsfOn (P: νGpdPresentation A):
   PathDiagramData (Op (νSemiShape A)) P.(G0) :=
   toPsfStr P.(GFace) P.(GFaceCoh).
 
@@ -187,9 +187,9 @@ End OfPsf.
 (** The record read off a path diagram. *)
 
 Definition ofPsf (ob: nat -> HGpd) (F: PathDiagram (Op (νSemiShape A)) ob):
-  PresheafGpd A :=
+  νGpdPresentation A :=
   let S := pathData (Op (νSemiShape A)) ob F in
-  Build_PresheafGpd A ob (ofPsfFace ob S) (ofPsfCoh ob S)
+  Build_νGpdPresentation A ob (ofPsfFace ob S) (ofPsfCoh ob S)
     (ofPsfCoh2 ob S (pathAssoc (Op (νSemiShape A)) ob F)).
 
 End PresheafGpdPseudofunctor.
@@ -200,7 +200,7 @@ Context (A: HSet).
 (** The source associativity path agrees with [wcompAssoc] by hom-set
     UIP, so the pointwise law follows from associativity of the word action. *)
 
-Lemma toPsfAssoc (P: PresheafGpd A):
+Lemma toPsfAssoc (P: νGpdPresentation A):
   PathDiagramAssoc (Op (νSemiShape A)) P.(G0) (toPsfOn A P).
 Proof.
   apply pathDiagramAssocOfPt. intros a b c d f g h E x.
@@ -226,12 +226,12 @@ Qed.
     computation rule; it is therefore taken here as a parameter, together with
     the rule. *)
 
-Definition toPsfOnW (P: PresheafGpd A)
+Definition toPsfOnW (P: νGpdPresentation A)
   (pidW: forall a, applyW a (wid a) (gpdStr P) = (fun x: P.(G0) a => x)):
   PathDiagramData (Op (νSemiShape A)) P.(G0) :=
   toPsfStrWithUnit A P.(GFace) P.(GFaceCoh) pidW.
 
-Lemma toPsfUnitLW (P: PresheafGpd A) pidW
+Lemma toPsfUnitLW (P: νGpdPresentation A) pidW
   (HpidW: forall a x, happly (pidW a) x = applyW_id (gpdStr P) x):
   PathDiagramUnitL (Op (νSemiShape A)) P.(G0) (toPsfOnW P pidW).
 Proof.
@@ -247,7 +247,7 @@ Proof.
   exact (applyWCompIdL A a b f (gpdStr P) P.(GFaceCoh) x).
 Qed.
 
-Lemma toPsfUnitRW (P: PresheafGpd A) pidW
+Lemma toPsfUnitRW (P: νGpdPresentation A) pidW
   (HpidW: forall a x, happly (pidW a) x = applyW_id (gpdStr P) x):
   PathDiagramUnitR (Op (νSemiShape A)) P.(G0) (toPsfOnW P pidW).
 Proof.
@@ -265,26 +265,26 @@ Qed.
 
 (** The unit path of [toPsfOn] and its computation rule. *)
 
-Definition toPsfPid (P: PresheafGpd A) (a: nat):
+Definition toPsfPid (P: νGpdPresentation A) (a: nat):
   applyW a (wid a) (gpdStr P) = (fun x: P.(G0) a => x) :=
   functional_extensionality_dep_good _ _ (fun x => applyW_id (gpdStr P) x).
 
-Lemma toPsfPidComp (P: PresheafGpd A) (a: nat) (x: P.(G0) a):
+Lemma toPsfPidComp (P: νGpdPresentation A) (a: nat) (x: P.(G0) a):
   happly (toPsfPid P a) x = applyW_id (gpdStr P) x.
 Proof.
   now exact (f_equal__functional_extensionality_dep_good
     (fun y => applyW_id (gpdStr P) y) x).
 Qed.
 
-Lemma toPsfUnitL (P: PresheafGpd A):
+Lemma toPsfUnitL (P: νGpdPresentation A):
   PathDiagramUnitL (Op (νSemiShape A)) P.(G0) (toPsfOn A P).
 Proof. now exact (toPsfUnitLW P (toPsfPid P) (toPsfPidComp P)). Qed.
 
-Lemma toPsfUnitR (P: PresheafGpd A):
+Lemma toPsfUnitR (P: νGpdPresentation A):
   PathDiagramUnitR (Op (νSemiShape A)) P.(G0) (toPsfOn A P).
 Proof. now exact (toPsfUnitRW P (toPsfPid P) (toPsfPidComp P)). Qed.
 
-Definition toPsf (P: PresheafGpd A): PathDiagram (Op (νSemiShape A)) P.(G0) :=
+Definition toPsf (P: νGpdPresentation A): PathDiagram (Op (νSemiShape A)) P.(G0) :=
   Build_PathDiagram (Op (νSemiShape A)) P.(G0) (toPsfOn A P) (toPsfUnitL P)
     (toPsfUnitR P) (toPsfAssoc P).
 
@@ -293,20 +293,20 @@ End PseudofunctorLaws.
 Section PackagedTranslations.
 Context (A: HSet).
 
-Definition toPsfTot (P: PresheafGpd A): PathDiagramFamily (Op (νSemiShape A)) :=
+Definition toPsfTot (P: νGpdPresentation A): PathDiagramFamily (Op (νSemiShape A)) :=
   Build_PathDiagramFamily (Op (νSemiShape A)) P.(G0) (toPsf A P).
 
-Definition ofPsfTot (X: PathDiagramFamily (Op (νSemiShape A))): PresheafGpd A :=
+Definition ofPsfTot (X: PathDiagramFamily (Op (νSemiShape A))): νGpdPresentation A :=
   ofPsf A X.(pfObj) X.(pfStr).
 
 End PackagedTranslations.
 
 (** The translations with their full 2-cell action and unit comparisons. *)
 
-Definition toPseudofunctor (A: HSet) (P: PresheafGpd A):
+Definition toPseudofunctor (A: HSet) (P: νGpdPresentation A):
   Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat :=
   expandPseudofunctor (toPsfTot A P).
 
 Definition ofPseudofunctor (A: HSet)
-  (F: Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat): PresheafGpd A :=
+  (F: Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat): νGpdPresentation A :=
   ofPsfTot A (contractPseudofunctor F).

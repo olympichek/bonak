@@ -29,7 +29,7 @@ Section CorrespondenceGpd.
 Context (A: HSet).
 
 Definition pshGpdEquivPsf:
-  Equiv (PresheafGpd A) (Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat) :=
+  Equiv (νGpdPresentation A) (Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat) :=
   qinvEquiv (toPseudofunctor A) (ofPseudofunctor A)
     (ofToPseudofunctor A) (toOfPseudofunctor A).
 
@@ -39,33 +39,33 @@ End CorrespondenceGpd.
     univalence. *)
 
 Definition pshGpdEqPsf (A: HSet):
-  PresheafGpd A = Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat :=
+  νGpdPresentation A = Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat :=
   ua (pshGpdEquivPsf A).
 
 (** The same correspondence with the target read as the 2-category of
     univalent groupoids, through the identification of the two targets. *)
 
 Definition pshGpdEqPsfGpd (A: HSet):
-  PresheafGpd A = Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) UnivGpd2Cat :=
+  νGpdPresentation A = Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) UnivGpd2Cat :=
   pshGpdEqPsf A
   • f_equal (fun T: Bicategory => Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) T) hgpd2CatEqUnivGpd2Cat.
 
 (** The augmented semi-simplicial and semi-cubical instances. *)
 
 Definition simplicialPresheafGpdEqPsf:
-  AugmentedSemiSimplicialPresheafGpd
+  AugmentedSemiSimplicialGpdPresentation
   = Pseudofunctor (locallyDiscrete (Op (νSemiShape hunit))) HGpd2Cat :=
   pshGpdEqPsf hunit.
 
 Definition cubicalPresheafGpdEqPsf:
-  SemiCubicalPresheafGpd = Pseudofunctor (locallyDiscrete (Op (νSemiShape hbool))) HGpd2Cat :=
+  SemiCubicalGpdPresentation = Pseudofunctor (locallyDiscrete (Op (νSemiShape hbool))) HGpd2Cat :=
   pshGpdEqPsf hbool.
 
 Definition simplicialPresheafGpdEqPsfGpd:
-  AugmentedSemiSimplicialPresheafGpd
+  AugmentedSemiSimplicialGpdPresentation
   = Pseudofunctor (locallyDiscrete (Op (νSemiShape hunit))) UnivGpd2Cat :=
   pshGpdEqPsfGpd hunit.
 
 Definition cubicalPresheafGpdEqPsfGpd:
-  SemiCubicalPresheafGpd = Pseudofunctor (locallyDiscrete (Op (νSemiShape hbool))) UnivGpd2Cat :=
+  SemiCubicalGpdPresentation = Pseudofunctor (locallyDiscrete (Op (νSemiShape hbool))) UnivGpd2Cat :=
   pshGpdEqPsfGpd hbool.
