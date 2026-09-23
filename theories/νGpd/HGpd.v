@@ -91,6 +91,19 @@ Definition gunit@{m}: HGpd@{m} := {|
   GUIP := unit_GUIP;
 |}.
 
+(** Every [HSet] is canonically an [HGpd]. *)
+
+Definition hgpdOfHSet (A: HSet): HGpd := {|
+  GDom := A;
+  GUIP := fun x y h g p q =>
+    eq_hprop_UIP (fun p q => A.(UIP)) p q;
+|}.
+
+(** The path space of an [HGpd], regarded one truncation level up. *)
+
+Definition gpaths {A: HGpd} (x y: A): HGpd :=
+  hgpdOfHSet (hpaths x y).
+
 
 (** [sigT] seen as a type constructor on [HGpd] *)
 
