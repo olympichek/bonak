@@ -2,7 +2,7 @@
 
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.Eqdep_dec Arith.PeanoNat.
-From Bonak Require Import Notation LeSProp.
+From Bonak Require Import Notation LeSProp HSet.
 
 Set Keyed Unification.
 
@@ -147,4 +147,48 @@ Proof.
   - now exact leR_O.
   - simpl in E. rewrite (leR0Eq H) in E. now discriminate E.
   - now exact (IHq n H E).
+Defined.
+
+(** Transparent arithmetic paths, with computation at concrete indices. *)
+
+Lemma addZeroR (n: nat): n + 0 = n.
+Proof.
+  induction n; cbn; [now reflexivity | now rewrite IHn].
+Defined.
+
+Lemma addSuccR (n m: nat): n + m.+1 = (n + m).+1.
+Proof.
+  induction n; cbn; [now reflexivity | now rewrite IHn].
+Defined.
+
+Lemma addComm (a b: nat): a + b = b + a.
+Proof.
+  induction a; cbn.
+  - now apply plus_n_O.
+  - now rewrite IHa, plus_n_Sm.
+Defined.
+
+(** By [natUIP], paths in [nat] form a proposition, hence a set. *)
+
+Definition natUIP2 {a b: nat} {e e': a = b} (α β: e = e'): α = β :=
+  eq_hprop_UIP (fun p q: a = b => natUIP p q) α β.
+
+(** These paths reduce to [eq_refl] when their recursive index is a numeral. *)
+
+Fixpoint plusSuccR (n m: nat): (n + m).+1 = n + m.+1 :=
+  match n with
+  | 0 => eq_refl
+  | S n' => f_equal S (plusSuccR n' m)
+  end.
+
+Fixpoint plusOneR (n: nat): n.+1 = n + 1 :=
+  match n with
+  | 0 => eq_refl
+  | S n' => f_equal S (plusOneR n')
+  end.
+Lemma leR_add_mono_r {r q: nat} (Hr: r <= q) p: r + p <= q + p.
+Proof.
+  induction p.
+  - rewrite <- (plus_n_O r), <- (plus_n_O q). now exact Hr.
+  - rewrite <- (plus_n_Sm r p), <- (plus_n_Sm q p). now exact (⇑ IHp).
 Defined.

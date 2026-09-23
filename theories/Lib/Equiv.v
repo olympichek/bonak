@@ -230,3 +230,138 @@ Definition fillerEquiv {A B: HSet} (F: A -> B):
   Equiv {D: B &T {d': A &T D = F d'}} A :=
   qinvEquiv (fun x => x.2.1) (fun a => (F a; (a; eq_refl)))
     (fillerContract F) (fun a => eq_refl).
+
+(** Equivalences between path types, without truncation
+
+    The combinators below are the truncation-free counterparts of the [HSet]
+    ones above: the same equivalences, with round trips proved rather than
+    read off from [UIP]. They are stated over arbitrary types, hence apply at
+    every truncation level, and are transparent, so the equivalences they
+    build still compute. *)
+
+(** Composing with a fixed path.
+
+    Post-composition with [e] is inverted by post-composition with
+    [eq_sym e]; the two cancellation lemmas are the computation rules of the
+    resulting equivalence. *)
+
+Lemma eqTransCancelR {A: Type} {x y z: A} (e: y = z) (q: x = y):
+  (q • e) • eq_sym e = q.
+Proof.
+  now destruct e.
+Defined.
+
+Lemma eqTransCancelL {A: Type} {x y z: A} (e: y = z) (q: x = z):
+  (q • eq_sym e) • e = q.
+Proof.
+  now destruct e.
+Defined.
+
+Definition eqTransEquiv {A: Type} {x y z: A} (e: y = z):
+  Equiv (x = y) (x = z) :=
+  qinvEquiv (fun q => q • e) (fun q => q • eq_sym e)
+    (eqTransCancelR e) (eqTransCancelL e).
+
+(** Composing with the image of a path under a map. Both directions are
+    kept in [f_equal] form: [f_equal f (eq_sym r)] and [eq_sym (f_equal f r)]
+    agree only propositionally, so which of the two a combinator produces
+    decides whether it matches a given call site definitionally. *)
+
+Lemma eqTransMapCancelR {A B: Type} (f: A -> B) {u: B} {a b: A} (r: a = b)
+  (q: u = f b): (q • f_equal f (eq_sym r)) • f_equal f r = q.
+Proof.
+  now destruct r.
+Defined.
+
+Lemma eqTransMapCancelL {A B: Type} (f: A -> B) {u: B} {a b: A} (r: a = b)
+  (q: u = f a): (q • f_equal f r) • f_equal f (eq_sym r) = q.
+Proof.
+  now destruct r.
+Defined.
+
+Definition eqTransMapEquiv {A B: Type} (f: A -> B) {u: B} {a b: A} (r: a = b):
+  Equiv (u = f b) (u = f a) :=
+  qinvEquiv (fun q => q • f_equal f (eq_sym r)) (fun q => q • f_equal f r)
+    (eqTransMapCancelR f r) (eqTransMapCancelL f r).
+
+(** Injectivity on paths as an equivalence
+
+    [f_equal] of an equivalence is an equivalence, inverted by [eqvInj]. The
+    round trip at the source is naturality of the retraction; the one at the
+    target consumes the half adjoint coherence, so it is stated at [IsHAE]
+    and specialised through [toIsHAE]. *)
+
+Lemma haeInjSec {A B: Type} {f: A -> B} (H: IsHAE f) {x y: A} (q: f x = f y):
+  f_equal f (eq_sym (H.(haeRet) x) • (f_equal H.(haeInv) q • H.(haeRet) y))
+  = q.
+Proof.
+  rewrite 2 eq_trans_map_distr, <- eq_sym_map_distr.
+  rewrite 2 H.(haeAdj), f_equal_compose.
+  rewrite <- (eq_trans_nat_id H.(haeSec) q).
+  now apply eq_trans_sym_cancel_l.
+Defined.
+
+Lemma fEqualRet {A B: Type} (e: Equiv A B) {x y: A} (p: x = y):
+  eqvInj e (f_equal e.(eqvFun) p) = p.
+Proof.
+  unfold eqvInj.
+  rewrite f_equal_compose.
+  rewrite <- (eq_trans_nat_id (retEq e) p).
+  now apply eq_trans_sym_cancel_l.
+Defined.
+
+Lemma fEqualSec {A B: Type} (e: Equiv A B) {x y: A} (q: e x = e y):
+  f_equal e.(eqvFun) (eqvInj e q) = q.
+Proof.
+  now exact (haeInjSec (toIsHAE e) q).
+Defined.
+
+Definition eqvInjEquiv {A B: Type} (e: Equiv A B) {x y: A}:
+  Equiv (e x = e y) (x = y) :=
+  qinvEquiv (fun q: e x = e y => eqvInj e q) (fun p => f_equal e.(eqvFun) p)
+    (fEqualSec e) (fEqualRet e).
+
+(** Path induction with the right endpoint fixed
+
+    [eq] is an inductive family in its right argument, so the eliminator
+    generalises that argument. A path whose right endpoint must stay fixed —
+    because it is a compound term the motive mentions elsewhere — is
+    eliminated by generalising the left endpoint instead. *)
+
+Lemma eqIndL {A: Type} {c: A} (P: forall D: A, D = c -> Type) (p: P c eq_refl)
+  {D: A} (e: D = c): P D e.
+Proof.
+  now destruct e.
+Defined.
+
+(** The total space of the graph of [F] projects equivalently onto the
+    domain: for each [d'] the based path space [{D &T D = F d'}] is
+    contractible, so the pair of a point with an identification of it with a
+    canonical image carries no information beyond that point. *)
+
+Lemma graphContract {A B: Type} (F: A -> B)
+  (x: {D: B &T {d': A &T D = F d'}}):
+  ((F x.2.1; (x.2.1; eq_refl)): {D: B &T {d': A &T D = F d'}}) = x.
+Proof.
+  destruct x as (D, (d', e)); cbn.
+  now exact (eqIndL (fun D0 e0 =>
+    ((F d'; (d'; eq_refl)): {D1: B &T {d: A &T D1 = F d}}) = (D0; (d'; e0)))
+    eq_refl e).
+Defined.
+
+Definition graphEquiv {A B: Type} (F: A -> B):
+  Equiv {D: B &T {d': A &T D = F d'}} A :=
+  qinvEquiv (fun x => x.2.1) (fun a => (F a; (a; eq_refl)))
+    (graphContract F) (fun a => eq_refl).
+
+(** The based-pair space over a fixed point contracts onto the fibre. *)
+
+Definition basePairEquiv {A: Type} (E: A -> Type) (D: A):
+  Equiv {t: {D0: A &T E D0} &T D = t.1} (E D).
+Proof.
+  unshelve refine (qinvEquiv
+    (fun x => rew [E] (eq_sym x.2) in x.1.2)
+    (fun c => ((D; c); eq_refl)) _ _).
+  - intros ((D0, c0), e); cbn in e. now destruct e.
+  - intros c. now reflexivity.
+Defined.

@@ -39,6 +39,13 @@ Proof.
   now destruct x, y.
 Defined.
 
+(** Every path in [unit] agrees with the canonical path [hunit_ext]. *)
+
+Lemma hunit_ext_uniq {x y: unit} (p: x = y): p = hunit_ext x y.
+Proof.
+  now destruct p, x.
+Defined.
+
 Definition hbool@{m}: HSet@{m} := {|
   Dom := bool;
   UIP := bool_UIP;

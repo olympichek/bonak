@@ -174,7 +174,7 @@ Definition sigT_trans_eq {A: Type} {P: A -> Type}
   {p': y = z} (q': rew [P] p' in v = w):
   rew [P] eq_trans p p' in u = w.
 Proof.
-  now destruct q', p', q, p.
+  destruct q', p'. now exact q.
 Defined.
 
 Infix "⊙" := sigT_trans_eq (at level 65, left associativity).
@@ -186,7 +186,7 @@ Lemma sigT_trans_eq_refl {A: Type} {P: A -> Type} {x: A} {u v w: P x}
   (q: u = v) (q': v = w):
   sigT_trans_eq (p := eq_refl) q (p' := eq_refl) q' = eq_trans q q'.
 Proof.
-  now destruct q', q.
+  now reflexivity.
 Defined.
 
 (** Prefixing a dependent path by a pure transport combines the base paths. *)
@@ -196,6 +196,20 @@ Lemma sigT_trans_eq_rew_l {A: Type} {P: A -> Type}
   eq_refl ⊙ h = eq_sym (rew_compose P p r u) • h.
 Proof.
   now destruct p, r, h.
+Defined.
+
+(** Dependent composition is transport along the base composite followed
+    by the two fibre paths. *)
+Lemma sigT_trans_transport {A: Type} {P: A -> Type} {x y z: A}
+  {u: P x} {v: P y} {w: P z} {p: x = y} {q: y = z}
+  (h: rew [P] p in u = v) (k: rew [P] q in v = w):
+  h ⊙ k = eq_sym (rew_compose P p q u) •
+    (f_equal (fun v => rew [P] q in v) h • k).
+Proof.
+  destruct h.
+  rewrite sigT_trans_eq_rew_l.
+  cbn [f_equal].
+  now rewrite eq_trans_refl_l.
 Defined.
 
 (** Solve for the second dependent path in a composite with a fixed first path. *)
@@ -215,6 +229,20 @@ Lemma sigT_trans_eq_inv_l_cancel {A: Type} {P: A -> Type}
   q ⊙ sigT_trans_eq_inv_l q h = h.
 Proof.
   now destruct q, p, r, h.
+Defined.
+
+(** Recovering the second edge of a pasted dependent path returns it. *)
+Lemma sigT_trans_eq_inv_l_recover {A: Type} {P: A -> Type}
+  {x y z: A} {u: P x} {v: P y} {w: P z}
+  {p: x = y} {q: y = z}
+  (h: rew [P] p in u = v) (k: rew [P] q in v = w):
+  sigT_trans_eq_inv_l h (h ⊙ k) = k.
+Proof.
+  unfold sigT_trans_eq_inv_l.
+  rewrite sigT_trans_transport.
+  rewrite (eq_trans_assoc (rew_compose P p q u)), eq_trans_sym_inv_r,
+    eq_trans_refl_l.
+  now rewrite eq_trans_assoc, eq_trans_sym_inv_l, eq_trans_refl_l.
 Defined.
 
 (** Fill the remaining dependent edge of a commuting square. *)
@@ -245,6 +273,23 @@ Proof.
   now exact (rew_opp_r _ H _).
 Defined.
 
+(** The displayed boundary determines the filled edge uniquely. *)
+Lemma sigT_square_fill_unique {X: Type} {P: X -> Type}
+  {x0 x1 y0 y1: X} {a: x0 = x1} {c: y0 = y1}
+  {p: x0 = y0} {q: x1 = y1} (H: p • c = a • q)
+  {u0: P x0} {u1: P x1} {v0: P y0} {v1: P y1}
+  (hp: rew [P] p in u0 = v0) (ha: rew [P] a in u0 = u1)
+  (hq: rew [P] q in u1 = v1) (hc: rew [P] c in v0 = v1)
+  (HH: rew [fun e => rew [P] e in u0 = v1] H in (hp ⊙ hc) = ha ⊙ hq):
+  hc = sigT_square_fill H hp ha hq.
+Proof.
+  unfold sigT_square_fill.
+  refine (eq_sym (sigT_trans_eq_inv_l_recover hp hc) • _).
+  apply (f_equal (sigT_trans_eq_inv_l hp)).
+  refine (eq_sym (rew_opp_l (fun e => rew [P] e in u0 = v1) H (hp ⊙ hc)) • _).
+  now exact (f_equal (fun h => rew [fun e => rew [P] e in u0 = v1] eq_sym H in h) HH).
+Defined.
+
 (** Naturality of dependent path composition in each argument. *)
 Lemma rew_sigT_trans_eq_l {A: Type} {P: A -> Type}
   {x y z: A} {u: P x} {v: P y} {w: P z}
@@ -273,7 +318,7 @@ Lemma eq_trans_eq_existT_curried {A: Type} {P: A -> Type}
   eq_trans (= p; q) (= p'; q') =
   (= eq_trans p p'; sigT_trans_eq q q').
 Proof.
-  now destruct q', p', q, p.
+  destruct q', p'. now reflexivity.
 Defined.
 
 Lemma sigT_trans_eq_existT_curried_dep {A: Type} {P: A -> Type}
@@ -294,7 +339,7 @@ Lemma sigT_trans_eq_existT_curried_dep {A: Type} {P: A -> Type}
     (Hv := rew [fun p => rew [Q] p in v = v'']
       eq_trans_eq_existT_curried H Hu H' Hu' in (Hv ⊙ Hv')).
 Proof.
-  now destruct Hv', Hu', H', Hv, Hu, H.
+  destruct Hu', H', Hv'. now reflexivity.
 Defined.
 
 Lemma rew_sigT_fst_const {A B: Type} {Q: A -> B -> Type} {x y: A}
