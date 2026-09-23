@@ -1,1 +1,2 @@
 theories/νGpd/νGpd.v
+theories/Equiv/Gpd

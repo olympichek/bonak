@@ -19,8 +19,8 @@ on:
       - ".github/rocq-9.2-blacklist.txt"
       - ".github/workflows/coq-action.yml"
 jobs:
-  # Builds the project with the latest Rocq release, minus the files listed in
-  # .github/rocq-9.2-blacklist.txt.
+  # Builds the project with Rocq 9.2, excluding the files and directories
+  # listed in .github/rocq-9.2-blacklist.txt.
   rocq-release:
     name: "Rocq 9.2"
     runs-on: "ubuntu-latest"
@@ -29,7 +29,7 @@ jobs:
         with:
           submodules: "true"
       - name: "Apply the blacklist"
-        run: xargs -r rm -- < .github/rocq-9.2-blacklist.txt
+        run: xargs -r rm -r -- < .github/rocq-9.2-blacklist.txt
       - name: "Docker Rocq action"
         uses: "coq-community/docker-coq-action@v1"
         with:
@@ -52,15 +52,14 @@ jobs:
               opam install --confirm-level=unsafe-yes -j 2 $PACKAGE --deps-only
             endGroup
 
-  # Builds the whole project with our patched Rocq, which carries the fixpoint
-  # refolding and conversion-cache patches the heavier files rely on.
+  # Builds the whole project with the experimental patched Rocq branch.
   rocq-patched:
-    name: "Rocq master+bonak-patches"
+    name: "Rocq master+bonak-patches-experimental"
     runs-on: "ubuntu-latest"
     timeout-minutes: 120
     env:
       ROCQ_REPO: "https://github.com/olympichek/rocq.git"
-      ROCQ_BRANCH: "master+bonak-patches"
+      ROCQ_BRANCH: "master+bonak-patches-experimental"
       # Rocq's stdlib lives in its own repository; this is the revision the
       # patched branch is developed against.
       STDLIB_REPO: "https://github.com/rocq-prover/stdlib.git"
