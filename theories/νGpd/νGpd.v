@@ -863,8 +863,8 @@ Proof.
     (P := fun x => depsCohs2.(_depsCohs).(_deps).(_paintings).2 x)
     (rf0 := fun a x =>
       depsCohs2.(_depsCohs).(_deps).(_restrFrames).2 0 leR_O a x)
-    (S := fun x => (mkDepsCohs depsCohs2).(1).(_deps).(_paintings).2 x)
-    (uf0 := fun a x =>
+    (SA := fun x => (mkDepsCohs depsCohs2).(1).(_deps).(_paintings).2 x)
+    (ufA := fun a x =>
       (mkDepsCohs depsCohs2).(1).(_deps).(_restrFrames).2 0 leR_O a x)
     (NA := fun dd ω0 c =>
       rew [fun x => depsCohs2.(_depsCohs).(_deps).(_paintings).2 x]
@@ -884,7 +884,7 @@ Proof.
     (rf0 := fun x => depsCohs2.(_depsCohs).(_deps).(_restrFrames).2 0 leR_O ζ x)
     (S1 := fun x => (mkDepsCohs depsCohs2).(1).(_deps).(_paintings).2 x)
     (uf0 := fun x => (mkDepsCohs depsCohs2).(1).(_deps).(_restrFrames).2 0 leR_O ζ x)
-    (S2 := fun x => (mkPaintings
+    (S2A := fun x => (mkPaintings
       (mkDepsRestr (depsCohs := depsCohs2.(_depsCohs).(1));
        mkExtraDeps (depsCohs2.(_depsCohs); depsCohs2.(_extraDepsCohs)))).2 x)
     (fA := ((mkCohFrameTypesAndRestrFrames depsCohs2.(_depsCohs).(_restrPaintings).1)
@@ -1044,7 +1044,9 @@ Proof.
       (G := mkRestrPainting depsCohs3.(_depsCohs2).(_extraDepsCohs) r (Hr ↕ Hq) ω)).
     unfold lmap2_triangle_pointwise.
     now eapply (rew_coh2Painting_restr0 (P := fun x => GDom (P x)) (r0 := rf0 θ)
-      (S := fun d0 => {a: mkLayer mkRestrFrames.2 d0 &T
+      (Sq := fun d0 => {a: mkLayer mkRestrFrames.2 d0 &T
+        mkPainting (mkExtraDeps depsCohs3.(_depsCohs2).(_extraDepsCohs)) (d0; a)})
+      (Sr := fun d0 => {a: mkLayer mkRestrFrames.2 d0 &T
         mkPainting (mkExtraDeps depsCohs3.(_depsCohs2).(_extraDepsCohs)) (d0; a)})).
   - intros p k depsCohs3 extraDepsCohs3 q Hq r Hr Hs ε ω θ d c.
     destruct r; [now contradiction |].
