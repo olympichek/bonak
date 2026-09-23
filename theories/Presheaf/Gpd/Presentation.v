@@ -1,5 +1,6 @@
 (** Groupoid-valued presheaves presented by face maps and coherent
-    exchange paths, with an [HGpd] of cells at each level.
+    exchange paths, with an [HGpd] of cells at each level. The arity
+    parameter is an arbitrary type.
 
     The exchange paths are data. [GFaceCoh2] identifies their two composites
     around the hexagon for three deletions. Since identity types of an
@@ -16,7 +17,7 @@ From Stdlib Require Import Logic.FunctionalExtensionality.
 Set Primitive Projections.
 Set Printing Projections.
 
-Record νGpdPresentation (arity: HSet) := {
+Record νGpdPresentation (arity: Type) := {
   G0: nat -> HGpd;
   GFace n q (Hq: q <= n) (ε: arity): G0 n.+1 -> G0 n;
   GFaceCoh n q (Hq: q <= n) r (Hr: r <= q) (ε ω: arity) (X: G0 n.+2):
