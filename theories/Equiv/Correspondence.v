@@ -15,7 +15,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import HSet Notation νSet.Layer Univalence
-  νSet Face Presheaf.Presentation Equiv.PresheafEquiv Equiv.νSetOfPresheaf Equiv.PresheafOfνSet
+  νSet Equiv.Face Presheaf.Presentation Equiv.PresheafEquiv Equiv.νSetOfPresheaf Equiv.PresheafOfνSet
   Equiv.νSetRoundtrip Equiv.PresheafRoundtrip Limit.
 From Bonak.Lib Require Import Equiv.
 
