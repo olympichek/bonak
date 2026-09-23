@@ -72,4 +72,5 @@ theories/Equiv/Gpd/Face.v
 theories/Equiv/Gpd/Filler.v
 theories/Equiv/Gpd/PathAlgebra.v
 theories/Equiv/Gpd/PathTactics.v
+theories/Equiv/Gpd/PresheafEquiv.v
 theories/Equiv/Gpd/Tower.v
