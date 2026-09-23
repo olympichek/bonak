@@ -5,7 +5,7 @@
     checks through a cut. The normalization rules themselves use only
     generic path identities. *)
 
-From Bonak Require Import SigT RewLemmas HSet Notation.
+From Bonak Require Import SigT RewLemmas Notation.
 From Bonak.Equiv.Gpd Require Import PathAlgebra.
 
 Ltac totalMoreNormalize TC TE TM :=
