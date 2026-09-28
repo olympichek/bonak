@@ -427,12 +427,12 @@ Proof.
     (Hq := ↑ Hrr1) (Hq' := ⇑ (HR ↕ ↑ HQ)) ω d).
   pose (aQ2 := pshFaceDimIrr (f_equal S (eq_sym e1))
     (Hq := ⇑ Hqq) (Hq' := ⇑ (⇑ HQ)) ε d).
-  pose proof (f_equal_naturality
+  pose proof (square_coherence_fill
     (psh.(GFace) m.+1 p0 (HS ↕ (HR ↕ ↑ HQ)) ζ)
     (psh.(GFace) m.+1 q0.+1 (⇑ HQ) ε)
     (psh.(GFace) m q0 HQ ε) (psh.(GFace) m p0 (HS ↕ (HR ↕ HQ)) ζ)
     (psh.(GFaceCoh) m q0 HQ p0 (HS ↕ HR) ε ζ) aR) as HB.
-  pose proof (f_equal_naturality
+  pose proof (square_coherence_fill
     (psh.(GFace) m.+1 p0 (HS ↕ (HR ↕ ↑ HQ)) ζ)
     (psh.(GFace) m.+1 r0.+1 (⇑ (HR ↕ HQ)) ω)
     (psh.(GFace) m r0 (HR ↕ HQ) ω) (psh.(GFace) m p0 (HS ↕ (HR ↕ HQ)) ζ)
@@ -1680,8 +1680,7 @@ Lemma sec_action_as_cohLayer_hex {Y X2A: Type} {SY: Y -> Type}
   {aL: S2A zs1} {aR: S2A zr1}
   {u0 u1: TUA} (eU1: u0 = u1)
   (pV0: rur zs2 = uf0 u0) (pV1: rusY zr2 = uf0 u1) (K1: rur zs1 = rusY zr1)
-  (HH1: f_equal rur pIs • (pV0 • f_equal uf0 eU1)
-        = K1 • (f_equal rusY pIr • pV1)):
+  (HH1: hexagonal_coherence rur uf0 rusY pIs eU1 pIr pV0 K1 pV1):
   f_equal_dep (fun t => SY (uf0 t)) (fun t => sec (uf0 t)) eU1
   = f_equal (fun x => rew [fun dd => SY (uf0 dd)] eU1 in x)
       (eq_sym (f_equal_dep SY sec pV0))
@@ -2722,7 +2721,7 @@ Proof.
         (fun y => mkPshPainting PCq.(_pshExtraDeps) y)
         (psh.(GFaceCoh) m.+1 (q.+1 + p0) (⇓ Hqp) (r.+1 + p0)
            (leR_add_mono_r Hr p0) ε ω d)).
-      unshelve eapply ((eq_existT_curried_dep_hex_split
+      unshelve eapply ((eq_existT_curried_hex_dep_split
         (P' := fun x => (mkLayer PCq.(_pshDeps).(_pdeps).(_restrFrames).2 x).(GDom))
         (R' := fun x l => (mkPainting PCq.(_pExtraDeps) (x; l)).(GDom))
         (P1 := fun a => (mkLayer PCq.(_pshDeps).(_pdeps).(_restrFrames).2
@@ -2768,6 +2767,7 @@ Proof.
       (* Each rebase path is chosen from the painting's boundary and the
          dimension-transfer boundary. The displayed law uses those same
          witnesses, so it needs no separate equality of boundary proofs. *)
+      unfold hexagonal_coherence_dep.
       (* LHS second edge *)
       lazymatch goal with
       | |- rew [_] _ in (_ ⊙ ((path_reindex_source (@rew_align_dep _ _ _ _ _ _ _ _ _ _ _ ?hcgB) _)

@@ -7,7 +7,7 @@
     [HGpd] are h-sets, any two proofs of this hexagon agree by [GUIP]. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import HSet Notation LeSProp νGpd.HGpd.
+From Bonak Require Import HSet Notation LeSProp CohShapes νGpd.HGpd.
 
 From Bonak.Presheaf Require Import FaceStructure.
 
@@ -25,15 +25,15 @@ Record νGpdPresentation (arity: Type) := {
     GFace n r (Hr ↕ Hq) ω (GFace n.+1 q.+1 (⇑ Hq) ε X);
   GFaceCoh2 n q (Hq: q <= n) r (Hr: r <= q) s (Hs: s <= r)
     (ε ω θ: arity) (X: G0 n.+3):
-    f_equal (GFace n q Hq ε) (GFaceCoh n.+1 r (Hr ↕ (↑ Hq)) s Hs ω θ X)
-    • (GFaceCoh n q Hq s (Hs ↕ Hr) ε θ
-        (GFace n.+2 r.+1 (⇑ (Hr ↕ (↑ Hq))) ω X)
-    • f_equal (GFace n s (Hs ↕ (Hr ↕ Hq)) θ)
-        (GFaceCoh n.+1 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω X)) =
-    GFaceCoh n q Hq r Hr ε ω (GFace n.+2 s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) θ X)
-    • (f_equal (GFace n r (Hr ↕ Hq) ω)
-        (GFaceCoh n.+1 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) ε θ X)
-    • GFaceCoh n r (Hr ↕ Hq) s Hs ω θ (GFace n.+2 q.+2 (⇑ (⇑ Hq)) ε X))
+    hexagonal_coherence
+      (GFace n q Hq ε) (GFace n s (Hs ↕ (Hr ↕ Hq)) θ) (GFace n r (Hr ↕ Hq) ω)
+      (GFaceCoh n.+1 r (Hr ↕ (↑ Hq)) s Hs ω θ X)
+      (GFaceCoh n.+1 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω X)
+      (GFaceCoh n.+1 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) ε θ X)
+      (GFaceCoh n q Hq s (Hs ↕ Hr) ε θ
+        (GFace n.+2 r.+1 (⇑ (Hr ↕ (↑ Hq))) ω X))
+      (GFaceCoh n q Hq r Hr ε ω (GFace n.+2 s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) θ X))
+      (GFaceCoh n r (Hr ↕ Hq) s Hs ω θ (GFace n.+2 q.+2 (⇑ (⇑ Hq)) ε X))
 }.
 
 Arguments G0 {arity} _ _.

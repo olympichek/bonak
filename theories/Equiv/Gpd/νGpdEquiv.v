@@ -17,6 +17,7 @@
     translations go [B -> A] ([eqvFun] of the stored equivalences), and so
     do the painting equivalences, fibrewise over them. *)
 
+From Bonak.Lib Require Import CohShapes.
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
@@ -389,20 +390,21 @@ Definition mkTrCohType {p k} (TC: TrDepsCohsBase p.+1 k)
   forall q (Hq: q <= k) r (Hr: r <= q) (ε ω: arity)
     (d: mkFrame (mkDepsRestr
       (depsCohs := trDepsCohsB (proj1TrDepsCohsBase TC))).(1)),
-  f_equal (fun x => TC.(_trDeps).(_frameEqvs).2 x)
+  hexagonal_coherence
+    (fun x => TC.(_trDeps).(_frameEqvs).2 x)
+    (fun x => TC.(_trDeps).(_depsA).(_restrFrames).2 r (Hr ↕ Hq) ω x)
+    (fun x => TC.(_trDeps).(_depsA).(_restrFrames).2 q Hq ε x)
     (TC.(_tCohsB).2 q Hq r Hr ε ω d)
-  • (TC.(_trDeps).(_trRestrs).2 r (Hr ↕ Hq) ω
-       ((mkRestrFrames (depsCohs := trDepsCohsB (proj1TrDepsCohsBase TC))).2
-          q.+1 (⇑ Hq) ε d)
-     • f_equal (fun x => TC.(_trDeps).(_depsA).(_restrFrames).2 r (Hr ↕ Hq) ω x)
-         (Q.2 q.+1 (⇑ Hq) ε d))
-  = TC.(_trDeps).(_trRestrs).2 q Hq ε
+    (Q.2 q.+1 (⇑ Hq) ε d)
+    (Q.2 r (Hr ↕ ↑ Hq) ω d)
+    (TC.(_trDeps).(_trRestrs).2 r (Hr ↕ Hq) ω
       ((mkRestrFrames (depsCohs := trDepsCohsB (proj1TrDepsCohsBase TC))).2
-         r (Hr ↕ ↑ Hq) ω d)
-    • (f_equal (fun x => TC.(_trDeps).(_depsA).(_restrFrames).2 q Hq ε x)
-         (Q.2 r (Hr ↕ ↑ Hq) ω d)
-       • TC.(_tCohsA).2 q Hq r Hr ε ω
-           ((mkFrameEqvs (proj1TrDepsRestr (mkTrDepsRestrOf TC Q))).2 d)).
+        q.+1 (⇑ Hq) ε d))
+    (TC.(_trDeps).(_trRestrs).2 q Hq ε
+      ((mkRestrFrames (depsCohs := trDepsCohsB (proj1TrDepsCohsBase TC))).2
+        r (Hr ↕ ↑ Hq) ω d))
+    (TC.(_tCohsA).2 q Hq r Hr ε ω
+      ((mkFrameEqvs (proj1TrDepsRestr (mkTrDepsRestrOf TC Q))).2 d)).
 
 Lemma mkTrRestrLayer {p k} (TC: TrDepsCohsBase p.+1 k)
   (Q: mkTrRestrFramesType (proj1TrDepsCohsBase TC))
@@ -699,34 +701,21 @@ Definition mkTrCohPaintingType {p k} (C: TrDepsCohs2Core p.+1 k): Type :=
       (depsCohs := trDepsCohsB (proj1TrDepsCohsBase TCB))).(1))
     (c: (mkPaintings (mkDepsRestr;
       mkExtraDeps (trDepsCohsB TCB; C.(_cXCB))%extradepscohs)%extradepsrestr).2 d),
-  rew [fun π: TCB.(_trDeps).(_frameEqvs).2
-         (TCB.(_trDeps).(_depsB).(_restrFrames).2 q Hq ε
-           (TR1.(_depsB).(_restrFrames).2 r (Hr ↕ ↑ Hq) ω d))
-       = TCB.(_trDeps).(_depsA).(_restrFrames).2 r (Hr ↕ Hq) ω
-           (TR1.(_depsA).(_restrFrames).2 q.+1 (⇑ Hq) ε
-             (FE d)) =>
-       rew [PA] π in
-       TCB.(_trDeps).(_paintingEqvs).2 _
-         (TCB.(_tRpB).2 q Hq ε _ (RPB.2 r (Hr ↕ ↑ Hq) ω d c))
-       = TCB.(_tRpA).2 r (Hr ↕ Hq) ω _
-           (RPA.2 q.+1 (⇑ Hq) ε _
-             (PE d c))]
-    C.(_cTrCohsL).(_trCohs).2 q Hq r Hr ε ω d in
-  (sigT_map_eq (Q := PA) (fun y c => TCB.(_trDeps).(_paintingEqvs).2 y c)
-     (C.(_cCpB).2 q Hq r Hr ε ω d c)
-   ⊙[PA] (TCB.(_trRestrPaintings).2 r (Hr ↕ Hq) ω
-            (TR1.(_depsB).(_restrFrames).2 q.+1 (⇑ Hq) ε d)
-            (RPB.2 q.+1 (⇑ Hq) ε d c)
-          ⊙[PA] sigT_map_eq (Q := PA) (fun y c => TCB.(_tRpA).2 r (Hr ↕ Hq) ω y c)
-                  (TRP.2 q.+1 (⇑ Hq) ε d c)))
-  = TCB.(_trRestrPaintings).2 q Hq ε
+  hexagonal_coherence_dep (Q := PA)
+    (fun y c => TCB.(_trDeps).(_paintingEqvs).2 y c)
+    (fun y c => TCB.(_tRpA).2 r (Hr ↕ Hq) ω y c)
+    (fun y c => TCB.(_tRpA).2 q Hq ε y c)
+    (C.(_cTrCohsL).(_trCohs).2 q Hq r Hr ε ω d)
+    (C.(_cCpB).2 q Hq r Hr ε ω d c)
+    (TRP.2 q.+1 (⇑ Hq) ε d c)
+    (TRP.2 r (Hr ↕ ↑ Hq) ω d c)
+    (TCB.(_trRestrPaintings).2 r (Hr ↕ Hq) ω
+      (TR1.(_depsB).(_restrFrames).2 q.+1 (⇑ Hq) ε d)
+      (RPB.2 q.+1 (⇑ Hq) ε d c))
+    (TCB.(_trRestrPaintings).2 q Hq ε
       (TR1.(_depsB).(_restrFrames).2 r (Hr ↕ ↑ Hq) ω d)
-      (RPB.2 r (Hr ↕ ↑ Hq) ω d c)
-    ⊙[PA] (sigT_map_eq (Q := PA) (fun y c => TCB.(_tRpA).2 q Hq ε y c)
-             (TRP.2 r (Hr ↕ ↑ Hq) ω d c)
-           ⊙[PA] C.(_cCpA).2 q Hq r Hr ε ω
-                   (FE d)
-                   (PE d c)).
+      (RPB.2 r (Hr ↕ ↑ Hq) ω d c))
+    (C.(_cCpA).2 q Hq r Hr ε ω (FE d) (PE d c)).
 
 Fixpoint mkTrCohPaintingTypes {p k}: forall (TC2: TrDepsCohs2Base p k), Type :=
   match p with
@@ -746,7 +735,31 @@ Definition mkTrCohLayerType {p k} (TC2: TrDepsCohs2Base p.+1 k)
   (d: mkFrame (mkDepsRestr (depsCohs := trDepsCohsB (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)))).(1).(1))
   (l: mkLayer (mkDepsRestr (depsCohs := trDepsCohsB (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)))).(1).(_restrFrames).2
     (painting := (mkDepsRestr (depsCohs := trDepsCohsB (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)))).(1).(_paintings).2) d): Type :=
-  rew [fun r0 : mkFrameEqv (proj1TrDepsRestr TC2.(_trCohsL).(_trBase).(_trDeps)) ((mkTrDepsRestr TC2.(_trCohsL)).(_depsB).(_restrFrames).2 q Hq ε ((mkRestrFrames (depsCohs := trDepsCohsB (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)))).2 r (Hr ↕ ↑ Hq) ω (d; l))).1 = (mkRestrFrames (depsCohs := trDepsCohsA (proj1TrDepsCohsBase TC2.(_trCohsL).(_trBase)))).2 r.+1 (⇑ (Hr ↕ Hq)) ω ((mkRestrFrames (depsCohs := trDepsCohsA (proj1TrDepsCohsBase (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2))))).2 q.+2 (⇑ (⇑ Hq)) ε (sigTEquiv ((mkTrRestrTypesAndFrames ((mkTrRestrTypesAndFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_frameEqvs).1 (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_paintingEqvs).1).(FrameEqvDef) (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_trRestrs).1).1 (mkPaintingEqvs (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trExt)).1.1).(FrameEqvDef) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1).1).2 (fun d0 => mkTrLayerEquiv (mkPaintingEqvs (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trExt)).1 ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) d0) (d; l)).1) => rew [fun t : mkFrame (proj1TrDepsRestr TC2.(_trCohsL).(_trBase).(_trDeps)).(_depsA) => mkLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_deps).(_restrFrames).2 t] r0 in mkTrLayerEquiv TC2.(_trCohsL).(_trBase).(_trDeps).(_paintingEqvs) TC2.(_trCohsL).(_trBase).(_trDeps).(_trRestrs) ((mkTrDepsRestr TC2.(_trCohsL)).(_depsB).(_restrFrames).2 q Hq ε ((mkRestrFrames (depsCohs := trDepsCohsB (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)))).2 r (Hr ↕ ↑ Hq) ω (d; l))).1 (mkRestrLayer (trDepsCohsB TC2.(_trCohsL).(_trBase)).(_restrPaintings).2 (trDepsCohsB TC2.(_trCohsL).(_trBase)).(_cohs).2 q Hq ε ((mkRestrFrames (depsCohs := trDepsCohsB (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)))).2 r (Hr ↕ ↑ Hq) ω (d; l)).1 ((mkRestrFrames (depsCohs := trDepsCohsB (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)))).2 r (Hr ↕ ↑ Hq) ω (d; l)).2) = mkRestrLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_restrPaintings).2 (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_cohs).2 r (Hr ↕ Hq) ω ((mkRestrFrames (depsCohs := trDepsCohsA (proj1TrDepsCohsBase (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2))))).2 q.+2 (⇑ (⇑ Hq)) ε (sigTEquiv ((mkTrRestrTypesAndFrames ((mkTrRestrTypesAndFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_frameEqvs).1 (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_paintingEqvs).1).(FrameEqvDef) (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_trRestrs).1).1 (mkPaintingEqvs (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trExt)).1.1).(FrameEqvDef) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1).1).2 (fun d0 => mkTrLayerEquiv (mkPaintingEqvs (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trExt)).1 ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) d0) (d; l)).1) (mkRestrLayer (trDepsCohsA (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2))).(_restrPaintings).2 (trDepsCohsA (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2))).(_cohs).2 q.+1 (⇑ Hq) ε (sigTEquiv ((mkTrRestrTypesAndFrames ((mkTrRestrTypesAndFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_frameEqvs).1 (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_paintingEqvs).1).(FrameEqvDef) (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_trRestrs).1).1 (mkPaintingEqvs (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trExt)).1.1).(FrameEqvDef) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1).1).2 (fun d0 => mkTrLayerEquiv (mkPaintingEqvs (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trExt)).1 ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) d0) (d; l)).1 (sigTEquiv ((mkTrRestrTypesAndFrames ((mkTrRestrTypesAndFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_frameEqvs).1 (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_paintingEqvs).1).(FrameEqvDef) (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trDeps).(_trRestrs).1).1 (mkPaintingEqvs (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trExt)).1.1).(FrameEqvDef) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1).1).2 (fun d0 => mkTrLayerEquiv (mkPaintingEqvs (proj1TrDepsCohsBase (mkTrDepsCohsBase TC2)).(_trExt)).1 ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) d0) (d; l)).2)] Q.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω d in (sigT_map_eq (Q := fun x => GDom (mkLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_deps).(_restrFrames).2 x)) (fun (a : mkFrame (proj1TrDepsRestr TC2.(_trCohsL).(_trBase).(_trDeps)).(_depsB)) (b : mkLayer TC2.(_trCohsL).(_trBase).(_trDeps).(_depsB).(_restrFrames).2 a) => mkTrLayerEquiv TC2.(_trCohsL).(_trBase).(_trDeps).(_paintingEqvs) TC2.(_trCohsL).(_trBase).(_trDeps).(_trRestrs) a b) (mkCohLayer TC2.(_tCpB).2 TC2.(_tC2B).2 q Hq r Hr ε ω d l) ⊙[fun x => GDom (mkLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_deps).(_restrFrames).2 x)] (mkTrRestrLayer TC2.(_trCohsL).(_trBase) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase TC2.(_trCohsL).(_trBase))).(TrRestrFramesDef) TC2.(_trCohsL).(_trCohs).1) TC2.(_trCohsL).(_trCohs).2 r (Hr ↕ Hq) ω ((mkRestrFrames (depsCohs := trDepsCohsB (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).2 q.+1 (⇑ Hq) ε (d; l)) ⊙[fun x => GDom (mkLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_deps).(_restrFrames).2 x)] sigT_map_eq (Q := fun x => GDom (mkLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_deps).(_restrFrames).2 x)) (mkRestrLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_restrPaintings).2 (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_cohs).2 r (Hr ↕ Hq) ω) (mkTrRestrLayer (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2 q.+1 (⇑ Hq) ε (d; l)))) = mkTrRestrLayer TC2.(_trCohsL).(_trBase) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase TC2.(_trCohsL).(_trBase))).(TrRestrFramesDef) TC2.(_trCohsL).(_trCohs).1) TC2.(_trCohsL).(_trCohs).2 q Hq ε ((mkRestrFrames (depsCohs := trDepsCohsB (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).2 r (Hr ↕ ↑ Hq) ω (d; l)) ⊙[fun x => GDom (mkLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_deps).(_restrFrames).2 x)] (sigT_map_eq (Q := fun x => GDom (mkLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_deps).(_restrFrames).2 x)) (mkRestrLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_restrPaintings).2 (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_cohs).2 q Hq ε) (mkTrRestrLayer (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2 r (Hr ↕ ↑ Hq) ω (d; l)) ⊙[fun x => GDom (mkLayer (trDepsCohsA TC2.(_trCohsL).(_trBase)).(_deps).(_restrFrames).2 x)] mkCohLayer TC2.(_tCpA).2 TC2.(_tC2A).2 q Hq r Hr ε ω (sigTEquiv ((mkTrRestrTypesAndFrames (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_frameEqvs).1 (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_paintingEqvs).1).(FrameEqvDef) (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_trRestrs).1).2 (fun d0 : ((mkRestrFrameTypesAndFrames (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_depsB).(_paintings).1).(FrameDef) (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_depsB).(_restrFrames).1).2 => mkTrLayerEquiv (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_paintingEqvs) (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_trRestrs) d0) (d; l)).1 (sigTEquiv ((mkTrRestrTypesAndFrames (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_frameEqvs).1 (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_paintingEqvs).1).(FrameEqvDef) (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_trRestrs).1).2 (fun d0 : ((mkRestrFrameTypesAndFrames (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_depsB).(_paintings).1).(FrameDef) (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_depsB).(_restrFrames).1).2 => mkTrLayerEquiv (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_paintingEqvs) (proj1TrDepsRestr (mkTrDepsRestrOf (mkTrDepsCohsBase TC2) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1; mkTrRestrFrameStep (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)) ((mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))).(TrRestrFramesDef) Q.1) Q.2))).(_trRestrs) d0) (d; l)).2).
+  let TCB := TC2.(_trCohsL).(_trBase) in
+  let TC := mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2) in
+  let R := (mkTrCohTypesAndRestrFrames (proj1TrDepsCohsBase TC))
+    .(TrRestrFramesDef) Q.1 in
+  let R0 := mkTrRestrFrames (proj1TrDepsCohs TC2.(_trCohsL)) in
+  let FE := mkFrameEqv (proj1TrDepsRestr
+    (mkTrDepsRestrOf (mkTrDepsCohsBase TC2)
+      (R; mkTrRestrFrameStep TC R Q.2))) in
+  let CA := trDepsCohsA TCB in
+  hexagonal_coherence_dep
+    (Q := fun x => GDom (mkLayer CA.(_deps).(_restrFrames).2 x))
+    (fun a b => mkTrLayerEquiv TCB.(_trDeps).(_paintingEqvs)
+      TCB.(_trDeps).(_trRestrs) a b)
+    (mkRestrLayer CA.(_restrPaintings).2 CA.(_cohs).2 r (Hr ↕ Hq) ω)
+    (mkRestrLayer CA.(_restrPaintings).2 CA.(_cohs).2 q Hq ε)
+    (Q.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω d)
+    (mkCohLayer TC2.(_tCpB).2 TC2.(_tC2B).2 q Hq r Hr ε ω d l)
+    (mkTrRestrLayer TC R Q.2 q.+1 (⇑ Hq) ε (d; l))
+    (mkTrRestrLayer TC R Q.2 r (Hr ↕ ↑ Hq) ω (d; l))
+    (mkTrRestrLayer TCB R0 TC2.(_trCohsL).(_trCohs).2 r (Hr ↕ Hq) ω
+      ((mkRestrFrames (depsCohs := trDepsCohsB TC)).2 q.+1 (⇑ Hq) ε (d; l)))
+    (mkTrRestrLayer TCB R0 TC2.(_trCohsL).(_trCohs).2 q Hq ε
+      ((mkRestrFrames (depsCohs := trDepsCohsB TC)).2 r (Hr ↕ ↑ Hq) ω (d; l)))
+    (mkCohLayer TC2.(_tCpA).2 TC2.(_tC2A).2 q Hq r Hr ε ω
+      (FE (d; l)).1 (FE (d; l)).2).
 
 Lemma mkTrCohLayer {p k} (TC2: TrDepsCohs2Base p.+1 k)
   (Q: mkTrCohTypes (mkTrDepsCohsBase (proj1TrDepsCohs2Base TC2)))
@@ -768,7 +781,7 @@ Proof.
       (NA := fun dd ω0 c => rew [fun x => TC2.(_trCohsL).(_trBase).(_trDeps).(_depsA).(_paintings).2 x] TC2.(_trCohsL).(_trBase).(_trDeps).(_trRestrs).2 0 leR_O ω0 dd in TC2.(_trCohsL).(_trBase).(_trDeps).(_paintingEqvs).2 _ c)
       (NB := fun dd ω0 c => rew [fun x => TC2.(_trCohsL).(_trBase).(_trDeps).(_depsA).(_paintings).2 x] TC2.(_trCohsL).(_trBase).(_tCohsA).2 r (Hr ↕ Hq) 0 leR_O ω ω0 dd in TC2.(_trCohsL).(_trBase).(_tRpA).2 r (Hr ↕ Hq) ω _ c)
       (NC := fun dd ω0 c => rew [fun x => TC2.(_trCohsL).(_trBase).(_trDeps).(_depsA).(_paintings).2 x] TC2.(_trCohsL).(_trBase).(_tCohsA).2 q Hq 0 leR_O ε ω0 dd in TC2.(_trCohsL).(_trBase).(_tRpA).2 q Hq ε _ c)).
-    intro ζ; unfold lmap2_hex_pointwise.
+    intro ζ.
     eapply (Lemmas.rew_coh2Layer_perm4
       (S0 := fun x => TC2.(_trCohsL).(_trBase).(_trDeps).(_depsA).(_paintings).2 x)
       (rf0 := fun x => TC2.(_trCohsL).(_trBase).(_trDeps).(_depsA).(_restrFrames).2 0 leR_O ζ x)
@@ -950,7 +963,7 @@ Definition mkTrDepsCohs2Core {p k} (TC2: TrDepsCohs2 p k)
     collapses to the stored commutation at the face
     ([rew_coh2Painting_restr0_split]); at [r.+1] the pair path
     decomposes into the layer hexagon [mkTrCohLayer] and the recursive
-    call one stage up ([eq_existT_curried_dep_hex]). *)
+    call one stage up ([eq_existT_curried_hex_dep]). *)
 Definition mkTrCohPainting {p k} (TC2: TrDepsCohs2 p k)
   {XA: DepsCohs2Extension p k (trDepsCohs2A TC2.(_trCohs2Base))}
   {XB: DepsCohs2Extension p k (trDepsCohs2B TC2.(_trCohs2Base))}
@@ -967,7 +980,7 @@ Proof.
   generalize dependent p.
   induction r as [|r mkTrCohPainting].
   - intros p k TC2 XA XB TCX q Hq Hr ε ω d c.
-    unfold mkTrCohPaintingType; cbv zeta.
+    unfold mkTrCohPaintingType, hexagonal_coherence_dep; cbv zeta.
     cbn.
     unfold mkTrRestrLayer.
     rewrite (sigT_fst_lmap2_rew_eq
@@ -991,7 +1004,7 @@ Proof.
     destruct TCX as [| p' k' TC2' XA' XB' TCX']; [now destruct (leR_O_contra Hq) |].
     destruct c as [l c].
     unfold mkTrCohPaintingType; cbv zeta.
-    unshelve eapply (eq_existT_curried_dep_hex_split
+    unshelve eapply (eq_existT_curried_hex_dep_split
       (A1 := mkFrame (proj1TrDepsRestr TC2'.(_trCohs2Base).(_trCohsL).(_trBase).(_trDeps)).(_depsB))
       (A3 := mkFrame (mkDepsRestr (depsCohs := trDepsCohsA
         (proj1TrDepsCohsBase TC2'.(_trCohs2Base).(_trCohsL).(_trBase)))).(1))

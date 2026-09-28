@@ -15,7 +15,8 @@ Lemma eq_trans_natural {A B: Type} (f g: A -> B)
   (α: forall x, f x = g x) {x y: A} (e: x = y):
   f_equal f e • α y = α x • f_equal g e.
 Proof.
-  pose proof (f_equal_naturality (fun x => x) (fun x => x) f g α e) as H.
+  pose proof (square_coherence_fill (fun x => x) (fun x => x) f g α e) as H.
+  unfold square_coherence in H.
   now rewrite f_equal_id in H.
 Defined.
 
@@ -727,8 +728,7 @@ Context {X X' TL TM: Type} {P: X -> Type} {P': X' -> Type}
   (K: φ (ρ (r0' d1)) = ρ w')
   (σq: β (ρ (r0' d1)) • K = f_equal ρ A1x)
   (HC: rew [fun x => P x] K in Φ (ρ (r0' d1)) (Gr (r0' d1) c) = Gr w' v')
-  (HH: f_equal φ (gA d1) • (b2 • f_equal r0 Q1)
-       = K • (f_equal ρ B1 • gA d1'))
+  (HH: hexagonal_coherence φ r0 ρ (gA d1) Q1 B1 b2 K (gA d1'))
   (Htau: rew [fun r: ρ (r0' d1) = ρ w' =>
                rew [fun x => P x] r in Gr (r0' d1) c = Gr w' v'] σq in
            (Pi (ρ (r0' d1)) (Gr (r0' d1) c) ⊙[fun x => P x] HC)
@@ -755,7 +755,7 @@ Definition frameRight :=
       (eq_trans_assoc (f_equal ρ A1) (f_equal ρ B1) (gA d1') •
         (whisker_r (eq_sym (eq_trans_map_distr ρ A1 B1)) (gA d1') •
           (whisker_r (f_equal (fun e => f_equal ρ e) S1) (gA d1') •
-            f_equal_naturality r0' f ρ r0 gA prv))) •
+            square_coherence_fill r0' f ρ r0 gA prv))) •
       eq_trans_sym_cancel_l (gA d1) (f_equal r0 (f_equal f prv))).
 
 Definition sigmaFrameRecipe:
@@ -902,7 +902,7 @@ Proof.
     (fun e h => sigT_map_eq (P := P') (Q := P) (f := ρ) Gr h) HS) as HMS.
   pose proof (displayed_whisker_r P (f_equal (fun e => f_equal ρ e) S1)
     (gA d1') pureEnd HMS) as ESource.
-  pose proof (f_equal_naturality_dep
+  pose proof (square_coherence_dep_fill
     (PA := fun a => P' (r0' a)) (PB := P') (PC := fun t => P (r0 t)) (PD := P)
     r0' f ρ r0 (fun _ u => u) targetMap Gr (fun _ u => u)
     gA (fun _ _ => eq_refl) prv source) as ENat.
@@ -1030,9 +1030,10 @@ Proof.
   rewrite (condFace_back (P := P) e0 e2 (fun u => F0 (F1 u))
     (fun v => G0 (G1 v)) (fun v => f_equal F0 (H1 v) • H0 (G1 v)) u).
   rewrite (condFace_back (P := P) e0 e1 F0 G0 H0 (F1 u)).
-  pose proof (f_equal_naturality (fun v => rew [P] eq_sym e1 in v)
+  pose proof (square_coherence_fill (fun v => rew [P] eq_sym e1 in v)
     G0 F0 (fun v => rew [P] eq_sym e0 in v) H0
     (condFace e1 e2 F1 G1 H1 u)) as N.
+  unfold square_coherence in N.
   rewrite (condFace_back (P := P) e1 e2 F1 G1 H1 u) in N.
   rewrite <- 2 eq_trans_assoc.
   rewrite <- N.
@@ -1254,7 +1255,7 @@ Proof.
   rewrite (eq_trans_map_distr FSr K1q (f_equal Gq theta)),
     (eq_trans_map_distr FSq K1r (f_equal Gr theta)).
   rewrite <- 2 eq_trans_assoc.
-  rewrite (f_equal_naturality Gr Gq FSq FSr cohS theta).
+  rewrite (square_coherence_fill Gr Gq FSq FSr cohS theta).
   pose proof (f_equal (fun p => p • f_equal FSr (f_equal Gq theta)) HSq) as H.
   cbn beta in H.
   rewrite <- 4 eq_trans_assoc in H.
@@ -1617,7 +1618,7 @@ Lemma canonicalUpperReindex
 Proof.
   rewrite eq_trans_map_distr, <- eq_trans_assoc.
   rewrite (eq_trans_assoc (f_equal read (f_equal face delta)) (J v)).
-  rewrite (f_equal_naturality face pair read restrict J delta).
+  rewrite (square_coherence_fill face pair read restrict J delta).
   rewrite <- eq_trans_assoc.
   rewrite (eq_trans_assoc (f_equal restrict (f_equal pair delta))).
   now rewrite <- eq_trans_map_distr, <- K_REINDEX.
@@ -1728,9 +1729,10 @@ Lemma hexMap {A B: Type} (F: A -> B) {a0 a1 a2 a3 a4 a5: A}
   (A1: a0 = a1) (B1: a1 = a2) (C1: a2 = a3)
   (D1: a0 = a4) (E1: a4 = a5) (F1: a5 = a3)
   (H: A1 • (B1 • C1) = D1 • (E1 • F1)):
-  f_equal F A1 • (f_equal F B1 • f_equal F C1)
-  = f_equal F D1 • (f_equal F E1 • f_equal F F1).
+  hexagonal_coherence F F F A1 C1 E1
+    (f_equal F B1) (f_equal F D1) (f_equal F F1).
 Proof.
+  unfold hexagonal_coherence.
   rewrite <- 4 eq_trans_map_distr.
   now exact (f_equal (fun e: a0 = a3 => f_equal F e) H).
 Defined.
@@ -1899,7 +1901,7 @@ Lemma rew_cohLayer_hex_sec {T1 T2 T3 X: Type} {P: X -> Type} {S3: T3 -> Type}
   (C1: rfF m2 = rf0 d1) (D1: rfG n2 = rf0 d2) (K: rfF m1 = rfG n1)
   {aR: S3 n1}
   (HC: rew [P] K in sec m1 = G n1 aR)
-  (Hpath: f_equal rfF C2 • (C1 • f_equal rf0 E1) = K • (f_equal rfG D2 • D1)):
+  (Hpath: hexagonal_coherence rfF rf0 rfG C2 E1 D2 C1 K D1):
   rew_cohLayer_hex P rf0 (fun _ a => a) G E1 C2 D2 C1 D1 K
     (sec m1) aR HC Hpath
   = f_equal (fun x => rew [fun d => P (rf0 d)] E1 in rew [P] C1 in x)
@@ -2034,8 +2036,8 @@ Proof.
     (RAW • eq_trans_assoc b_e (f_equal g_e p_o) G) PREFIX) as HP.
   rewrite <- (f_equal_compose deep n_o u_e),
     <- (f_equal_compose deep n_e u_o) in HP.
-  rewrite <- (f_equal_naturality (fun y => y) deep g_o n_o alpha_o u_e),
-    <- (f_equal_naturality (fun y => y) deep g_e n_e alpha_e u_o) in HP.
+  rewrite <- (square_coherence_fill (fun y => y) deep g_o n_o alpha_o u_e),
+    <- (square_coherence_fill (fun y => y) deep g_e n_e alpha_e u_o) in HP.
   rewrite 2 f_equal_id in HP.
   rewrite <- 4 eq_trans_assoc in HP.
   rewrite (eq_trans_assoc (f_equal g_o p_e) (f_equal g_o u_e)),
@@ -2095,7 +2097,7 @@ Definition restriction_naturality_cell {U V W: Type}
   (f: U -> W) (d: U -> V) (tr: V -> W)
   (alpha: forall u, f u = tr (d u)) {u0 u1: U} (e: u0 = u1):
   alpha u0 • f_equal tr (f_equal d e) = f_equal f e • alpha u1 :=
-  eq_sym (f_equal_naturality f d (fun w => w) tr alpha e)
+  eq_sym (square_coherence_fill f d (fun w => w) tr alpha e)
     • f_equal (fun q => q • alpha u1) (f_equal_id (f_equal f e)).
 
 (** This choice pastes the index comparison, the naturality square, and
