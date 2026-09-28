@@ -381,7 +381,7 @@ Lemma frtPaintingIndexNaturality {u v: (g X).(G0) M.+1} (e: u = v):
   f_equal_dep_sigT (Q := PA) frameA valueA e ⊙[PA] paintings.1.2 v.
 Proof.
   destruct e.
-  cbn [restriction_naturality_cell f_equal_naturality f_equal
+  cbn [restriction_naturality_cell square_coherence_fill f_equal
     f_equal_dep_sigT f_equal_id sigT_map_eq eq_sym eq_trans].
   rewrite (displayed_unit_right (P := PA) (paintings.1.2 u)).
   now exact (eq_sym (sigT_trans_eq_refl_l (P := PA) (frames.1.2 u) (paintings.1.2 u))).

@@ -166,24 +166,13 @@ Definition square_map {X Y: Type} (f: X -> Y) {x0 x1 y0 y1: X}
   eq_sym (eq_trans_map_distr f p b) •
     (f_equal (fun h => f_equal f h) H • eq_trans_map_distr f a q).
 
-(** The naturality square for a homotopy between two composites:
-    Lemma 2.4.3 of the HoTT book (The Univalent Foundations Program,
-    "Homotopy Type Theory: Univalent Foundations of Mathematics", 2013),
-    with the equality reversed and path actions expanded through the composites. *)
-Lemma f_equal_naturality {A B C D: Type}
-  (u: A -> B) (v: A -> C) (f: B -> D) (g: C -> D)
-  (K: forall x, f (u x) = g (v x)) {x y: A} (p: x = y):
-  f_equal f (f_equal u p) • K y = K x • f_equal g (f_equal v p).
-Proof.
-  destruct p; cbn. now exact (eq_trans_refl_l (K x)).
-Defined.
-
 (** A homotopy changes the endpoints of the action of a path. *)
 Lemma path_change_natural {A B: Type} (f g: A -> B)
   (α: forall x, f x = g x) {x y: A} (p: x = y):
   f_equal f p = path_change (α x) (f_equal g p) (α y).
 Proof.
-  pose proof (f_equal_naturality (fun x => x) (fun x => x) f g α p) as H.
+  pose proof (square_coherence_fill (fun x => x) (fun x => x) f g α p) as H.
+  unfold square_coherence in H.
   rewrite f_equal_id in H.
   apply (f_equal (fun q => q • eq_sym (α y))) in H.
   rewrite <- 2 eq_trans_assoc in H.
@@ -848,7 +837,7 @@ Proof.
   unfold path_change.
   rewrite H, <- eq_trans_assoc.
   rewrite (eq_trans_assoc (f_equal F (f_equal G' (η2 t)))).
-  rewrite (f_equal_naturality G' F' F G K (η2 t)).
+  rewrite (square_coherence_fill G' F' F G K (η2 t)).
   now rewrite <- eq_trans_assoc.
 Defined.
 
@@ -1083,7 +1072,8 @@ Lemma homotopy_cell_reindex {A B: Type} (f g: A -> B)
   (h: forall x, f x = g x) {x y: A} (p: x = y):
   h x = path_change (f_equal f p) (h y) (f_equal g p).
 Proof.
-  pose proof (f_equal_naturality (fun x => x) (fun x => x) f g h p) as N.
+  pose proof (square_coherence_fill (fun x => x) (fun x => x) f g h p) as N.
+  unfold square_coherence in N.
   rewrite f_equal_id in N.
   pose proof (path_suffix_solve (eq_sym N)) as H.
   now rewrite <- eq_trans_assoc in H.

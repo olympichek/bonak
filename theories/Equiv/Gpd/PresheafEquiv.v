@@ -419,7 +419,7 @@ Proof.
   rewrite 2 path_change_map, 3 path_change_comp.
   unfold path_change.
   rewrite H.
-  pose proof (path_prefix_solve (f_equal_naturality gr gq fq fr c2 μ)) as N.
+  pose proof (path_prefix_solve (square_coherence_fill gr gq fq fr c2 μ)) as N.
   rewrite N.
   rewrite <- 6 eq_trans_assoc.
   now rewrite eq_trans_sym_inv_r, eq_trans_refl_r, <- eq_trans_assoc.

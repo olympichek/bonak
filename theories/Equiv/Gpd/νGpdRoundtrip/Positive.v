@@ -98,7 +98,7 @@ Context {T U V X: Type} {P: X -> Type} {S: V -> Type}
   {d0 d1: T} (E: d0 = d1) {u0 u1: U} (e: u0 = u1)
   {v0 v1: V} (p: v0 = v1) (cq: f u1 = r d0) (cr: g v1 = r d1)
   (k: f u0 = g v0) (a: S v0) (hk: rew [P] k in s u0 = G v0 a)
-  (H: f_equal f e • (cq • f_equal r E) = k • (f_equal g p • cr))
+  (H: hexagonal_coherence f r g e E p cq k cr)
   (b: S v1) (cb: b = rew [S] p in a)
   {w0: P (r d0)} {w1: P (r d1)}
   (c0: w0 = rew [P] cq in s u1) (c1: w1 = rew [P] cr in G v1 b).
@@ -651,7 +651,7 @@ Definition mapped_layer_square {T U X Y: Type}
   {d0 d1: T} (p: d0 = d1) (ω: arity):
   f_equal phi (f_equal (r ω) p) • eta d1 ω =
   eta d0 ω • f_equal (s ω) (f_equal f p) :=
-  f_equal_naturality (r ω) f phi (s ω) (fun d => eta d ω) p.
+  square_coherence_fill (r ω) f phi (s ω) (fun d => eta d ω) p.
 
 Lemma layer_map_value {T U: Type} {B: T -> arity -> HGpd}
   {C: U -> arity -> HGpd} (f: T -> U)
@@ -693,7 +693,7 @@ Lemma mapped_layer_square_dep {T U X Y: Type}
           (f := f) (fun d l => lmap (G d) l) h) ω).
 Proof.
   intro G.
-  pose (HN := f_equal_naturality_dep
+  pose (HN := square_coherence_dep_fill
     (PA := fun d => GDom (Layer (fun ζ => P (r ζ d))))
     (PB := fun x => GDom (P x)) (PC := fun u => GDom (Q (s ω u)))
     (PD := fun y => GDom (Q y))
@@ -734,38 +734,27 @@ Context {HL: forall θ a,
   rew [fun d => P (rf0 θ d)] E1 in F2 θ (F1 θ a) = G2 θ (G1 θ a)}
   {θ: arity} {KA: rq (m1 θ) = rr (n1 θ)}
   {HK: rew [P] KA in F (m1 θ) (aL θ (nth l θ)) = G (n1 θ) (aR θ (nth l θ))}
-  {κ: f_equal rq (e2 θ) • (pQ θ • f_equal (rf0 θ) E1) =
-    KA • (f_equal rr (e5 θ) • pR θ)}.
+  {κ: hexagonal_coherence rq (rf0 θ) rr (e2 θ) E1 (e5 θ) (pQ θ) KA (pR θ)}.
 
 Definition separate_triangle_pointwise: Type :=
-  rew [fun π => rew [P] π in F (m1 θ) (aL θ (nth l θ)) =
-    G2 θ (G1 θ (nth l θ))] κ in
-  (sigT_map_eq (Q := fun x => GDom (P x)) F (p := e2 θ) eq_refl
-   ⊙[fun x => GDom (P x)] (eq_refl ⊙[fun x => GDom (P x)]
-     sigT_map_eq (P := fun d => GDom (P (rf0 θ d)))
-       (Q := fun x => GDom (P x)) (f := rf0 θ) (fun _ a => a) (HL θ (nth l θ)))) =
-  HK ⊙[fun x => GDom (P x)]
-    (sigT_map_eq (Q := fun x => GDom (P x)) G (p := e5 θ) eq_refl
-     ⊙[fun x => GDom (P x)] eq_refl).
+  hexagonal_coherence_dep (Q := fun x => GDom (P x))
+    (f2 := rf0 θ) F (fun _ a => a) G κ
+    eq_refl (HL θ (nth l θ)) eq_refl eq_refl HK eq_refl.
 
 (** Evaluating a layer triangle cancels the computation corrections at
     its shared vertices, leaving the pointwise triangle. *)
 Lemma separate_triangle_boundary:
   separate_triangle_pointwise ->
-  rew [fun π => rew [P] π in F (m1 θ) (aL θ (nth l θ)) =
-    nth (lmap G2 (lmap G1 l)) θ] κ in
-  (sigT_map_eq (Q := fun x => GDom (P x)) F (eq_sym (nth_lmap F1 l θ))
-   ⊙[fun x => GDom (P x)]
-     (eq_sym (nth_lmap F2 (lmap F1 l) θ)
-      ⊙[fun x => GDom (P x)]
-        sigT_map_eq (P := fun d => GDom (Layer (fun ω => P (rf0 ω d))))
-          (Q := fun x => GDom (P x)) (f := rf0 θ) (fun d u => nth u θ)
-          (lmap2_rew_eq (P := P) (rf0 := rf0) (E1 := E1) HL))) =
-  HK ⊙[fun x => GDom (P x)]
-    (sigT_map_eq (Q := fun x => GDom (P x)) G (eq_sym (nth_lmap G1 l θ))
-     ⊙[fun x => GDom (P x)] eq_sym (nth_lmap G2 (lmap G1 l) θ)).
+  hexagonal_coherence_dep (Q := fun x => GDom (P x))
+    (f2 := rf0 θ) F (fun d (u: Layer (fun ω => P (rf0 ω d))) => nth u θ) G κ
+    (eq_sym (nth_lmap F1 l θ))
+    (lmap2_rew_eq (P := P) (rf0 := rf0) (E1 := E1) HL)
+    (eq_sym (nth_lmap G1 l θ))
+    (eq_sym (nth_lmap F2 (lmap F1 l) θ)) HK
+    (eq_sym (nth_lmap G2 (lmap G1 l) θ)).
 Proof.
   intro Hpointwise.
+  unfold hexagonal_coherence_dep.
   rewrite (sigT_map_eq_lmap2_rew_eq (P := P) (rf0 := rf0) (θ := θ) (l := l)
     (F1 := F1) (F2 := F2) (G1 := G1) (G2 := G2) HL).
   rewrite <- (dpath_change_refl (P := fun x => GDom (Sq x)) (e2 θ)
@@ -1216,6 +1205,7 @@ Definition actualTrBoundary := ltac:(
   pose proof (actualTranslationBoundary (frtTrCohs FC).(_trBase)
     (mkTrRestrFrames (proj1TrDepsCohs (frtTrCohs FC))) (frtTrCohs FC).(_trCohs).2
     q Hq ε (descTop (DescS HD) cB' t).1 ω) as H;
+  unfold hexagonal_coherence_dep in H;
   rewrite <- mapped_nth_component in H;
   now exact (square_strip_prefix_dep scalarP _ _ _ _ _ _ H)).
 
