@@ -25,7 +25,8 @@ Lemma pcompPaste {C: Category} {ob: C.(CObj) -> HGpd}
 Proof.
   pose proof (psCompPaste (expandData C ob F)
     (expandCellComp C ob F) (expandCompNatL C ob F) (expandCompNatR C ob F)
-    (expandAssoc C ob F (pathDiagramAssocOfPt F PA))
+    (expandAssoc C ob F (pathDiagramAssocOfPt F
+      (fun a b c d f g h x => PA a b c d f g h (C.(cassoc) f g h) x)))
     f g h α β γ δ ((C.(CHom) a d).(UIP))) as E.
   exact (f_equal (fun α => α x) E • eq_trans_refl_l _).
 Qed.

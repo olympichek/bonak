@@ -131,7 +131,7 @@ Qed.
     space, and the frame identification [FRT] ([pshF] of a cell is the
     translation of its frame), the candidate filler over a translated
     frame is equivalent to the original filler. The construction composes
-    existing equivalences, and [UIP] identifies their path components. *)
+    path equivalences with direct cancellation proofs. *)
 
 Definition fillerEquivOf {FrB FrA CellH: HSet} (tr: Equiv FrB FrA)
   {E: FrB -> HSet} (HF: CellH = {D: FrB & E D})
@@ -142,18 +142,14 @@ Definition fillerEquivOf {FrB FrA CellH: HSet} (tr: Equiv FrB FrA)
   (D: FrB):
   Equiv {cell: CellH &T tr D = pshF cell} (E D) :=
   compEquiv
-    (sigTEquivSnd (fun cell => pathEquiv (A := FrA)
-      (fun q => q • f_equal pshF (eq_sym (rew_sym_cancel (P := Dom) HF cell)))
-      (fun q => q • f_equal pshF (rew_sym_cancel (P := Dom) HF cell))))
+    (sigTEquivSnd (fun cell =>
+      eqTransMapEquiv pshF (rew_sym_cancel (P := Dom) HF cell)))
   (compEquiv
     (sigTEquivFst (rewEquiv (fun h: HSet => h.(Dom)) HF))
   (compEquiv
-    (sigTEquivSnd (fun t => pathEquiv (A := FrA)
-      (fun q => q • FRT t.1 t.2)
-      (fun q => q • eq_sym (FRT t.1 t.2))))
+    (sigTEquivSnd (fun t => eqTransEquiv (FRT t.1 t.2)))
   (compEquiv
-    (sigTEquivSnd (fun t => pathEquiv2 (eqvInj tr)
-      (fun q => f_equal tr q)))
+    (sigTEquivSnd (fun t => eqvInjEquiv tr))
     (baseContract E D)))).
 
 (** The inverse of the contraction, whole: the pair of the candidate frame
@@ -172,12 +168,9 @@ Lemma fillerEquivOfWhole {FrB FrA CellH: HSet} (tr: Equiv FrB FrA)
    : {D0: FrA &T {cell: CellH &T D0 = pshF cell}})
   = (tr D; symEquiv (fillerEquivOf tr HF pshF FRT D) c).
 Proof.
-  refine (eq_existT_curried (FRT D c) _).
-  cbn.
-  etransitivity.
-  { now exact (rew_sigT_fst_const (FRT D c) _ eq_refl). }
-  apply f_equal.
-  now apply FrA.(UIP).
+  now exact (graphContract pshF
+    ((tr D; symEquiv (fillerEquivOf tr HF pshF FRT D) c)
+     : {D0: FrA &T {cell: CellH &T D0 = pshF cell}})).
 Qed.
 
 Lemma gFaceLevelEq {m0} {Xpre0: (νSetAt m0).(prefix)} (X0: νSetFrom m0 Xpre0)

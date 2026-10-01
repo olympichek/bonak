@@ -197,15 +197,13 @@ End PresheafGpdPseudofunctor.
 Section PseudofunctorLaws.
 Context (A: HSet).
 
-(** The source associativity path agrees with [wcompAssoc] by hom-set
-    UIP, so the pointwise law follows from associativity of the word action. *)
+(** The source associativity path is [eq_sym (wcompAssoc f g h)], so
+    associativity of the word action gives the diagram law directly. *)
 
 Lemma toPsfAssoc (P: νGpdPresentation A):
   PathDiagramAssoc (Op (νSemiShape A)) P.(G0) (toPsfOn A P).
 Proof.
-  apply pathDiagramAssocOfPt. intros a b c d f g h E x.
-  rewrite (((Op (νSemiShape A)).(CHom) a d).(UIP)
-    (h := E) (g := eq_sym (wcompAssoc f g h))).
+  apply pathDiagramAssocOfPt. intros a b c d f g h x.
   unfold phomEq.
   change (f_equal (applyW c h (gpdStr P)) (pshGpdComp P f g x)
     • (pshGpdComp P (wcomp f g) h x
@@ -235,15 +233,14 @@ Lemma toPsfUnitLW (P: νGpdPresentation A) pidW
   (HpidW: forall a x, happly (pidW a) x = applyW_id (gpdStr P) x):
   PathDiagramUnitL (Op (νSemiShape A)) P.(G0) (toPsfOnW P pidW).
 Proof.
-  apply pathDiagramUnitLOfPt. intros a b f E x.
+  apply pathDiagramUnitLOfPt. intros a b f x.
+  set (E := (Op (νSemiShape A)).(cidl) f).
   apply (transCancelR _ _ (phomEq (toPsfOnW P pidW) E x)).
   rewrite transSymCancelR2.
   unfold pidPt, phomEq.
   change (applyWComp a a b (wid a) f (gpdStr P) P.(GFaceCoh) x
     • f_equal (fun w => applyW a w (gpdStr P) x) E = f_equal (applyW a f (gpdStr P)) (happly (pidW a) x)).
   rewrite HpidW.
-  rewrite (((Op (νSemiShape A)).(CHom) a b).(UIP)
-    (h := E) (g := wcompIdl f)).
   exact (applyWCompIdL A a b f (gpdStr P) P.(GFaceCoh) x).
 Qed.
 
@@ -251,15 +248,14 @@ Lemma toPsfUnitRW (P: νGpdPresentation A) pidW
   (HpidW: forall a x, happly (pidW a) x = applyW_id (gpdStr P) x):
   PathDiagramUnitR (Op (νSemiShape A)) P.(G0) (toPsfOnW P pidW).
 Proof.
-  apply pathDiagramUnitROfPt. intros a b f E x.
+  apply pathDiagramUnitROfPt. intros a b f x.
+  set (E := (Op (νSemiShape A)).(cidr) f).
   apply (transCancelR _ _ (phomEq (toPsfOnW P pidW) E x)).
   rewrite transSymCancelR2.
   unfold pidPt, phomEq.
   change (applyWComp a b b f (wid b) (gpdStr P) P.(GFaceCoh) x
     • f_equal (fun w => applyW a w (gpdStr P) x) E = happly (pidW b) (applyW a f (gpdStr P) x)).
   rewrite HpidW.
-  rewrite (((Op (νSemiShape A)).(CHom) a b).(UIP)
-    (h := E) (g := wcompIdr f)).
   exact (applyWCompIdR A a b f (gpdStr P) P.(GFaceCoh) x).
 Qed.
 

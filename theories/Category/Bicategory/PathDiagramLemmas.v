@@ -94,6 +94,53 @@ Proof.
   now exact (homotopyNat _ _ (F.(pcomp) (a := a) (b := b) (c := c) u v) e).
 Defined.
 
+(** Naturality at the congruence paths of composition follows by path
+    induction. The variants below that accept an independent composite
+    path additionally use the source hom-set's UIP. *)
+
+Lemma pcompNatLCanonical {ob: C.(CObj) -> HGpd} (F: PathDiagramData C ob)
+  {a b c} {u u': C.(CHom) a b} (Eu: u = u') (v: C.(CHom) b c)
+  (x: ob a):
+  f_equal (F.(phom) v) (phomEq F Eu x)
+  • F.(pcomp) u' v x
+  = F.(pcomp) u v x • phomEq F (f_equal (fun w => ccomp w v) Eu) x.
+Proof. destruct Eu. now exact (eq_trans_refl_l _). Defined.
+
+Lemma pcompNatRCanonical {ob: C.(CObj) -> HGpd} (F: PathDiagramData C ob)
+  {a b c} (u: C.(CHom) a b) {v v': C.(CHom) b c} (Ev: v = v')
+  (x: ob a):
+  phomEq F Ev (F.(phom) u x)
+  • F.(pcomp) u v' x
+  = F.(pcomp) u v x • phomEq F (f_equal (ccomp u) Ev) x.
+Proof. destruct Ev. now exact (eq_trans_refl_l _). Defined.
+
+Lemma pcompCompareNatCanonical {ob: C.(CObj) -> HGpd} (F: PathDiagramData C ob)
+  {a b c} {u u': C.(CHom) a b} (Eu: u = u') {v v': C.(CHom) b c} (Ev: v = v')
+  (SU: ob a -> ob b) (HU: forall z, SU z = F.(phom) u z)
+  (X: ob a):
+  phomEq F Ev (SU X)
+  • (f_equal (F.(phom) v') (HU X • phomEq F Eu X)
+     • F.(pcomp) u' v' X)
+  = f_equal (F.(phom) v) (HU X)
+    • (F.(pcomp) u v X
+       • phomEq F (f_equal (fun w => ccomp w v) Eu • f_equal (ccomp u') Ev) X).
+Proof. destruct Eu, Ev. now exact (eq_trans_refl_l _). Defined.
+
+Lemma pcompCompareNatSymCanonical {ob: C.(CObj) -> HGpd} (F: PathDiagramData C ob)
+  {a b c} {u u': C.(CHom) a b} (Eu: u = u') {v v': C.(CHom) b c} (Ev: v = v')
+  (SU: ob a -> ob b) (HU: forall z, SU z = F.(phom) u z)
+  (SV: ob b -> ob c) (HV: forall z, SV z = F.(phom) v z)
+  (X: ob a):
+  eq_sym (F.(pcomp) u' v' X)
+  • (eq_sym (f_equal (F.(phom) v')
+               (HU X • phomEq F Eu X))
+     • eq_sym (HV (SU X) • phomEq F Ev (SU X)))
+  = eq_sym (phomEq F (f_equal (fun w => ccomp w v) Eu • f_equal (ccomp u') Ev) X)
+    • (eq_sym (F.(pcomp) u v X)
+       • (eq_sym (f_equal (F.(phom) v) (HU X))
+          • eq_sym (HV (SU X)))).
+Proof. destruct Eu, Ev. now exact (eq_sym (eq_trans_refl_l _)). Defined.
+
 Lemma pcompNatL {ob: C.(CObj) -> HGpd} (F: PathDiagramData C ob)
   {a b c} {u u': C.(CHom) a b} (Eu: u = u') (v: C.(CHom) b c)
   (Euv: ccomp u v = ccomp u' v) (x: ob a):
@@ -263,30 +310,43 @@ Proof.
   now exact ((C.(CHom) a d).(UIP)).
 Defined.
 
-(** Pointwise laws reconstruct the complete diagram laws by functional
-    extensionality. The source hom-set identifies any chosen unit or
-    associativity path with the one stored in the category. *)
+(** Pointwise laws at the category's specified unit and associativity
+    paths reconstruct the complete diagram laws by functional extensionality. *)
 
 Lemma pathDiagramUnitLOfPt {ob: C.(CObj) -> HGpd}
-  (F: PathDiagramData C ob) (H: PathDiagramUnitLPt F): PathDiagramUnitL C ob F.
+  (F: PathDiagramData C ob)
+  (H: forall a b (f: C.(CHom) a b) (x: ob a),
+    F.(pcomp) (C.(cid) a) f x
+    = f_equal (F.(phom) f) (pidPt F a x) • eq_sym (phomEq F (C.(cidl) f) x)):
+  PathDiagramUnitL C ob F.
 Proof.
   intros a b f. apply functional_extensionality_dep; intro x.
   rewrite hom2RewPt, hgpd2CatI2Pt, !fEqualSym, eq_sym_involutive.
   rewrite psfUnitLPt, phomEqHapply, eq_trans_refl_l.
-  exact (H a b f (C.(cidl) f) x).
+  now exact (H a b f x).
 Qed.
 
 Lemma pathDiagramUnitROfPt {ob: C.(CObj) -> HGpd}
-  (F: PathDiagramData C ob) (H: PathDiagramUnitRPt F): PathDiagramUnitR C ob F.
+  (F: PathDiagramData C ob)
+  (H: forall a b (f: C.(CHom) a b) (x: ob a),
+    F.(pcomp) f (C.(cid) b) x
+    = pidPt F b (F.(phom) f x) • eq_sym (phomEq F (C.(cidr) f) x)):
+  PathDiagramUnitR C ob F.
 Proof.
   intros a b f. apply functional_extensionality_dep; intro x.
   rewrite hom2RewPt, hgpd2CatI2Pt, !fEqualSym, eq_sym_involutive.
   rewrite psfUnitRPt, phomEqHapply, eq_trans_refl_l.
-  exact (H a b f (C.(cidr) f) x).
+  now exact (H a b f x).
 Qed.
 
 Lemma pathDiagramAssocOfPt {ob: C.(CObj) -> HGpd}
-  (F: PathDiagramData C ob) (H: PathDiagramAssocPt F): PathDiagramAssoc C ob F.
+  (F: PathDiagramData C ob)
+  (H: forall a b c d (f: C.(CHom) a b) (g: C.(CHom) b c)
+    (h: C.(CHom) c d) (x: ob a),
+    f_equal (F.(phom) h) (F.(pcomp) f g x)
+      • (F.(pcomp) (f ⨟ g) h x • phomEq F (C.(cassoc) f g h) x)
+    = F.(pcomp) g h (F.(phom) f x) • F.(pcomp) f (g ⨟ h) x):
+  PathDiagramAssoc C ob F.
 Proof.
   intros a b c d f g h. apply functional_extensionality_dep; intro x.
   rewrite hom2RewPt.
@@ -298,7 +358,7 @@ Proof.
     • F.(pcomp) (f ⨟ g) h x) • phomEq F (C.(cassoc) f g h) x
     = F.(pcomp) g h (F.(phom) f x) • F.(pcomp) f (g ⨟ h) x).
   rewrite eqTransAssoc.
-  exact (H a b c d f g h (C.(cassoc) f g h) x).
+  now exact (H a b c d f g h x).
 Qed.
 
 (** Right whiskering of a conjugated comparison. Naturality of the
@@ -334,7 +394,7 @@ Lemma pcompWhiskerR {ob: C.(CObj) -> HGpd}
 Proof.
   rewrite !eq_trans_map_distr, fEqualSym.
   now exact (conjAlgebra _ _ _ _ _ _ _ _ _ _ (psfAssocPt F FA u v w X)
-    (psfAssocPt F FA u v' w' X) (pcompNatR F u e (f_equal (ccomp u) e) X)).
+    (psfAssocPt F FA u v' w' X) (pcompNatRCanonical F u e X)).
 Defined.
 
 End Pointwise.

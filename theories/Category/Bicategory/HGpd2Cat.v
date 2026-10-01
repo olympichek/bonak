@@ -8,51 +8,79 @@ Set Printing Projections.
 Set Universe Polymorphism.
 
 (** Functions between 1-types and homotopies form a groupoid. *)
-Definition hgpdHomCategory (X Y: HGpd): Category.
-Proof.
-  refine {| CObj := X -> Y;
-    CHom f g := hpiT (fun x: X => hpaths (f x) (g x));
-    cid f := fun x => eq_refl;
-    ccomp f g h α β := fun x => α x • β x |}.
-  - intros f g α. apply functional_extensionality_dep; intro x. apply eq_trans_refl_l.
-  - intros; reflexivity.
-  - intros f g h i α β γ. apply functional_extensionality_dep; intro x. apply eqTransAssoc.
-Defined.
+Definition hgpdHomCategory (X Y: HGpd): Category := {|
+  CObj := X -> Y;
+  CHom f g := hpiT (fun x: X => hpaths (f x) (g x));
+  cid f := fun x => eq_refl;
+  ccomp f g h α β := fun x => α x • β x;
+  cidl f g α := functional_extensionality_dep _ _
+    (fun x => eq_trans_refl_l (α x));
+  cidr f g α := eq_refl;
+  cassoc f g h i α β γ := functional_extensionality_dep _ _
+    (fun x => eqTransAssoc (α x) (β x) (γ x));
+|}.
 
-(** The bicategory of 1-types, functions, and homotopies. *)
-Definition HGpd2Cat: Bicategory.
-Proof.
-  unshelve refine {|
-    BObj := HGpd;
-    BHom := hgpdHomCategory;
-    bid a := fun x => x;
-    bcomp a b c f g := fun x => g (f x);
-    bwhiskerL a b c f g h α := fun x => α (f x);
-    bwhiskerR a b c f g α h := fun x => f_equal h (α x);
-    bunitL a b f := idToIso eq_refl;
-    bunitR a b f := idToIso eq_refl;
-    bassoc a b c d f g h := idToIso eq_refl;
-  |}; intros; apply functional_extensionality_dep; intro x; cbn.
-  - reflexivity.
-  - reflexivity.
-  - reflexivity.
-  - apply eq_trans_map_distr.
-  - destruct (α x). cbn. apply eq_trans_refl_l.
-  - apply eq_sym, eq_trans_refl_l.
-  - rewrite f_equal_id. apply eq_sym, eq_trans_refl_l.
-  - apply eq_sym, eq_trans_refl_l.
-  - rewrite f_equal_compose. apply eq_sym, eq_trans_refl_l.
-  - apply eq_sym, eq_trans_refl_l.
-  - reflexivity.
-  - reflexivity.
-Defined.
+Local Lemma homotopyInterchange {X Y: Type} {f g: X -> Y}
+  (α: forall x, f x = g x) {x y: X} (p: x = y):
+  f_equal f p • α y = α x • f_equal g p.
+Proof. destruct p. cbn. now apply eq_trans_refl_l. Defined.
 
-Definition hgpdLocallyGroupoid: IsLocallyGroupoid HGpd2Cat.
-Proof.
-  intros X Y f g α.
-  refine (@Build_IsInvertible (hgpdHomCategory X Y) f g α (fun x => eq_sym (α x)) _ _);
-    apply functional_extensionality_dep; intro x; cbn; destruct (α x); reflexivity.
-Defined.
+Local Lemma homotopyUnitRNat {X: Type} {x y: X} (p: x = y):
+  f_equal (fun z => z) p = eq_refl • p.
+Proof. rewrite f_equal_id. now apply eq_sym, eq_trans_refl_l. Defined.
+
+Local Lemma homotopyAssocNatR {X Y Z: Type} (f: X -> Y) (g: Y -> Z)
+  {x y: X} (p: x = y):
+  f_equal g (f_equal f p) = eq_refl • f_equal (fun z => g (f z)) p.
+Proof. rewrite f_equal_compose. now apply eq_sym, eq_trans_refl_l. Defined.
+
+(** The bicategory of 1-types, functions, and homotopies. Its coherence
+    laws follow pointwise from path composition and congruence. *)
+Definition HGpd2Cat: Bicategory := {|
+  BObj := HGpd;
+  BHom := hgpdHomCategory;
+  bid a := fun x => x;
+  bcomp a b c f g := fun x => g (f x);
+  bwhiskerL a b c f g h α := fun x => α (f x);
+  bwhiskerR a b c f g α h := fun x => f_equal h (α x);
+  bunitL a b f := idToIso eq_refl;
+  bunitR a b f := idToIso eq_refl;
+  bassoc a b c d f g h := idToIso eq_refl;
+  bwhiskerLId a b c f g := functional_extensionality_dep _ _ (fun x => eq_refl);
+  bwhiskerRId a b c f g := functional_extensionality_dep _ _ (fun x => eq_refl);
+  bwhiskerLComp a b c f g h i α β :=
+    functional_extensionality_dep _ _ (fun x => eq_refl);
+  bwhiskerRComp a b c f g h α β i := functional_extensionality_dep _ _
+    (fun x => @eq_trans_map_distr _ _ _ _ _ i (α x) (β x));
+  binterchange a b c f g h i α β := functional_extensionality_dep _ _
+    (fun x => homotopyInterchange β (α x));
+  bunitLNat a b f g α := functional_extensionality_dep _ _
+    (fun x => eq_sym (eq_trans_refl_l (α x)));
+  bunitRNat a b f g α := functional_extensionality_dep _ _
+    (fun x => homotopyUnitRNat (α x));
+  bassocNatL a b c d f g h i α := functional_extensionality_dep _ _
+    (fun x => eq_sym (eq_trans_refl_l (α (g (f x)))));
+  bassocNatR a b c d f g α h i := functional_extensionality_dep _ _
+    (fun x => homotopyAssocNatR h i (α x));
+  bassocNatM a b c d f g h α i := functional_extensionality_dep _ _
+    (fun x => eq_sym (eq_trans_refl_l (f_equal i (α (f x)))));
+  btriangle a b c f g := functional_extensionality_dep _ _ (fun x => eq_refl);
+  bpentagon a b c d e f g h i := functional_extensionality_dep _ _ (fun x => eq_refl);
+|}.
+
+Local Lemma homotopyInverseR {X: Type} {x y: X} (p: x = y):
+  p • eq_sym p = eq_refl.
+Proof. now destruct p. Defined.
+
+Local Lemma homotopyInverseL {X: Type} {x y: X} (p: x = y):
+  eq_sym p • p = eq_refl.
+Proof. now destruct p. Defined.
+
+Definition hgpdLocallyGroupoid: IsLocallyGroupoid HGpd2Cat :=
+  fun X Y f g α =>
+    @Build_IsInvertible (hgpdHomCategory X Y) f g α (fun x => eq_sym (α x))
+      (functional_extensionality_dep _ _ (fun x => homotopyInverseR (α x)))
+      (functional_extensionality_dep _ _ (fun x => homotopyInverseL (α x))).
 
 (** Function composition has reflexivity witnesses for its three laws. *)
 Definition hgpdUnitL {X Y: HGpd} (f: X -> Y):

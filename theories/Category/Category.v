@@ -106,7 +106,7 @@ Proof.
   assert (en: an = bn).
   { apply functional_extensionality_dep; intro a.
     apply functional_extensionality_dep; intro b.
-    apply functional_extensionality_dep; intro f. now apply (D.(CHom)). }
+    apply functional_extensionality_dep; intro f. now apply (D.(CHom) _ _).(UIP). }
   now destruct en.
 Qed.
 
@@ -227,8 +227,8 @@ Proof.
   assert (e: u = v).
   { rewrite <- (C.(cidr) u), <- vr, <- C.(cassoc), ul. apply C.(cidl). }
   destruct e.
-  assert (ur = vr) by apply (C.(CHom) a a).
-  assert (ul = vl) by apply (C.(CHom) b b). now subst.
+  assert (ur = vr) by now apply (C.(CHom) a a).(UIP).
+  assert (ul = vl) by now apply (C.(CHom) b b).(UIP). now subst.
 Qed.
 
 Record Iso (C: Category) (a b: C.(CObj)) := {
