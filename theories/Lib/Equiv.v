@@ -210,23 +210,18 @@ Proof.
   - intros c. now reflexivity.
 Defined.
 
-(** The contraction of a candidate total space: pairs of a point [D] of an
-    HSet with a cell whose canonical image is identified with [D] project
-    equivalently onto the cells (the fibres are singletons; [UIP] of the
-    HSet collapses the identification component). *)
+(** A candidate total space contracts onto its cells by path induction
+    on the identification of the candidate point with the cell's image. *)
 
-Lemma fillerContract {A B: HSet} (F: A -> B)
+Lemma fillerContract {A B: Type} (F: A -> B)
   (x: {D: B &T {d': A &T D = F d'}}):
   ((F x.2.1; (x.2.1; eq_refl)): {D: B &T {d': A &T D = F d'}}) = x.
 Proof.
   destruct x as (D, (d', e)). cbn.
-  refine (eq_existT_curried (eq_sym e) _).
-  etransitivity.
-  { now exact (rew_sigT_fst_const (eq_sym e) d' eq_refl). }
-  now exact (f_equal (fun h => (d'; h)) (B.(UIP))).
+  now subst D.
 Qed.
 
-Definition fillerEquiv {A B: HSet} (F: A -> B):
+Definition fillerEquiv {A B: Type} (F: A -> B):
   Equiv {D: B &T {d': A &T D = F d'}} A :=
   qinvEquiv (fun x => x.2.1) (fun a => (F a; (a; eq_refl)))
     (fillerContract F) (fun a => eq_refl).

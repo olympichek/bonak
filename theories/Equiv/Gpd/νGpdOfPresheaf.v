@@ -3000,7 +3000,9 @@ Proof.
   unshelve esplit.
   - now exact tt.
   - intros q Hq r Hr Hqp ε ω d.
-    now apply unit_UIP.
+    destruct q as [|q]; [|now destruct Hq].
+    destruct r as [|r]; [|now destruct Hr].
+    cbn. rewrite fEqualConst. now reflexivity.
 Defined.
 
 (** The bottom painting 2-coherence.  Both indices are forced to [0] by

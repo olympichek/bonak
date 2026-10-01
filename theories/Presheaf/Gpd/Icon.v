@@ -358,10 +358,8 @@ Proof.
        (HSF (S k) q (↑ Hq) b x) (phomEq F (wgenLift Hq b) x)) _) • _).
   refine (transCongL _ (eqTransAssoc _ _ _) • _).
   refine (transCongL _ (transCongL _ (eq_sym (eqTransAssoc _ _ _))) • _).
-  refine (transCongL _ (transCongL _ (transCongR (pcompNatL F
-    (wgenLift Hq b) (wgen k k ε)
-    (f_equal (fun z: Word A (S k) (S (S k)) => wcomp z (wgen k k ε))
-       (wgenLift Hq b)) x) _)) • _).
+  refine (transCongL _ (transCongL _ (transCongR (pcompNatLCanonical F
+    (wgenLift Hq b) (wgen k k ε) x) _)) • _).
   refine (transCongL _ (transCongL _ (eqTransAssoc _ _ _)) • _).
   refine (transCongL _ (transCongL _ (transCongL _ _))).
   (* the three word equalities agree, the hom-types of the ν-semi-shape category being h-sets *)
@@ -400,27 +398,16 @@ Proof.
   refine (eqTransAssoc _ _ _ • _).
   refine (transCongL _ (transCongL _ (eq_sym (eqTransAssoc _ _ _))) • _).
   refine (transCongL _ (eq_sym (eqTransAssoc _ _ _)) • _).
-  refine (transCongL _ (transCongR (pcompCompareNat F
+  refine (transCongL _ (transCongR (pcompCompareNatCanonical F
     (wgenLift (Hr ↕ (↑ Hq)) ω) (wgenLift Hq ε)
-    (SF (S (S n)) r (↑ (Hr ↕ (↑ Hq))) ω) (HSF (S (S n)) r (↑ (Hr ↕ (↑ Hq))) ω)
-    (f_equal (fun z: Word A (S (S n)) (S (S (S n))) =>
-                wcomp z (wgen (S n) q ε)) (wgenLift (Hr ↕ (↑ Hq)) ω)
-     • f_equal (fun z: Word A (S n) (S (S n)) =>
-                  wcomp (wkeep (wgen (S n) r ω)) z) (wgenLift Hq ε))
-    X) _) • _).
+    (SF (S (S n)) r (↑ (Hr ↕ (↑ Hq))) ω) (HSF (S (S n)) r (↑ (Hr ↕ (↑ Hq))) ω) X) _) • _).
   refine (transCongL _ (eqTransAssoc _ _ _) • _).
   refine (transCongL _ (transCongL _ (eqTransAssoc _ _ _)) • _).
   refine (transCongL _ (transCongL _ (transCongL _ _))).
-  refine (transCongL _ (transCongL _ (pcompCompareNatSym F
+  refine (transCongL _ (transCongL _ (pcompCompareNatSymCanonical F
     (wgenLift (⇑ Hq) ε) (wgenLift (Hr ↕ Hq) ω)
     (SF (S (S n)) (S q) (⇑ (↑ Hq)) ε) (HSF (S (S n)) (S q) (⇑ (↑ Hq)) ε)
-    (SF (S n) r (Hr ↕ (↑ Hq)) ω) (HSF (S n) r (Hr ↕ (↑ Hq)) ω)
-    (f_equal (fun z: Word A (S (S n)) (S (S (S n))) =>
-                wcomp z (wgen (S n) r ω)) (wgenLift (⇑ Hq) ε)
-     • f_equal (fun z: Word A (S n) (S (S n)) =>
-                  wcomp (wkeep (wgen (S n) (S q) ε)) z)
-         (wgenLift (Hr ↕ Hq) ω))
-    X)) • _).
+    (SF (S n) r (Hr ↕ (↑ Hq)) ω) (HSF (S n) r (Hr ↕ (↑ Hq)) ω) X)) • _).
   refine (transCongL _ (eq_sym (eqTransAssoc _ _ _)) • _).
   refine (eq_sym (eqTransAssoc _ _ _) • _).
   refine (transCongR _ _).
@@ -702,8 +689,7 @@ Proof.
     refine (transCongL _ (eq_trans_sym_cancel_l _ _) • _).
     refine (transCongL _ (f_equal (@eq_sym _ _ _)
       (f_equal (fun e: wcomp (wid 0) (wid 0) = wid 0 => phomEq F e x)
-         (((Op (νSemiShape A)).(CHom) 0 0).(UIP)
-            (h := wcompIdr (wid 0)) (g := eq_refl)))) • _).
+         (eq_refl: wcompIdr (wid 0) = eq_refl))) • _).
     now exact (eq_sym (eq_trans_refl_l _)).
   - destruct f as [(ε, f)|f].
     + (* a deleted top dimension in the first word *)

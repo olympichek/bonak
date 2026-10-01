@@ -39,14 +39,14 @@ Proof.
     apply functional_extensionality_dep; intro f. now exact (H a b f). }
   destruct e.
   assert (ei: zi = wi).
-  { apply functional_extensionality_dep; intro a. now apply (D.(CHom)). }
+  { apply functional_extensionality_dep; intro a. now apply (D.(CHom) _ _).(UIP). }
   destruct ei.
   assert (ec: zc = wc).
   { apply functional_extensionality_dep; intro a.
     apply functional_extensionality_dep; intro b.
     apply functional_extensionality_dep; intro c.
     apply functional_extensionality_dep; intro f.
-    apply functional_extensionality_dep; intro g. now apply (D.(CHom)). }
+    apply functional_extensionality_dep; intro g. now apply (D.(CHom) _ _).(UIP). }
   now destruct ec.
 Qed.
 
@@ -134,11 +134,11 @@ Proof.
   assert (el: Cl = l).
   { apply functional_extensionality_dep; intro a.
     apply functional_extensionality_dep; intro b.
-    apply functional_extensionality_dep; intro f. now apply (Ch a b). }
+    apply functional_extensionality_dep; intro f. now apply (Ch a b).(UIP). }
   assert (er: Cr = r).
   { apply functional_extensionality_dep; intro a.
     apply functional_extensionality_dep; intro b.
-    apply functional_extensionality_dep; intro f. now apply (Ch a b). }
+    apply functional_extensionality_dep; intro f. now apply (Ch a b).(UIP). }
   assert (es: Cs = s).
   { apply functional_extensionality_dep; intro a.
     apply functional_extensionality_dep; intro b.
@@ -146,7 +146,7 @@ Proof.
     apply functional_extensionality_dep; intro e.
     apply functional_extensionality_dep; intro f.
     apply functional_extensionality_dep; intro g.
-    apply functional_extensionality_dep; intro h. now apply (Ch a e). }
+    apply functional_extensionality_dep; intro h. now apply (Ch a e).(UIP). }
   now destruct el, er, es.
 Qed.
 

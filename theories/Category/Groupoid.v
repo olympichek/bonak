@@ -43,7 +43,7 @@ Proof.
   intros [p h]. unshelve refine (eq_existT_curried _ _).
   - refine (f_equal (invEq e) _ • retEq e p).
     apply isoEq. cbn. now rewrite idToIsoHom.
-  - apply (G.(CHom) a b).
+  - now apply (G.(CHom) a b).(UIP).
 Defined.
 
 (** The two round trips of [idToHom]. The retraction is the first component
@@ -92,18 +92,19 @@ Proof.
   now rewrite <- fhomIdToHom, 2 idToHomToId.
 Qed.
 
-(** A quasi-inverse of [idToHom] suffices to build the univalence field: the
-    fibre element is unique in its first component by injectivity of
-    [idToHom], and in its second by [UIP] of the hom-h-set. *)
+(** A quasi-inverse of [idToHom] lifts to an equivalence of its fibres
+    with based path spaces, whose contractions supply univalence. *)
 
 Lemma univFromQinv (C: Category) (h: forall a b, C.(CHom) a b -> a = b)
   (Hs: forall a b (f: C.(CHom) a b), idToHom (h a b f) = f)
   (Hr: forall a b (p: a = b), h a b (idToHom p) = p)
   (a b: C.(CObj)) (f: C.(CHom) a b): Contr {p: a = b &T idToHom p = f}.
 Proof.
-  exists (h a b f; Hs a b f); intro x.
-  refine (eq_existT_curried (f_equal (h a b) (eq_sym x.2) • Hr a b x.1) _).
-  now apply (C.(CHom) a b).
+  pose (E := sigTEquivFst (B := fun g: C.(CHom) a b => g = f)
+    (qinvEquiv (@idToHom C a b) (h a b) (Hr a b) (Hs a b))).
+  exists (invEq E (f; eq_refl)); intro x.
+  refine (f_equal (invEq E) _ • retEq E x).
+  destruct (E x) as [g p]. now subst g.
 Qed.
 
 (** The objects of a univalent groupoid form a 1-type: their identity types retract
@@ -187,7 +188,7 @@ Proof.
       (eq_sym ((u a b i.(isoHom)).2 (p; e))
        • (u a b i.(isoHom)).2
           (q; eq_sym (idToIsoHom q) • f_equal isoHom h))).
-  - apply (isoSet C a b).
+  - now apply (isoSet C a b).(UIP).
 Defined.
 
 Lemma univalentGroupoidFromPathsRet (G: UnivalentGroupoid):

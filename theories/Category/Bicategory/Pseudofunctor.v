@@ -76,13 +76,20 @@ Proof.
   destruct u as [ui uc u1 u2 ul ur uil uir ua], v as [vi vc v1 v2 vl vr vil vir va].
   assert (ui = vi) by (repeat (apply functional_extensionality_dep; intro); apply isInvertibleProp).
   assert (uc = vc) by (repeat (apply functional_extensionality_dep; intro); apply isInvertibleProp).
-  assert (u1 = v1) by (repeat (apply functional_extensionality_dep; intro); apply (T.(BHom) _ _).(CHom)).
-  assert (u2 = v2) by (repeat (apply functional_extensionality_dep; intro); apply (T.(BHom) _ _).(CHom)).
-  assert (ul = vl) by (repeat (apply functional_extensionality_dep; intro); apply (T.(BHom) _ _).(CHom)).
-  assert (ur = vr) by (repeat (apply functional_extensionality_dep; intro); apply (T.(BHom) _ _).(CHom)).
-  assert (uil = vil) by (repeat (apply functional_extensionality_dep; intro); apply (T.(BHom) _ _).(CHom)).
-  assert (uir = vir) by (repeat (apply functional_extensionality_dep; intro); apply (T.(BHom) _ _).(CHom)).
-  assert (ua = va) by (repeat (apply functional_extensionality_dep; intro); apply (T.(BHom) _ _).(CHom)).
+  assert (u1 = v1) by (repeat (apply functional_extensionality_dep; intro);
+        now apply ((T.(BHom) _ _).(CHom) _ _).(UIP)).
+  assert (u2 = v2) by (repeat (apply functional_extensionality_dep; intro);
+        now apply ((T.(BHom) _ _).(CHom) _ _).(UIP)).
+  assert (ul = vl) by (repeat (apply functional_extensionality_dep; intro);
+        now apply ((T.(BHom) _ _).(CHom) _ _).(UIP)).
+  assert (ur = vr) by (repeat (apply functional_extensionality_dep; intro);
+        now apply ((T.(BHom) _ _).(CHom) _ _).(UIP)).
+  assert (uil = vil) by (repeat (apply functional_extensionality_dep; intro);
+        now apply ((T.(BHom) _ _).(CHom) _ _).(UIP)).
+  assert (uir = vir) by (repeat (apply functional_extensionality_dep; intro);
+        now apply ((T.(BHom) _ _).(CHom) _ _).(UIP)).
+  assert (ua = va) by (repeat (apply functional_extensionality_dep; intro);
+        now apply ((T.(BHom) _ _).(CHom) _ _).(UIP)).
   now subst.
 Qed.
 

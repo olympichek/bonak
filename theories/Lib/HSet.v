@@ -77,7 +77,7 @@ Defined.
 Lemma sigT_UIP {A: HSet} {B: A -> HSet} (x y: {a: A &T B a}) (p q: x = y):
   p = q.
 Proof.
-  unshelve eapply sigT_decompose. now apply A. now apply (B y.1).
+  unshelve eapply sigT_decompose. now apply A.(UIP). now apply (B y.1).(UIP).
 Defined.
 
 Definition hsigT {A: HSet} (B: A -> HSet): HSet := {|
@@ -106,7 +106,7 @@ Proof.
   rewrite <- hpiT_decompose with (p := p),
           <- hpiT_decompose with (p := q).
   f_equal.
-  apply functional_extensionality_dep_good; intro a. now apply (B a).
+  apply functional_extensionality_dep_good; intro a. now apply (B a).(UIP).
 Qed.
 
 Definition hpiT {A: Type} (B: A -> HSet): HSet.
