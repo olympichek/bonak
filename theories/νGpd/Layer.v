@@ -341,7 +341,7 @@ Proof.
     _ _ (H6 ζ) (nth_lmap R2 l ζ)).
   (** Move the computation paths to the six vertices and compose them there. *)
   rewrite 6 dpath_change_map, 12 dpath_change_nest.
-  rewrite 6 f_equal_compose, <- 12 eq_trans_assoc.
+  rewrite 6 f_equal_compose.
   (** Only the two exterior endpoint corrections survive the pasting. *)
   rewrite 4 dpath_change_comp.
   now apply (dpath_change_cell (P := fun dd => GDom (P (rf0 ζ dd)))).

@@ -29,8 +29,9 @@ Lemma eq_existT_curried_hex {A1 A2 A3 B: Type}
     (= K1; W1) (= K3; W3) (= K2; W2) (= H2; U2) (= H1'; U1') (= H3'; U3').
 Proof.
   refine (_ • (eq_existT_curried_eq HH HHu • eq_sym _)).
-  - now exact (sigT_path_paste (f_equal_eq_existT_curried f1 g1 K1 W1)
-      (sigT_path_paste eq_refl (f_equal_eq_existT_curried f3 g3 K3 W3))).
+  - now exact (sigT_path_paste
+      (sigT_path_paste (f_equal_eq_existT_curried f1 g1 K1 W1) eq_refl)
+      (f_equal_eq_existT_curried f3 g3 K3 W3)).
   - now exact (sigT_path_paste eq_refl
       (sigT_path_paste (f_equal_eq_existT_curried f2 g2 K2 W2) eq_refl)).
 Defined.
@@ -180,10 +181,10 @@ Definition permutahedral_coherence
   let Ngs := square_coherence_fill uf0 fB rfs rf0 gs eU2 in
   let Ngr := square_coherence_fill uf0 fC rfr rf0 gr eU3 in
   let left := square_compose_map rf0
-      (layer_square_map uf0 rur rus rfq fA rf0 gq eU1 pIs pIr pV0 pV1 K1 HH1 Ngq)
       (square_compose_map rf0
-        (layer_square_nat rus ruq1 rfq rfs rf0 KA2 pIr pV1 pV2 e2 (gq u1) (gs u2) HH2 NKA2)
-        (layer_square_map uf0 ruq1 rur1 rfs fB rf0 gs eU2 pIr pIq pV2 pV3 K3 HH3 Ngs)) •
+        (layer_square_map uf0 rur rus rfq fA rf0 gq eU1 pIs pIr pV0 pV1 K1 HH1 Ngq)
+        (layer_square_nat rus ruq1 rfq rfs rf0 KA2 pIr pV1 pV2 e2 (gq u1) (gs u2) HH2 NKA2))
+      (layer_square_map uf0 ruq1 rur1 rfs fB rf0 gs eU2 pIr pIq pV2 pV3 K3 HH3 Ngs) •
     whisker_r HHA _ in
   let right := whisker_l _ (f_equal (fun e => f_equal rf0 e) κ) •
     square_compose_map rf0
@@ -243,13 +244,13 @@ Proof.
   refine (square_cube_map_dep rf0 S0 _ _ κ HHA Hcoh3Frame
     _ _ _ _ _ _ _ _ Hcoh2Painting).
   - eapply square_compose_map_dep.
-    + now exact (layer_square_map_dep uf0 rur rus rfq fA rf0 gq S1 S0 S2 S2
-        Fq Rr Rs eU1 pIs pIr pV0 pV1 K1 HH1 HK1).
     + eapply square_compose_map_dep.
+      * now exact (layer_square_map_dep uf0 rur rus rfq fA rf0 gq S1 S0 S2 S2
+          Fq Rr Rs eU1 pIs pIr pV0 pV1 K1 HH1 HK1).
       * now exact (layer_square_nat_dep rus ruq1 rfq rfs rf0 Rs Rq1 Fq Fs KA2 HKA2
           pIr pV1 pV2 e2 (gq u1) (gs u2) HH2 aR).
-      * now exact (layer_square_map_dep uf0 ruq1 rur1 rfs fB rf0 gs S1 S0 S2 S2
-          Fs Rq1 Rr1 eU2 pIr pIq pV2 pV3 K3 HH3 HK3).
+    + now exact (layer_square_map_dep uf0 ruq1 rur1 rfs fB rf0 gs S1 S0 S2 S2
+        Fs Rq1 Rr1 eU2 pIr pIq pV2 pV3 K3 HH3 HK3).
   - eapply square_compose_map_dep.
     + now exact (layer_square_nat_dep rur ruq1 rfq rfr rf0 Rr Rq1 Fq Fr KA4 HKA4
         pIs pV0 pV4 e4 (gq u0) (gr u4) HH4 aS).
@@ -279,8 +280,5 @@ Lemma rew_coh2Painting_restr0 {TU TL: Type}
     eq_refl (rew_cohLayer_hex P r0 F G E1 e2 e5 pQ pR KA aL aR HK κ)
     eq_refl eq_refl HK eq_refl.
 Proof.
-  unfold hexagonal_coherence_dep.
-  rewrite <- sigT_trans_eq_assoc.
-  rewrite rew_compose.
   now exact (layer_square rq rr r0 F G e2 e5 E1 pQ pR KA HK κ).
 Defined.
