@@ -421,14 +421,14 @@ Lemma mkCoh2Frame `(extraDepsCohs: DepsCohsExtension p.+1 k depsCohs)
      (mkRestrPaintings extraDepsCohs).1):
   forall q (Hq: q <= k) r (Hr: r <= q) (ε ω θ: arity)
   (d: mkFrame (mkDepsRestr (depsCohs := toDepsCohs prevCohFrames.1)).(1)),
-  f_equal
+  (f_equal
     (fun x => depsCohs.(_deps).(_restrFrames).2 q _ ε x)
     (prevCohFrames.2 r (Hr ↕ ↑ Hq) 0 leR_O ω θ d)
-  • (depsCohs.(_cohs).2 q Hq 0 leR_O ε θ
-      (mkRestrFrame r.+1 (⇑ (Hr ↕ ↑ Hq)) ω d)
+  • depsCohs.(_cohs).2 q Hq 0 leR_O ε θ
+      (mkRestrFrame r.+1 (⇑ (Hr ↕ ↑ Hq)) ω d))
   • f_equal
       (fun x => depsCohs.(_deps).(_restrFrames).2 0 leR_O θ x)
-      (prevCohFrames.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω d)) =
+      (prevCohFrames.2 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω d) =
   depsCohs.(_cohs).2 q Hq r Hr ε ω (mkRestrFrame 0 leR_O θ d)
   • (f_equal
       (fun x => depsCohs.(_deps).(_restrFrames).2 r _ ω x)

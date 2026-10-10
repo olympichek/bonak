@@ -164,7 +164,7 @@ Lemma rew_cohLayer_hex {T1 T2 T3 X: Type} {P: X -> Type}
 Proof.
   intros HC Hpath.
   refine (rew_map P rf0 E1 _ • _).
-  now exact (sigT_square_fill (eq_sym (eq_trans_assoc _ _ _) • Hpath)
+  now exact (sigT_square_fill Hpath
     (sigT_map_eq (Q := P) F (p := C2) (u := aL) eq_refl ⊙ eq_refl)
     HC (sigT_map_eq (Q := P) G (p := D2) (u := aR) eq_refl ⊙ eq_refl)).
 Defined.
@@ -219,13 +219,12 @@ Lemma rew_cohLayer_sq_31 {T1 T2 X: Type} {P: X -> Type} {S2: T2 -> Type}
   {D1: rfF m1 = rf0 d2}
   {aL: S2 m1} {aR: P (rfF m1)}:
   F m1 aL = aR ->
-  f_equal rfF C2 • (C1 • f_equal rf0 E1) = D1 ->
+  (f_equal rfF C2 • C1) • f_equal rf0 E1 = D1 ->
   rew [fun d => P (rf0 d)] E1 in rew [P] C1 in F m2 (rew [S2] C2 in aL)
   = rew [P] D1 in aR.
 Proof.
   intros HC Hpath.
   refine (rew_map P rf0 E1 _ • _).
-  now exact (sigT_square_fill
-    (eq_sym (eq_trans_assoc _ _ _) • (Hpath • eq_sym (eq_trans_refl_l _)))
+  now exact (sigT_square_fill (Hpath • eq_sym (eq_trans_refl_l _))
     (sigT_map_eq (Q := P) F (p := C2) (u := aL) eq_refl ⊙ eq_refl) HC eq_refl).
 Defined.

@@ -3,14 +3,13 @@
 From Bonak.Lib Require Import Notation SigT.
 
 (** Three mapped paths alternate with three connecting paths. The maps
-    [f1] and [f2] occur on the left route, and [f3] on the right route.
-    Each route is associated to the right. *)
+    [f1] and [f2] occur on the left route, and [f3] on the right route. *)
 Definition hexagonal_coherence {A1 A2 A3 B: Type}
   (f1: A1 -> B) (f2: A2 -> B) (f3: A3 -> B)
   {x0 x1: A1} {x2 x3: A2} {x4 x5: A3}
   (p1: x0 = x1) (p2: x2 = x3) (p3: x4 = x5)
   (h1: f1 x1 = f2 x2) (h2: f1 x0 = f3 x4) (h3: f3 x5 = f2 x3): Prop :=
-  f_equal f1 p1 • (h1 • f_equal f2 p2) = h2 • (f_equal f3 p3 • h3).
+  (f_equal f1 p1 • h1) • f_equal f2 p2 = h2 • (f_equal f3 p3 • h3).
 
 (** A filler for every hexagon is equivalent to UIP. For the converse,
     take three constant maps from [unit] to [x], with all edges reflexive
@@ -76,7 +75,7 @@ Definition hexagonal_coherence_dep {A1 A2 A3 B: Type}
   (k2: rew [Q] h2 in F1 x0 u0 = F3 x4 u4)
   (k3: rew [Q] h3 in F3 x5 u5 = F2 x3 u3): Prop :=
   rew [fun h => rew [Q] h in F1 x0 u0 = F2 x3 u3] H in
-    (sigT_map_eq F1 q1 ⊙ (k1 ⊙ sigT_map_eq F2 q2)) =
+    ((sigT_map_eq F1 q1 ⊙ k1) ⊙ sigT_map_eq F2 q2) =
   k2 ⊙ (sigT_map_eq F3 q3 ⊙ k3).
 
 (** Dependent paths around a naturality square, compared after transport

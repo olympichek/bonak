@@ -59,7 +59,8 @@ Definition square_compose {X: Type} {x0 x1 x2 y0 y1 y2: X}
   eq_trans_assoc p c d •
   (whisker_r H d •
   (eq_sym (eq_trans_assoc a q d) •
-  (whisker_l a K • eq_trans_assoc a b r))).
+  (whisker_l a K •
+  eq_trans_assoc a b r))).
 
 (** Stack two squares along their common horizontal edge. *)
 Definition square_stack {X: Type} {x0 x1 y0 y1 z0 z1: X}
@@ -99,7 +100,7 @@ Lemma square_compose_dep {X: Type} (P: X -> Type) {x0 x1 x2 y0 y1 y2: X}
 Proof.
   destruct p, q, r, hp, hq, hr. cbn in H, K. destruct H, K.
   destruct c, d.
-  cbn [square_compose whisker_l whisker_r eq_trans_assoc f_equal eq_sym eq_trans eq_rect] in *.
+  cbn [square_compose whisker_l whisker_r f_equal eq_sym eq_trans eq_rect] in *.
   rewrite 8 sigT_trans_eq_refl, eq_trans_refl_l, eq_trans_refl_r in *.
   now rewrite HH, KK.
 Defined.
@@ -121,7 +122,7 @@ Lemma square_stack_dep {X: Type} (P: X -> Type) {x0 x1 y0 y1 z0 z1: X}
 Proof.
   destruct p, q, r, s, hp, hq, hr, hs. cbn in H, K.
   destruct H, K, d.
-  cbn [square_stack whisker_l whisker_r eq_trans_assoc f_equal eq_sym eq_trans eq_rect] in *.
+  cbn [square_stack whisker_l whisker_r f_equal eq_sym eq_trans eq_rect] in *.
   rewrite 2 sigT_trans_eq_refl, eq_trans_refl_l in HH, KK.
   rewrite 4 sigT_trans_eq_refl, eq_trans_refl_l.
   now exact (KK • HH).
@@ -303,8 +304,7 @@ Lemma layer_square {V V' W X: Type} {S: V -> Type} {S': V' -> Type} {P: X -> Typ
   (c: f m2 = d w1) (c': g n2 = d w2) (k: f m1 = g n1)
   {a: S m1} {b: S' n1} (h: rew [P] k in F m1 a = G n1 b)
   (H: hexagonal_coherence f d g l e r c k c'):
-  rew [fun e => rew [P] e in F m1 a = rew [P] c' in G n2 (rew [S'] r in b)]
-    (eq_sym (eq_trans_assoc _ _ _) • H) in
+  rew [fun e => rew [P] e in F m1 a = rew [P] c' in G n2 (rew [S'] r in b)] H in
     ((sigT_map_eq F (p := l) (u := a) eq_refl ⊙ eq_refl) ⊙
       sigT_map_eq (Q := P) (fun _ u => u)
        (rew_cohLayer_hex (P := P) (rf0 := d) (F := F) (G := G) (E1 := e)
@@ -330,8 +330,7 @@ Definition layer_square_map
   (f_equal f (f_equal s p • v) • α d) • f_equal j (f_equal g e) =
   f_equal f k • (f_equal f (f_equal t q • w) • α d').
 Proof.
-  now exact (square_stack
-    (square_map f (eq_sym (eq_trans_assoc _ _ _) • H)) (eq_sym Hnat)).
+  now exact (square_stack (square_map f H) (eq_sym Hnat)).
 Defined.
 
 Lemma layer_square_map_dep
@@ -385,7 +384,7 @@ Definition layer_square_nat {Z V W X: Type}
     k z1 • (f_equal g (f_equal R p • r) • c').
 Proof.
   now exact (square_change_sides (map_compose_tail f (f_equal L p) l c)
-    (square_stack Hnat (eq_sym (eq_trans_assoc _ _ _) • H))
+    (square_stack Hnat H)
     (map_compose_tail g (f_equal R p) r c')).
 Defined.
 
