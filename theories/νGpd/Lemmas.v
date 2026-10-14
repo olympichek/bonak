@@ -29,8 +29,9 @@ Lemma eq_existT_curried_hex {A1 A2 A3 B: Type}
     (= K1; W1) (= K3; W3) (= K2; W2) (= H2; U2) (= H1'; U1') (= H3'; U3').
 Proof.
   refine (_ • (eq_existT_curried_eq HH HHu • eq_sym _)).
-  - now exact (sigT_path_paste (f_equal_eq_existT_curried f1 g1 K1 W1)
-      (sigT_path_paste eq_refl (f_equal_eq_existT_curried f3 g3 K3 W3))).
+  - now exact (sigT_path_paste
+      (sigT_path_paste (f_equal_eq_existT_curried f1 g1 K1 W1) eq_refl)
+      (f_equal_eq_existT_curried f3 g3 K3 W3)).
   - now exact (sigT_path_paste eq_refl
       (sigT_path_paste (f_equal_eq_existT_curried f2 g2 K2 W2) eq_refl)).
 Defined.
@@ -258,10 +259,10 @@ Definition permutahedral_coherence
   let Ngs := square_coherence_fill ufB fB rfs rf0 gs eU2 in
   let Ngr := square_coherence_fill ufC fC rfr rf0 gr eU3 in
   let left := square_compose_map rf0
-      (layer_square_map uf0 rur rusY rfq fA rf0 gq eU1 pIs pIr pV0 pV1 K1 HH1 Ngq)
       (square_compose_map rf0
-        (layer_square_nat rusY ruq1 rfq rfs rf0 KA2 pIr pV1 pV2 e2 (gq u1) (gs u2) HH2 NKA2)
-        (layer_square_map ufB ruq1 rur1 rfs fB rf0 gs eU2 pIr pIq pV2 pV3 K3 HH3 Ngs)) •
+        (layer_square_map uf0 rur rusY rfq fA rf0 gq eU1 pIs pIr pV0 pV1 K1 HH1 Ngq)
+        (layer_square_nat rusY ruq1 rfq rfs rf0 KA2 pIr pV1 pV2 e2 (gq u1) (gs u2) HH2 NKA2))
+      (layer_square_map ufB ruq1 rur1 rfs fB rf0 gs eU2 pIr pIq pV2 pV3 K3 HH3 Ngs) •
     whisker_r HHA _ in
   let right := whisker_l _ (f_equal (fun e => f_equal rf0 e) κ) •
     square_compose_map rf0
@@ -321,13 +322,13 @@ Proof.
   refine (square_cube_map_dep rf0 S0 _ _ κ HHA Hcoh3Frame
     _ _ _ _ _ _ _ _ Hcoh2Painting).
   - eapply square_compose_map_dep.
-    + now exact (layer_square_map_dep uf0 rur rusY rfq fA rf0 gq SY S0 S2A S2A
-        Fq Rr RsY eU1 pIs pIr pV0 pV1 K1 HH1 HK1).
     + eapply square_compose_map_dep.
+      * now exact (layer_square_map_dep uf0 rur rusY rfq fA rf0 gq SY S0 S2A S2A
+          Fq Rr RsY eU1 pIs pIr pV0 pV1 K1 HH1 HK1).
       * now exact (layer_square_nat_dep rusY ruq1 rfq rfs rf0 RsY Rq1 Fq Fs KA2 HKA2
           pIr pV1 pV2 e2 (gq u1) (gs u2) HH2 aR).
-      * now exact (layer_square_map_dep ufB ruq1 rur1 rfs fB rf0 gs S1 S0 S2A S2C
-          Fs Rq1 Rr1 eU2 pIr pIq pV2 pV3 K3 HH3 HK3).
+    + now exact (layer_square_map_dep ufB ruq1 rur1 rfs fB rf0 gs S1 S0 S2A S2C
+        Fs Rq1 Rr1 eU2 pIr pIq pV2 pV3 K3 HH3 HK3).
   - eapply square_compose_map_dep.
     + now exact (layer_square_nat_dep rur ruq1 rfq rfr rf0 Rr Rq1 Fq Fr KA4 HKA4
         pIs pV0 pV4 e4 (gq u0) (gr u4) HH4 aS).
@@ -357,9 +358,6 @@ Lemma rew_coh2Painting_restr0 {TU0 TU2 TU3 TL: Type}
     eq_refl (rew_cohLayer_hex P r0 F G E1 e2 e5 pQ pR KA aL aR HK κ)
     eq_refl eq_refl HK eq_refl.
 Proof.
-  unfold hexagonal_coherence_dep.
-  rewrite <- sigT_trans_eq_assoc.
-  rewrite rew_compose.
   now exact (layer_square rq rr r0 F G e2 e5 E1 pQ pR KA HK κ).
 Defined.
 
@@ -461,7 +459,7 @@ Lemma rew_coh2Layer_split
     pV0 pV1 pV2 pV3 pV4 pV5 K1 K3 K5 HH1 HH3 HH5 κ HH2 HH4 HH6 HHA):
   rew [fun e: fA u0 = fB u3 =>
        rew [fun dd => S0 (rf0 dd)] e in cA0 = cB3] κ in
-  (f_equal (fun x => rew [fun dd => S0 (rf0 dd)] f_equal fA eU1 in x) kc0
+  ((f_equal (fun x => rew [fun dd => S0 (rf0 dd)] f_equal fA eU1 in x) kc0
    • (sigT_map_eq (P := fun dd => SY (uf0 dd)) (Q := fun dd => S0 (rf0 dd))
         (f := fA) (fun dd x => rew [S0] gq dd in Fq (uf0 dd) x)
         (f_equal (fun x => rew [fun dd => SY (uf0 dd)] eU1 in x) kbP
@@ -479,7 +477,7 @@ Lemma rew_coh2Layer_split
          • (rew_cohLayer_hex S0 rf0 Fq Fs e2 pV1 pV2 (gq u1) (gs u2) (KA2 zr2)
               (RsY zr2 aQ) (Rq1 zr2 aQ) (HKA2 zr2 aQ) HH2
             • (eq_sym (f_equal (fun x => rew [S0] gs u2 in Fs (ufB u2) x) kbR)
-               • eq_sym kc2)))
+               • eq_sym kc2)))))
       ⊙[fun dd => S0 (rf0 dd)]
         (f_equal (fun x => rew [fun dd => S0 (rf0 dd)] f_equal fB eU2 in x) kc2
          • (sigT_map_eq (P := fun dd => S1 (ufB dd))
@@ -493,7 +491,7 @@ Lemma rew_coh2Layer_split
                      • (eq_sym (f_equal (fun x =>
                           rew [S1] pV3 in Rr1 zq2 x) kR)
                         • eq_sym kbR'))))
-            • eq_sym kc3))))
+            • eq_sym kc3)))
   = f_equal (fun x => rew [fun dd => S0 (rf0 dd)] e4 in x) kc0
     • (f_equal (fun x => rew [fun dd => S0 (rf0 dd)] e4 in
          rew [S0] gq u0 in Fq (uf0 u0) x) kbP
@@ -607,17 +605,16 @@ Lemma rew_coh2Painting_restr0_split {TU0 TU2 TU3 TL B0: Type}
   (w3: P (r0 d1)) (kM: w3 = rew [P] pQ in F m2 u1)
   (w4: P (r0 d2)) (kM': w4 = rew [P] pR in G n2 u12):
   rew [fun π: rq m1 = r0 d2 => rew [P] π in F m1 (AR b0) = w4] κ in
-  (sigT_map_eq (Q := P) F (eq_sym kF)
-   ⊙ (eq_sym kM
-      ⊙ (eq_sym (rew_map P r0 E1 w3)
-         • (f_equal (fun x => rew [fun dd: TU0 => P (r0 dd)] E1 in x) kM
-            • (f_equal (fun x =>
-                 rew [fun dd: TU0 => P (r0 dd)] E1 in rew [P] pQ in F m2 x) kF
-               • (rew_cohLayer_hex P r0 F G E1 e2 e5 pQ pR KA
-                    (AR b0) (AQ1 b0) HK κ
-                  • (eq_sym (f_equal (fun x =>
-                       rew [P] pR in G n2 x) kG)
-                     • eq_sym kM'))))))) =
+  ((sigT_map_eq (Q := P) F (eq_sym kF) ⊙ eq_sym kM)
+   ⊙ (eq_sym (rew_map P r0 E1 w3)
+      • (f_equal (fun x => rew [fun dd: TU0 => P (r0 dd)] E1 in x) kM
+         • (f_equal (fun x =>
+              rew [fun dd: TU0 => P (r0 dd)] E1 in rew [P] pQ in F m2 x) kF
+            • (rew_cohLayer_hex P r0 F G E1 e2 e5 pQ pR KA
+                 (AR b0) (AQ1 b0) HK κ
+               • (eq_sym (f_equal (fun x =>
+                    rew [P] pR in G n2 x) kG)
+                  • eq_sym kM')))))) =
   HK ⊙ (sigT_map_eq (Q := P) G (eq_sym kG) ⊙ eq_sym kM').
 Proof.
   rewrite (dpath_change_flat_map (P := fun d => P (r0 d))
@@ -671,17 +668,16 @@ Lemma rew_coh2Painting_restr0_edges {TU0 TU2 TU3 TL: Type}
   (EM: rew [P] pR in G n2 u12 = w4)
   (hEM: EM = eq_sym kM'):
   rew [fun π: rq m1 = r0 d2 => rew [P] π in F m1 aL = w4] κ in
-  (EA
-   ⊙ (EB
-      ⊙ (eq_sym (rew_map P r0 E1 w3)
-         • (f_equal (fun x => rew [fun dd: TU0 => P (r0 dd)] E1 in x) kM
-            • (f_equal (fun x =>
-                 rew [fun dd: TU0 => P (r0 dd)] E1 in rew [P] pQ in F m2 x)
-                 (eq_sym kF)
-               • (rew_cohLayer_hex P r0 F G E1 e2 e5 pQ pR KA aL aR HK κ
-                  • (eq_sym (f_equal (fun x =>
-                       rew [P] pR in G n2 x) kG)
-                     • eq_sym kM'))))))) =
+  ((EA ⊙ EB)
+   ⊙ (eq_sym (rew_map P r0 E1 w3)
+      • (f_equal (fun x => rew [fun dd: TU0 => P (r0 dd)] E1 in x) kM
+         • (f_equal (fun x =>
+              rew [fun dd: TU0 => P (r0 dd)] E1 in rew [P] pQ in F m2 x)
+              (eq_sym kF)
+            • (rew_cohLayer_hex P r0 F G E1 e2 e5 pQ pR KA aL aR HK κ
+               • (eq_sym (f_equal (fun x =>
+                    rew [P] pR in G n2 x) kG)
+                  • eq_sym kM')))))) =
   HK ⊙ (EG ⊙ EM).
 Proof.
   rewrite hEA, hEB, hEG, hEM.

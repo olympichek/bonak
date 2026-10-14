@@ -508,13 +508,13 @@ Lemma restrCellCoh2
   (C: (mkPaintings (mkDepsRestr (depsCohs :=
         (proj1DepsCohs2 (mkDepsCohs2 dc3Up)).(_depsCohs));
         mkExtraDeps extUp)).2 D):
-  f_equal (fun z => restrCell ext0 Q HQ ε z.1 z.2)
+  (f_equal (fun z => restrCell ext0 Q HQ ε z.1 z.2)
     (restrCellCoh dc3Up R (HR ↕ ↑ HQ) S HS ω θ D C)
-  • (restrCellCoh dc3 Q HQ S (HS ↕ HR) ε θ
+   • restrCellCoh dc3 Q HQ S (HS ↕ HR) ε θ
        (restrCell extUp R.+1 (⇑ (HR ↕ ↑ HQ)) ω D C).1
-       (restrCell extUp R.+1 (⇑ (HR ↕ ↑ HQ)) ω D C).2
-     • f_equal (fun z => restrCell ext0 S (HS ↕ (HR ↕ HQ)) θ z.1 z.2)
-         (restrCellCoh dc3Up Q.+1 (⇑ HQ) R.+1 (⇑ HR) ε ω D C))
+       (restrCell extUp R.+1 (⇑ (HR ↕ ↑ HQ)) ω D C).2)
+  • f_equal (fun z => restrCell ext0 S (HS ↕ (HR ↕ HQ)) θ z.1 z.2)
+    (restrCellCoh dc3Up Q.+1 (⇑ HQ) R.+1 (⇑ HR) ε ω D C)
   = restrCellCoh dc3 Q HQ R HR ε ω
       (restrCell extUp S (↑ (↑ (HS ↕ (HR ↕ HQ)))) θ D C).1
       (restrCell extUp S (↑ (↑ (HS ↕ (HR ↕ HQ)))) θ D C).2
@@ -629,15 +629,15 @@ Lemma faceAtCoh2
   (C: (mkPaintings (mkDepsRestr (depsCohs :=
         (proj1DepsCohs2 (mkDepsCohs2 dc3Up)).(_depsCohs));
         mkExtraDeps extUp)).2 D):
-  f_equal (fun z: CellUp => faceRebuild a (restrCell ext0 Q HQ ε z.1 z.2))
+  (f_equal (fun z: CellUp => faceRebuild a (restrCell ext0 Q HQ ε z.1 z.2))
     (restrCellCoh dc3Up R (HR ↕ ↑ HQ) S HS ω θ D C)
-  • (f_equal (faceRebuild a)
+   • f_equal (faceRebuild a)
        (restrCellCoh dc3 Q HQ S (HS ↕ HR) ε θ
           (restrCell extUp R.+1 (⇑ (HR ↕ ↑ HQ)) ω D C).1
-          (restrCell extUp R.+1 (⇑ (HR ↕ ↑ HQ)) ω D C).2)
-     • f_equal (fun z: CellUp =>
-         faceRebuild a (restrCell ext0 S (HS ↕ (HR ↕ HQ)) θ z.1 z.2))
-         (restrCellCoh dc3Up Q.+1 (⇑ HQ) R.+1 (⇑ HR) ε ω D C))
+          (restrCell extUp R.+1 (⇑ (HR ↕ ↑ HQ)) ω D C).2))
+  • f_equal (fun z: CellUp =>
+    faceRebuild a (restrCell ext0 S (HS ↕ (HR ↕ HQ)) θ z.1 z.2))
+    (restrCellCoh dc3Up Q.+1 (⇑ HQ) R.+1 (⇑ HR) ε ω D C)
   = f_equal (faceRebuild a)
       (restrCellCoh dc3 Q HQ R HR ε ω
          (restrCell extUp S (↑ (↑ (HS ↕ (HR ↕ HQ)))) θ D C).1
@@ -961,14 +961,14 @@ Lemma faceAtCoh2Up
   (D: mkFrame (mkDepsRestr (depsCohs := dcV.(_depsCohs))).(1))
   (C: (mkPaintings (mkDepsRestr (depsCohs := dcV.(_depsCohs));
         mkExtraDeps dcV.(_extraDepsCohs))).2 D):
-  f_equal (fun w => faceAt c Q HQ ε (deepCell c w).1 (deepCell c w).2)
+  (f_equal (fun w => faceAt c Q HQ ε (deepCell c w).1 (deepCell c w).2)
     (faceAtCohUp e1 a1 R (HR ↕ ↑ HQ) s Hs ω θ D C)
-  • (faceAtCohUp e0 a Q HQ s (Hs ↕ HR) ε θ
+   • faceAtCohUp e0 a Q HQ s (Hs ↕ HR) ε θ
        (deepCell u (faceAt v R.+1 (⇑ (HR ↕ ↑ HQ)) ω D C)).1
-       (deepCell u (faceAt v R.+1 (⇑ (HR ↕ ↑ HQ)) ω D C)).2
-     • f_equal (fun w => faceAt c s (Hs ↕ (HR ↕ HQ)) θ
-                  (deepCell c w).1 (deepCell c w).2)
-         (faceAtCohUp e1 a1 Q.+1 (⇑ HQ) R.+1 (⇑ HR) ε ω D C))
+       (deepCell u (faceAt v R.+1 (⇑ (HR ↕ ↑ HQ)) ω D C)).2)
+  • f_equal (fun w => faceAt c s (Hs ↕ (HR ↕ HQ)) θ
+             (deepCell c w).1 (deepCell c w).2)
+    (faceAtCohUp e1 a1 Q.+1 (⇑ HQ) R.+1 (⇑ HR) ε ω D C)
   = faceAtCohUp e0 a Q HQ R HR ε ω
       (deepCell u (faceAt v s (↑ (↑ (Hs ↕ (HR ↕ HQ)))) θ D C)).1
       (deepCell u (faceAt v s (↑ (↑ (Hs ↕ (HR ↕ HQ)))) θ D C)).2

@@ -751,7 +751,7 @@ Lemma rew_cohLayer_hex_section {T1 T2 T3 X: Type}
   {n1 n2: T3} (D2: n1 = n2)
   (C1: rfF m2 = rf0 d1) (D1: rfG n2 = rf0 d2) (K: rfF m1 = rfG n1)
   (aL: S2 m1) (aR: S3 n1)
-  (HH: f_equal rfF C2 • (C1 • f_equal rf0 E) = K • (f_equal rfG D2 • D1)):
+  (HH: hexagonal_coherence rfF rf0 rfG C2 E D2 C1 K D1):
   rew_cohLayer_hex (P := P) (rf0 := rf0)
     (F := fun m (_: S2 m) => s (rfF m)) (G := fun n (_: S3 n) => s (rfG n))
     (E1 := E) (C2 := C2) (D2 := D2) (C1 := C1) (D1 := D1) (K := K)
@@ -899,9 +899,9 @@ Definition hex_reindex_cell {A: Type} {x0 x1 x2 x3 y1 y2: A}
   {b1 b1': x0 = y1} (Hb1: b1 = b1')
   {b2 b2': y1 = y2} (Hb2: b2 = b2')
   {b3 b3': y2 = x3} (Hb3: b3 = b3')
-  (K: a1' • (a2' • a3') = b1' • (b2' • b3')):
-  a1 • (a2 • a3) = b1 • (b2 • b3) :=
-  cell_reindex (path_compose_cell Ha1 (path_compose_cell Ha2 Ha3))
+  (K: (a1' • a2') • a3' = b1' • (b2' • b3')):
+  (a1 • a2) • a3 = b1 • (b2 • b3) :=
+  cell_reindex (path_compose_cell (path_compose_cell Ha1 Ha2) Ha3)
     (path_compose_cell Hb1 (path_compose_cell Hb2 Hb3)) K.
 
 Lemma hex_reindex_cell_dep {A: Type} (P: A -> Type)
@@ -917,27 +917,27 @@ Lemma hex_reindex_cell_dep {A: Type} (P: A -> Type)
   (c3: rew [P] a3' in u2 = u3)
   (d1: rew [P] b1' in u0 = v1) (d2: rew [P] b2' in v1 = v2)
   (d3: rew [P] b3' in v2 = u3)
-  {K: a1' • (a2' • a3') = b1' • (b2' • b3')}
+  {K: (a1' • a2') • a3' = b1' • (b2' • b3')}
   (H: rew [fun e => rew [P] e in u0 = u3] K in
-    (c1 ⊙ (c2 ⊙ c3)) = d1 ⊙ (d2 ⊙ d3)):
+    ((c1 ⊙ c2) ⊙ c3) = d1 ⊙ (d2 ⊙ d3)):
   rew [fun e => rew [P] e in u0 = u3]
     hex_reindex_cell Ha1 Ha2 Ha3 Hb1 Hb2 Hb3 K in
-    ((rew <- [fun e => rew [P] e in u0 = u1] Ha1 in c1) ⊙
-      ((rew <- [fun e => rew [P] e in u1 = u2] Ha2 in c2) ⊙
-        (rew <- [fun e => rew [P] e in u2 = u3] Ha3 in c3))) =
+    (((rew <- [fun e => rew [P] e in u0 = u1] Ha1 in c1) ⊙
+       (rew <- [fun e => rew [P] e in u1 = u2] Ha2 in c2)) ⊙
+      (rew <- [fun e => rew [P] e in u2 = u3] Ha3 in c3)) =
     (rew <- [fun e => rew [P] e in u0 = v1] Hb1 in d1) ⊙
       ((rew <- [fun e => rew [P] e in v1 = v2] Hb2 in d2) ⊙
         (rew <- [fun e => rew [P] e in v2 = u3] Hb3 in d3)).
 Proof.
   unfold hex_reindex_cell.
   refine (cell_reindex_dep (fun e: x0 = x3 => rew [P] e in u0 = u3)
-    (path_compose_cell Ha1 (path_compose_cell Ha2 Ha3))
+    (path_compose_cell (path_compose_cell Ha1 Ha2) Ha3)
     (path_compose_cell Hb1 (path_compose_cell Hb2 Hb3)) K _ _ H).
-  - refine (path_compose_cell_dep P Ha1 (path_compose_cell Ha2 Ha3) _ _).
-    + now exact (rew_opp_r (fun e: x0 = x1 => rew [P] e in u0 = u1) Ha1 c1).
-    + refine (path_compose_cell_dep P Ha2 Ha3 _ _).
+  - refine (path_compose_cell_dep P (path_compose_cell Ha1 Ha2) Ha3 _ _).
+    + refine (path_compose_cell_dep P Ha1 Ha2 _ _).
+      * now exact (rew_opp_r (fun e: x0 = x1 => rew [P] e in u0 = u1) Ha1 c1).
       * now exact (rew_opp_r (fun e: x1 = x2 => rew [P] e in u1 = u2) Ha2 c2).
-      * now exact (rew_opp_r (fun e: x2 = x3 => rew [P] e in u2 = u3) Ha3 c3).
+    + now exact (rew_opp_r (fun e: x2 = x3 => rew [P] e in u2 = u3) Ha3 c3).
   - refine (path_compose_cell_dep P Hb1 (path_compose_cell Hb2 Hb3) _ _).
     + now exact (rew_opp_r (fun e: x0 = y1 => rew [P] e in u0 = v1) Hb1 d1).
     + refine (path_compose_cell_dep P Hb2 Hb3 _ _).
@@ -954,10 +954,10 @@ Definition hex_reindex_inverse_cell {A: Type} {x0 x1 x2 x3 y1 y2: A}
   {b1 b1': x0 = y1} (Hb1: b1 = b1')
   {b2 b2': y1 = y2} (Hb2: b2 = b2')
   {b3 b3': y2 = x3} (Hb3: b3 = b3')
-  (K: a1 • (a2 • a3) = b1 • (b2 • b3)):
-  a1' • (a2' • a3') = b1' • (b2' • b3') :=
+  (K: (a1 • a2) • a3 = b1 • (b2 • b3)):
+  (a1' • a2') • a3' = b1' • (b2' • b3') :=
   cell_reindex
-    (eq_sym (path_compose_cell Ha1 (path_compose_cell Ha2 Ha3)))
+    (eq_sym (path_compose_cell (path_compose_cell Ha1 Ha2) Ha3))
     (eq_sym (path_compose_cell Hb1 (path_compose_cell Hb2 Hb3))) K.
 
 Lemma cell_reindex_roundtrip {A: Type} {x x' y y': A}
@@ -978,15 +978,15 @@ Lemma hex_reindex_recover_dep {A: Type} (P: A -> Type)
   (c3: rew [P] a3' in u2 = u3)
   (d1: rew [P] b1' in u0 = v1) (d2: rew [P] b2' in v1 = v2)
   (d3: rew [P] b3' in v2 = u3)
-  (K: a1 • (a2 • a3) = b1 • (b2 • b3))
+  (K: (a1 • a2) • a3 = b1 • (b2 • b3))
   (H: rew [fun e => rew [P] e in u0 = u3]
     (hex_reindex_inverse_cell Ha1 Ha2 Ha3 Hb1 Hb2 Hb3 K) in
-    (c1 ⊙ (c2 ⊙ c3)) = d1 ⊙ (d2 ⊙ d3)):
+    ((c1 ⊙ c2) ⊙ c3) = d1 ⊙ (d2 ⊙ d3)):
   rew [fun e => rew [P] e in u0 = u3]
     K in
-    ((rew <- [fun e => rew [P] e in u0 = u1] Ha1 in c1) ⊙
-      ((rew <- [fun e => rew [P] e in u1 = u2] Ha2 in c2) ⊙
-        (rew <- [fun e => rew [P] e in u2 = u3] Ha3 in c3))) =
+    (((rew <- [fun e => rew [P] e in u0 = u1] Ha1 in c1) ⊙
+       (rew <- [fun e => rew [P] e in u1 = u2] Ha2 in c2)) ⊙
+      (rew <- [fun e => rew [P] e in u2 = u3] Ha3 in c3)) =
     (rew <- [fun e => rew [P] e in u0 = v1] Hb1 in d1) ⊙
       ((rew <- [fun e => rew [P] e in v1 = v2] Hb2 in d2) ⊙
         (rew <- [fun e => rew [P] e in v2 = u3] Hb3 in d3)).
@@ -995,7 +995,7 @@ Proof.
     c1 c2 c3 d1 d2 d3 H) as HH.
   unfold hex_reindex_cell, hex_reindex_inverse_cell in HH.
   rewrite (cell_reindex_roundtrip
-    (path_compose_cell Ha1 (path_compose_cell Ha2 Ha3))
+    (path_compose_cell (path_compose_cell Ha1 Ha2) Ha3)
     (path_compose_cell Hb1 (path_compose_cell Hb2 Hb3)) K) in HH.
   now exact HH.
 Defined.
@@ -1013,24 +1013,13 @@ Lemma hex_paste_side_cells {T: Type}
   (B': t1 = t2) (C': t3 = t4) (F': t6 = t5)
   (HB: u • B = B' • x) (HF: w • F = F' • y)
   (HC: C' • (z • y) = (v • x) • C)
-  (H: A • (B • C) = D • (E • F)):
-  (A • eq_sym u) • ((B' • eq_sym v) • C') =
+  (H: (A • B) • C = D • (E • F)):
+  ((A • eq_sym u) • (B' • eq_sym v)) • C' =
   D • ((E • eq_sym w) • (F' • eq_sym z)).
 Proof.
-  pose proof (path_suffix_solve (eq_sym HB)) as Bcell.
-  pose proof (path_suffix_solve (eq_sym HF)) as Fcell.
-  pose proof (path_suffix_solve HC) as Ccell.
-  rewrite <- eq_trans_assoc in Bcell.
-  rewrite <- eq_trans_assoc in Fcell.
-  rewrite <- eq_trans_assoc in Ccell.
-  rewrite Bcell, Fcell, Ccell, eq_trans_sym_distr.
-  rewrite <- 8 eq_trans_assoc.
-  rewrite (eq_trans_sym_cancel_l u), (eq_trans_sym_cancel_l v),
-    (eq_trans_sym_cancel_l x), (eq_trans_sym_cancel_l w).
-  pose proof (f_equal (fun p => p • (eq_sym y • eq_sym z)) H) as K.
-  cbn beta in K.
-  rewrite <- 4 eq_trans_assoc in K.
-  now exact K.
+  destruct u, x, v, w, y, z. cbn in HB, HF, HC |- *.
+  rewrite eq_trans_refl_l in HB, HF, HC.
+  destruct HB, HF, HC. now exact H.
 Defined.
 (** View the expanded endpoint corrections as a dependent path change. *)
 Lemma dpath_change_fold {X: Type} {P: X -> Type} {x y: X} {p: x = y}

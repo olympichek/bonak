@@ -209,12 +209,12 @@ Let PCXU := AddPshCohDep psh _ PC2N PCXN.
 Lemma pshRestrCellCoh (HP2: mkPshRestrPaintingCohType psh PC2N PCXN)
   q (Hq: q <= k) r (Hr: r <= q) (Hqp: q.+1 + p <= m.+2) (ε ω: arity)
   (d: psh.(G0) m.+3):
-  f_equal (pshCell PC2.(_pshDepsCohs psh))
+  (f_equal (pshCell PC2.(_pshDepsCohs psh))
     (psh.(GFaceCoh) m.+1 (q + p) (⇓ Hqp) (r + p) (leR_add_mono_r Hr p) ε ω d)
-  • (pshFaceCell PC2 PCX r (Hr ↕ Hq) (leR_add_mono_r Hr p ↕ (⇓ Hqp)) ω
-       (psh.(GFace) m.+2 (q.+1 + p) Hqp ε d)
-     • f_equal (pshRestrFn PC2 r (Hr ↕ Hq) ω)
-         (pshFaceCell PC2U PCXU q.+1 (⇑ Hq) Hqp ε d))
+   • pshFaceCell PC2 PCX r (Hr ↕ Hq) (leR_add_mono_r Hr p ↕ (⇓ Hqp)) ω
+       (psh.(GFace) m.+2 (q.+1 + p) Hqp ε d))
+  • f_equal (pshRestrFn PC2 r (Hr ↕ Hq) ω)
+    (pshFaceCell PC2U PCXU q.+1 (⇑ Hq) Hqp ε d)
   = pshFaceCell PC2 PCX q Hq (⇓ Hqp) ε
       (psh.(GFace) m.+2 (r + p) (↑ (leR_add_mono_r Hr p ↕ (⇓ Hqp))) ω d)
     • (f_equal (pshRestrFn PC2 q Hq ε)
@@ -1692,11 +1692,11 @@ Definition baseCohCore (Hq Hr: 0 <= 0) (ε ω: arity)
 
 Lemma pshRestrCellCoh0Stored (Hq Hr: 0 <= 0) (ε ω: arity)
   (d: psh.(G0) 2):
-  f_equal pshCell0 (psh.(GFaceCoh) 0 0 Hq 0 Hr ε ω d)
-  • (pshFaceCell0S (Hr ↕ Hq) ω
-       (psh.(GFace) 1 (1 + 0) leR_refl ε d)
-     • f_equal (baseRestrFn2 (Hr ↕ Hq) ω)
-         (pshFaceCell PC2E PCXE 1 (⇑ Hq) leR_refl ε d))
+  (f_equal pshCell0 (psh.(GFaceCoh) 0 0 Hq 0 Hr ε ω d)
+   • pshFaceCell0S (Hr ↕ Hq) ω
+       (psh.(GFace) 1 (1 + 0) leR_refl ε d))
+  • f_equal (baseRestrFn2 (Hr ↕ Hq) ω)
+    (pshFaceCell PC2E PCXE 1 (⇑ Hq) leR_refl ε d)
   = pshFaceCell0S Hq ε
       (psh.(GFace) 1 (0 + 0) (Hr ↕ (↑ Hq)) ω d)
     • (f_equal (baseRestrFn2 Hq ε)

@@ -370,7 +370,7 @@ Defined.
 Polymorphic Lemma hexRotate {X: Type} {w0 w1 w2 w3 v1 v2: X}
   (P1: w0 = w1) (P2: w1 = w2) (P3: w2 = w3)
   (Q1: w0 = v1) (Q2: v1 = v2) (Q3: v2 = w3)
-  (h: P1 • (P2 • P3) = Q1 • (Q2 • Q3)):
+  (h: (P1 • P2) • P3 = Q1 • (Q2 • Q3)):
   Q2 • (Q3 • (eq_sym P3 • (eq_sym P2 • eq_sym P1))) = eq_sym Q1.
 Proof.
   destruct P1, P2, P3, Q1. simpl in h |- *.

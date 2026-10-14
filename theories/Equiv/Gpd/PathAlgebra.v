@@ -145,11 +145,11 @@ Lemma sigT_hex1 {A1 B: Type} {Q: B -> Type}
   (H1': f1 x1 = b4) (U1': rew [Q] H1' in g1 x1 = c4)
   (B2: b4 = b5) (V2: rew [Q] B2 in c4 = c5)
   (H3': b5 = b3) (U3': rew [Q] H3' in c5 = c3)
-  (HH: f_equal f1 K1 • (H2 • B3) = H1' • (B2 • H3'))
+  (HH: (f_equal f1 K1 • H2) • B3 = H1' • (B2 • H3'))
   (HHu: rew [fun h => rew [Q] h in g1 x1 = c3] HH in
-      sigT_trans3 (f_equal f1 K1) (f_equal_dep_sigT f1 g1 K1) H2 U2 B3 V3 =
+      ((f_equal_dep_sigT f1 g1 K1 ⊙ U2) ⊙ V3) =
       sigT_trans3 H1' U1' B2 V2 H3' U3'):
-  f_equal (fun a => (f1 a; g1 a)) K1 • ((= H2; U2) • (= B3; V3)) =
+  (f_equal (fun a => (f1 a; g1 a)) K1 • (= H2; U2)) • (= B3; V3) =
   (= H1'; U1') • ((= B2; V2) • (= H3'; U3')).
 Proof.
   rewrite (f_equal_sigT_dep f1 g1 K1).
@@ -180,9 +180,9 @@ Definition section_hex_parts {A B: Type} {Q: B -> Type}
   (b2p: b4 = b5) (k2: rew [Q] b2p in c4 = c5)
   (b3p: b5 = b3) (k3: rew [Q] b3p in c5 = c3)
  : Type :=
-  {K: f_equal f p • (a2 • a3) = b1 • (b2p • b3p) &T
+  {K: (f_equal f p • a2) • a3 = b1 • (b2p • b3p) &T
    rew [fun e => rew [Q] e in g x = c3] K in
-     (f_equal_dep_sigT f g p ⊙ (h2 ⊙ h3)) = k1 ⊙ (k2 ⊙ k3)}.
+     ((f_equal_dep_sigT f g p ⊙ h2) ⊙ h3) = k1 ⊙ (k2 ⊙ k3)}.
 
 
 Lemma section_hex_layer_map_first {A B: Type} {Q: B -> Type}
@@ -195,12 +195,12 @@ Lemma section_hex_layer_map_first {A B: Type} {Q: B -> Type}
   (b2p: b4 = b5) (k2: rew [Q] b2p in c4 = c5)
   (b3p: b5 = b3) (k3: rew [Q] b3p in c5 = c3)
 
-  (K: f_equal f p • (a2 • a3) = b1 • (b2p • b3p))
+  (K: (f_equal f p • a2) • a3 = b1 • (b2p • b3p))
   (H: rew [fun e => rew [Q] e in g x = c3] K in
-    (f_equal_dep_sigT f g p ⊙ (h2 ⊙ h3)) = k1 ⊙ (k2 ⊙ k3)):
+    ((f_equal_dep_sigT f g p ⊙ h2) ⊙ h3) = k1 ⊙ (k2 ⊙ k3)):
   rew [fun e => rew [Q] e in g x = c3] K in
-    (sigT_map_eq (P := fun a => Q (f a)) (Q := Q) (f := f) (fun _ u => u)
-      (f_equal_dep (fun a => Q (f a)) g p) ⊙ (h2 ⊙ h3)) = k1 ⊙ (k2 ⊙ k3).
+    ((sigT_map_eq (P := fun a => Q (f a)) (Q := Q) (f := f) (fun _ u => u)
+      (f_equal_dep (fun a => Q (f a)) g p) ⊙ h2) ⊙ h3) = k1 ⊙ (k2 ⊙ k3).
 Proof.
   rewrite (sigT_map_eq_id_dep_sigT f g p).
   now exact H.
@@ -699,6 +699,62 @@ Proof.
     sigT_trans_eq_assoc hpq (sigT_sym_eq hpp) (hs ⊙[P] hr)).
 Defined.
 
+(** Transfer a hexagon across two naturality squares and an identified edge.
+    Both split sides retain their individual edges in the resulting boundary. *)
+Local Definition hex_transfer_cells {A: Type}
+  {a b c d e f t v u w: A}
+  (pq: a = b) (pp: c = b) (qq: d = e) (qp: f = e)
+  (etaX: a = d) (etaY: b = e) (etaZ: c = f)
+  (k: f = t) (r1: t = u) (r2: u = w) (d1: e = v) (d2: v = w) (s: c = t)
+  (NP: pp • etaY = etaZ • qp) (NQ: pq • etaY = etaX • qq)
+  (H: (qp • d1) • d2 = k • (r1 • r2)) (HS: etaZ • k = s):
+  ((etaX • qq) • d1) • d2 = pq • (eq_sym pp • ((s • r1) • r2)).
+Proof.
+  destruct pq, pp, qq, qp, etaY, d1, d2, r1, r2.
+  cbn in NP, NQ, H, HS. destruct NP, NQ, H, HS.
+  now reflexivity.
+Defined.
+
+Local Lemma hex_transfer_cells_dep {A: Type} (P: A -> Type)
+  {a b c d e f t v u w: A}
+  (pq: a = b) (pp: c = b) (qq: d = e) (qp: f = e)
+  (etaX: a = d) (etaY: b = e) (etaZ: c = f)
+  (k: f = t) (r1: t = u) (r2: u = w) (d1: e = v) (d2: v = w) (s: c = t)
+  (NP: pp • etaY = etaZ • qp) (NQ: pq • etaY = etaX • qq)
+  (H: (qp • d1) • d2 = k • (r1 • r2)) (HS: etaZ • k = s)
+  {ua: P a} {ub: P b} {uc: P c} {ud: P d} {ue: P e}
+  {uf: P f} {ut: P t} {uv: P v} {uu: P u} {uw: P w}
+  (hpq: rew [P] pq in ua = ub) (hpp: rew [P] pp in uc = ub)
+  (hqq: rew [P] qq in ud = ue) (hqp: rew [P] qp in uf = ue)
+  (hetaX: rew [P] etaX in ua = ud) (hetaY: rew [P] etaY in ub = ue)
+  (hetaZ: rew [P] etaZ in uc = uf)
+  (hk: rew [P] k in uf = ut)
+  (hr1: rew [P] r1 in ut = uu) (hr2: rew [P] r2 in uu = uw)
+  (hd1: rew [P] d1 in ue = uv) (hd2: rew [P] d2 in uv = uw)
+  (hs: rew [P] s in uc = ut)
+  (HNP: rew [fun e => rew [P] e in uc = ue] NP in (hpp ⊙ hetaY) = hetaZ ⊙ hqp)
+  (HNQ: rew [fun e => rew [P] e in ua = ue] NQ in (hpq ⊙ hetaY) = hetaX ⊙ hqq)
+  (HH: rew [fun e => rew [P] e in uf = uw] H in ((hqp ⊙ hd1) ⊙ hd2) = hk ⊙ (hr1 ⊙ hr2))
+  (HHS: rew [fun e => rew [P] e in uc = ut] HS in (hetaZ ⊙ hk) = hs):
+  rew [fun e => rew [P] e in ua = uw]
+    hex_transfer_cells pq pp qq qp etaX etaY etaZ k r1 r2 d1 d2 s NP NQ H HS in
+    (((hetaX ⊙ hqq) ⊙ hd1) ⊙ hd2) = hpq ⊙ (sigT_sym_eq hpp ⊙ ((hs ⊙ hr1) ⊙ hr2)).
+Proof.
+  destruct pq, pp, qq, qp, etaY, d1, d2, r1, r2.
+  cbn in NP, NQ, H, HS. destruct NP, NQ, H, HS.
+  cbn in hpq, hpp, hqq, hqp, hetaY, hd1, hd2, hr1, hr2.
+  subst ub uc ud uf ue uv uw.
+  cbn [hex_transfer_cells sigT_sym_eq] in *.
+  do 4 (rewrite sigT_trans_eq_refl in *).
+  rewrite eq_trans_refl_l in *.
+  cbn in HNP, HNQ, HH, HHS.
+  rewrite eq_trans_refl_l in HNP, HNQ.
+  subst hetaY hetaZ hs.
+  cbn.
+  destruct hk, hr1. cbn in HH |- *.
+  now exact HH.
+Defined.
+
 Section ScalarSigma.
 Context {X X' TL TM: Type} {P: X -> Type} {P': X' -> Type}
   (f: TM -> TL) (r0: TL -> X) (r0': TM -> X')
@@ -735,27 +791,22 @@ Context {X X' TL TM: Type} {P: X -> Type} {P': X' -> Type}
          = sigT_map_eq (P := P') (Q := P) (f := ρ) Gr pinx).
 
 Definition frameLeft :=
-  eq_trans_map_distr r0 a1 Q1 •
-    (whisker_r (eq_sym σ) (f_equal r0 Q1) •
-      (eq_sym (eq_trans_assoc (β (r0 (f d1))) b2 (f_equal r0 Q1)) •
-        whisker_l (β (r0 (f d1)))
-          (eq_sym (eq_trans_refl_l (b2 • f_equal r0 Q1))))).
+  eq_trans_map_distr r0 a1 Q1 • whisker_r (eq_sym σ) (f_equal r0 Q1).
 
 Definition frameRaw :=
-  square_transfer_cells eq_refl (gA d1) eq_refl (f_equal φ (gA d1))
+  hex_transfer_cells eq_refl (gA d1) eq_refl (f_equal φ (gA d1))
     (β (r0 (f d1))) (β (r0 (f d1))) (β (ρ (r0' d1)))
-    K (f_equal ρ B1 • gA d1') (b2 • f_equal r0 Q1) (f_equal ρ A1)
+    K (f_equal ρ B1) (gA d1') b2 (f_equal r0 Q1) (f_equal ρ A1)
     (homotopy_id_cell φ β (gA d1)) (eq_trans_refl_l (β (r0 (f d1))))
     HH (σq • f_equal (fun e => f_equal ρ e) (eq_sym HA)).
 
 Definition frameRight :=
   eq_trans_refl_l
-    (eq_sym (gA d1) • (f_equal ρ A1 • (f_equal ρ B1 • gA d1'))) •
+    (eq_sym (gA d1) • ((f_equal ρ A1 • f_equal ρ B1) • gA d1')) •
     (whisker_l (eq_sym (gA d1))
-      (eq_trans_assoc (f_equal ρ A1) (f_equal ρ B1) (gA d1') •
-        (whisker_r (eq_sym (eq_trans_map_distr ρ A1 B1)) (gA d1') •
-          (whisker_r (f_equal (fun e => f_equal ρ e) S1) (gA d1') •
-            square_coherence_fill r0' f ρ r0 gA prv))) •
+      (whisker_r (eq_sym (eq_trans_map_distr ρ A1 B1)) (gA d1') •
+        (whisker_r (f_equal (fun e => f_equal ρ e) S1) (gA d1') •
+          square_coherence_fill r0' f ρ r0 gA prv)) •
       eq_trans_sym_cancel_l (gA d1) (f_equal r0 (f_equal f prv))).
 
 Definition sigmaFrameRecipe:
@@ -790,20 +841,21 @@ Let hPp := (eq_refl: rew [P] gA d1 in G0 = Corr).
 Let hQp := sigT_map_eq (P := P) (Q := P) (f := φ) Φ hPp.
 Let hQq := sigT_map_eq (P := P) (Q := P) (f := φ) Φ (p := eq_refl) nG1.
 Let hS := sigT_map_eq (P := P') (Q := P) (f := ρ) Gr pin.
-Let hR := sigT_map_eq (P := P') (Q := P) (f := ρ) Gr (eq_sym nF) ⊙[P] eq_sym nG2.
-Let hDD := (eq_refl: rew [P] b2 in Φ (r0 (f d1)) Corr = _) ⊙[P]
-  sigT_map_eq (P := fun t => P (r0 t)) (Q := P) (f := r0) (fun _ u => u)
-    (rawLayer • endCorrection).
-Let rawLeft := Pi (r0 (f d1)) u0 ⊙[P] (hQq ⊙[P] hDD).
+Let hR1 := sigT_map_eq (P := P') (Q := P) (f := ρ) Gr (eq_sym nF).
+Let hR2 := eq_sym nG2.
+Let hD1 := (eq_refl: rew [P] b2 in Φ (r0 (f d1)) Corr = _).
+Let hD2 := sigT_map_eq (P := fun t => P (r0 t)) (Q := P) (f := r0)
+  (fun _ u => u) (rawLayer • endCorrection).
+Let rawLeft := ((Pi (r0 (f d1)) u0 ⊙[P] hQq) ⊙[P] hD1) ⊙[P] hD2.
 Let rawRight :=
   (nG1: rew [P] (eq_refl: r0 (f d1) = r0 (f d1)) in u0 = Corr)
-    ⊙[P] (sigT_sym_eq hPp ⊙[P] (hS ⊙[P] hR)).
+    ⊙[P] (sigT_sym_eq hPp ⊙[P] ((hS ⊙[P] hR1) ⊙[P] hR2)).
 
 Lemma sigmaDD:
   rew [fun e => rew [P] e in Φ (ρ (r0' d1)) G0 = u1] HH in
-    (hQp ⊙[P] hDD) = HC ⊙[P] hR.
+    ((hQp ⊙[P] hD1) ⊙[P] hD2) = HC ⊙[P] (hR1 ⊙[P] hR2).
 Proof.
-  unfold hQp, hDD, hR, hPp, Corr, rawLayer, endCorrection, G0.
+  unfold hQp, hD1, hD2, hR1, hR2, hPp, Corr, rawLayer, endCorrection, G0.
   pose proof (rew_coh2Painting_restr0_edges Φ Gr Q1 (gA d1) B1 b2 (gA d1') K
     (Gr (r0' d1) c) v' HC HH
     (rew [P] gA d1 in Gr (r0' d1) c) eq_refl L1c nF
@@ -819,14 +871,14 @@ Lemma sigmaRaw:
   rew [fun e => rew [P] e in u0 = u1] frameRaw in rawLeft = rawRight.
 Proof.
   unfold frameRaw, rawLeft, rawRight.
-  refine (square_transfer_cells_dep P
+  refine (hex_transfer_cells_dep P
     (eq_refl: r0 (f d1) = r0 (f d1)) (gA d1)
     (eq_refl: φ (r0 (f d1)) = φ (r0 (f d1))) (f_equal φ (gA d1))
     (β (r0 (f d1))) (β (r0 (f d1))) (β (ρ (r0' d1)))
-    K (f_equal ρ B1 • gA d1') (b2 • f_equal r0 Q1) (f_equal ρ A1)
+    K (f_equal ρ B1) (gA d1') b2 (f_equal r0 Q1) (f_equal ρ A1)
     (homotopy_id_cell φ β (gA d1)) (eq_trans_refl_l (β (r0 (f d1))))
     HH (σq • f_equal (fun e => f_equal ρ e) (eq_sym HA))
-    nG1 hPp hQq hQp (Pi _ _) (Pi _ _) (Pi _ _) HC hR hDD hS _ _ sigmaDD _).
+    nG1 hPp hQq hQp (Pi _ _) (Pi _ _) (Pi _ _) HC hR1 hR2 hD1 hD2 hS _ _ sigmaDD _).
   - now exact (homotopy_id_cell_dep P φ Φ β Pi (gA d1) hPp).
   - now exact (homotopy_id_cell_dep P φ Φ β Pi eq_refl nG1).
   - now exact (Htau ⊙[fun e => rew [P] e in G0 = Gr w' v']
@@ -852,31 +904,17 @@ Proof.
     (Pi (r0 (f d1)) Corr) eq_refl) as Hfirst.
   pose proof (displayed_whisker_r P (eq_sym σ) (f_equal r0 Q1) mapTail
     (sigT_sym_eq Hfirst)) as E2.
-  pose proof (sigT_trans_eq_assoc (Pi (r0 (f d1)) Corr)
-    (eq_refl: rew [P] b2 in Φ (r0 (f d1)) Corr = _) mapTail) as E3.
   assert (TAIL: tail = rawLayer • endCorrection).
   { unfold tail. cbn [f_equal]. now rewrite 2 eq_trans_refl_l. }
-  assert (DD: (eq_refl: rew [P] b2 in Φ (r0 (f d1)) Corr = _) ⊙[P] mapTail = hDD).
-  { now exact (f_equal (fun h =>
-      (eq_refl: rew [P] b2 in Φ (r0 (f d1)) Corr = _) ⊙[P]
-        sigT_map_eq (P := fun t => P (r0 t)) (Q := P) (f := r0)
-          (fun _ u => u) h) TAIL). }
-  pose (U := eq_sym (eq_trans_refl_l (b2 • f_equal r0 Q1))).
-  pose (DDom := fun e: φ (r0 (f d1)) = r0 (f d1') =>
-    rew [P] e in Φ (r0 (f d1)) Corr = u1).
-  pose proof (f_equal (fun h => rew [DDom] U in h) DD •
-    eq_sym (sigT_trans_eq_refl_l (b2 • f_equal r0 Q1) hDD)) as EUnit.
-  pose proof (displayed_whisker_left P (β (r0 (f d1))) U
-    (Pi (r0 (f d1)) Corr) EUnit) as E4.
-  now exact (E1 ⊙[D] (E2 ⊙[D] (E3 ⊙[D] E4))).
+  refine ((E1 ⊙[D] E2) • _).
+  unfold rawLeft, hQq, hD1, hD2, mapTail.
+  rewrite TAIL. now reflexivity.
 Defined.
 
 Lemma sigmaRight:
   rew [fun e => rew [P] e in u0 = u1] frameRight in rawRight = rightMap.
 Proof.
   subst L1c u1 u0.
-  pose (mapB := sigT_map_eq (P := P') (Q := P) (f := ρ) Gr
-    (eq_refl: rew [P'] B1 in v' = _)).
   pose (pureEnd := (eq_refl: rew [P] gA d1' in
     Gr (r0' d1') (rew [P'] B1 in v') = _)).
   pose (finalMap := sigT_map_eq (P := fun t => P (r0 t)) (Q := P) (f := r0)
@@ -886,9 +924,8 @@ Proof.
   pose (Inner := fun e: ρ (r0' d1) = r0 (f d1') =>
     rew [P] e in G0 = rew [P] gA d1' in Gr (r0' d1') (rew [P'] B1 in v')).
   pose proof (displayed_left_unit P
-    (eq_sym (gA d1) • (f_equal ρ A1 • (f_equal ρ B1 • gA d1')))
-    (sigT_sym_eq hPp ⊙[P] (hS ⊙[P] hR))) as EUnit.
-  pose proof (displayed_assoc_forward P hS mapB pureEnd) as EAssoc.
+    (eq_sym (gA d1) • ((f_equal ρ A1 • f_equal ρ B1) • gA d1'))
+    (sigT_sym_eq hPp ⊙[P] ((hS ⊙[P] hR1) ⊙[P] hR2))) as EUnit.
   pose proof (displayed_whisker_r P (eq_sym (eq_trans_map_distr ρ A1 B1))
     (gA d1') pureEnd
     (sigT_sym_eq (sigT_map_eq_comp Gr pin (eq_refl: rew [P'] B1 in v' = _)))) as EMap.
@@ -906,7 +943,7 @@ Proof.
     (PA := fun a => P' (r0' a)) (PB := P') (PC := fun t => P (r0 t)) (PD := P)
     r0' f ρ r0 (fun _ u => u) targetMap Gr (fun _ u => u)
     gA (fun _ _ => eq_refl) prv source) as ENat.
-  pose proof (EAssoc ⊙[Inner] (EMap ⊙[Inner] (ESource ⊙[Inner] ENat))) as EInner.
+  pose proof (EMap ⊙[Inner] (ESource ⊙[Inner] ENat)) as EInner.
   pose proof (displayed_whisker_left P (eq_sym (gA d1)) _
     (sigT_sym_eq hPp) EInner) as EPrefix.
   pose proof (displayed_inverse_cancel P (gA d1) (f_equal r0 (f_equal f prv))
@@ -1690,12 +1727,12 @@ Lemma hexReindex {T: Type} {v0 v1 v2 v3 v4 v5 w0 w1 w2 w3 w4 w5: T}
   (m4: v4 = w4) (m5: v5 = w5)
   (A: w0 = w1) (B: w1 = w2) (C: w2 = w3)
   (D: w0 = w4) (E: w4 = w5) (F: w5 = w3)
-  (H: A • (B • C) = D • (E • F)):
-  (m0 • (A • eq_sym m1)) • ((m1 • (B • eq_sym m2)) • (m2 • (C • eq_sym m3)))
+  (H: (A • B) • C = D • (E • F)):
+  ((m0 • (A • eq_sym m1)) • (m1 • (B • eq_sym m2))) • (m2 • (C • eq_sym m3))
   = (m0 • (D • eq_sym m4)) • ((m4 • (E • eq_sym m5)) • (m5 • (F • eq_sym m3))).
 Proof.
-  change (path_change m0 A m1 •
-    (path_change m1 B m2 • path_change m2 C m3) =
+  change ((path_change m0 A m1 • path_change m1 B m2) •
+    path_change m2 C m3 =
     path_change m0 D m4 • (path_change m4 E m5 • path_change m5 F m3)).
   rewrite 4 path_change_comp.
   now rewrite H.
@@ -1717,18 +1754,17 @@ Defined.
 Lemma hexRotate {T: Type} {w0 w1 w2 w3 w4 w5: T}
   (A: w0 = w1) (B: w1 = w2) (C: w2 = w3)
   (D: w0 = w4) (E: w4 = w5) (F: w5 = w3)
-  (H: A • (B • C) = D • (E • F)):
+  (H: (A • B) • C = D • (E • F)):
   F • (eq_sym C • eq_sym B) = eq_sym E • (eq_sym D • A).
 Proof.
-  pose proof (square_rotate (H • eq_trans_assoc D E F)) as K.
-  rewrite 2 eq_trans_sym_distr, <- eq_trans_assoc in K.
-  now exact K.
+  destruct A, B, C, E, F. cbn in H. destruct H.
+  now reflexivity.
 Defined.
 
 Lemma hexMap {A B: Type} (F: A -> B) {a0 a1 a2 a3 a4 a5: A}
   (A1: a0 = a1) (B1: a1 = a2) (C1: a2 = a3)
   (D1: a0 = a4) (E1: a4 = a5) (F1: a5 = a3)
-  (H: A1 • (B1 • C1) = D1 • (E1 • F1)):
+  (H: (A1 • B1) • C1 = D1 • (E1 • F1)):
   hexagonal_coherence F F F A1 C1 E1
     (f_equal F B1) (f_equal F D1) (f_equal F F1).
 Proof.
@@ -1793,8 +1829,8 @@ Lemma hexReindexR {T: Type} {v0 v1 v2 v3 v4 v5 w0 w1 w2 w3 w4 w5: T}
   = ((m0 • (D • eq_sym m4)) • (m4 • (E • eq_sym m5)))
     • (m5 • (F • eq_sym m3)).
 Proof.
-  now exact (hexReindex m0 m1 m2 m3 m4 m5 A B C D E F H
-    • eq_trans_assoc _ _ _).
+  destruct m0, m1, m2, m3, m4, m5, A, B, C, E, F.
+  cbn in H. destruct H. now reflexivity.
 Defined.
 
 (** A hexagon follows from six edge presentations and a hexagon between

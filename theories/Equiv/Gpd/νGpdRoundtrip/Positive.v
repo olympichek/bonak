@@ -41,23 +41,29 @@ Defined.
 
 Local Definition square_strip_prefix {X: Type} {x x' y z w: X}
   {a: x = x'} {p: x' = y} {b: y = w} {q: x = z} {r: z = w}
-  (H: a • (p • b) = q • r): p • b = (eq_sym a • q) • r :=
-  path_prefix_solve H • eq_trans_assoc _ _ _.
+  (H: (a • p) • b = q • r): p • b = (eq_sym a • q) • r.
+Proof.
+  destruct p, b, r. cbn in H |- *. destruct H.
+  now exact (eq_sym (eq_trans_sym_inv_l a)).
+Defined.
 
 Local Lemma square_strip_prefix_dep {X: Type} (P: X -> Type) {x x' y z w: X}
   {a: x = x'} {p: x' = y} {b: y = w} {q: x = z} {r: z = w}
-  (H: a • (p • b) = q • r)
+  (H: (a • p) • b = q • r)
   {u: P x} {u': P x'} {v: P y} {s: P z} {t: P w}
   (ha: rew [P] a in u = u') (hp: rew [P] p in u' = v)
   (hb: rew [P] b in v = t) (hq: rew [P] q in u = s)
   (hr: rew [P] r in s = t)
   (HH: rew [fun e => rew [P] e in u = t] H in
-    (ha ⊙ (hp ⊙ hb)) = hq ⊙ hr):
+    ((ha ⊙ hp) ⊙ hb) = hq ⊙ hr):
   rew [fun e => rew [P] e in u' = t] square_strip_prefix H in
     (hp ⊙ hb) = (sigT_sym_eq ha ⊙ hq) ⊙ hr.
 Proof.
-  now exact (sigT_prefix_solve_dep P ha (hp ⊙ hb) (hq ⊙ hr) H HH
-    ⊙ sigT_trans_assoc (sigT_sym_eq ha) hq hr).
+  destruct p, b, r. cbn in H. destruct H. destruct a.
+  cbn in hp, hb, hq, hr, ha, HH |- *. subst v t s.
+  rewrite 3 sigT_trans_eq_refl in HH.
+  rewrite eq_trans_refl_l in HH.
+  cbn in HH. subst hr. now destruct ha.
 Defined.
 
 Local Definition square_prepend {X: Type} {x x' y z w: X}
@@ -113,7 +119,7 @@ Local Definition section_coherence_edge:
 
 Local Definition section_coherence_square:
   (f_equal f e • cq) • f_equal r E = k • (f_equal g p • cr) :=
-  eq_sym (eq_trans_assoc _ _ _) • H.
+  H.
 
 Local Lemma section_coherence_boundary:
   rew [fun path => rew [P] path in s u0 = w1] section_coherence_square in
@@ -128,8 +134,6 @@ Proof.
     (eq_sym c0) eq_refl (sigT_map_eq (Q := P) G (eq_sym cb)) eq_refl
     (eq_sym c1) eq_refl).
   unfold section_coherence_square.
-  rewrite <- (rew_compose (fun path => rew [P] path in s u0 = w1)).
-  rewrite sigT_trans_eq_assoc.
   unfold section_coherence_edge.
   rewrite sigT_map_eq_id.
   now exact Hcore.

@@ -149,33 +149,33 @@ Fixpoint gFaceCoh2C {m} {Xpre: (νGpdAt m).(prefix)} (X: νGpdFrom m Xpre)
   (n: nat) {struct n}:
   forall (q: nat) (Hq: q <= n + k) (r: nat) (Hr: r <= q) (s: nat) (Hs: s <= r)
     (ε ω θ: arity) (d: gF0 X n.+3),
-  f_equal (gFaceC X a n q Hq ε)
+  CohShapes.hexagonal_coherence
+    (gFaceC X a n q Hq ε) (gFaceC X a n s (Hs ↕ (Hr ↕ Hq)) θ)
+    (gFaceC X a n r (Hr ↕ Hq) ω)
     (gFaceCohC X a n.+1 r (Hr ↕ (↑ Hq)) s Hs ω θ d)
-  • (gFaceCohC X a n q Hq s (Hs ↕ Hr) ε θ
-       (gFaceC X a n.+2 r.+1 (⇑ (Hr ↕ (↑ Hq))) ω d)
-     • f_equal (gFaceC X a n s (Hs ↕ (Hr ↕ Hq)) θ)
-         (gFaceCohC X a n.+1 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω d))
-  = gFaceCohC X a n q Hq r Hr ε ω
-      (gFaceC X a n.+2 s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) θ d)
-    • (f_equal (gFaceC X a n r (Hr ↕ Hq) ω)
-         (gFaceCohC X a n.+1 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) ε θ d)
-       • gFaceCohC X a n r (Hr ↕ Hq) s Hs ω θ
-           (gFaceC X a n.+2 q.+2 (⇑ (⇑ Hq)) ε d)) :=
+    (gFaceCohC X a n.+1 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω d)
+    (gFaceCohC X a n.+1 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) ε θ d)
+    (gFaceCohC X a n q Hq s (Hs ↕ Hr) ε θ
+      (gFaceC X a n.+2 r.+1 (⇑ (Hr ↕ (↑ Hq))) ω d))
+    (gFaceCohC X a n q Hq r Hr ε ω
+      (gFaceC X a n.+2 s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) θ d))
+    (gFaceCohC X a n r (Hr ↕ Hq) s Hs ω θ
+      (gFaceC X a n.+2 q.+2 (⇑ (⇑ Hq)) ε d)) :=
   match n return
     forall (q: nat) (Hq: q <= n + k) (r: nat) (Hr: r <= q) (s: nat) (Hs: s <= r)
       (ε ω θ: arity) (d: gF0 X n.+3),
-    f_equal (gFaceC X a n q Hq ε)
+    CohShapes.hexagonal_coherence
+      (gFaceC X a n q Hq ε) (gFaceC X a n s (Hs ↕ (Hr ↕ Hq)) θ)
+      (gFaceC X a n r (Hr ↕ Hq) ω)
       (gFaceCohC X a n.+1 r (Hr ↕ (↑ Hq)) s Hs ω θ d)
-    • (gFaceCohC X a n q Hq s (Hs ↕ Hr) ε θ
-         (gFaceC X a n.+2 r.+1 (⇑ (Hr ↕ (↑ Hq))) ω d)
-       • f_equal (gFaceC X a n s (Hs ↕ (Hr ↕ Hq)) θ)
-           (gFaceCohC X a n.+1 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω d))
-    = gFaceCohC X a n q Hq r Hr ε ω
-        (gFaceC X a n.+2 s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) θ d)
-      • (f_equal (gFaceC X a n r (Hr ↕ Hq) ω)
-           (gFaceCohC X a n.+1 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) ε θ d)
-         • gFaceCohC X a n r (Hr ↕ Hq) s Hs ω θ
-             (gFaceC X a n.+2 q.+2 (⇑ (⇑ Hq)) ε d)) with
+      (gFaceCohC X a n.+1 q.+1 (⇑ Hq) r.+1 (⇑ Hr) ε ω d)
+      (gFaceCohC X a n.+1 q.+1 (⇑ Hq) s (↑ (Hs ↕ Hr)) ε θ d)
+      (gFaceCohC X a n q Hq s (Hs ↕ Hr) ε θ
+        (gFaceC X a n.+2 r.+1 (⇑ (Hr ↕ (↑ Hq))) ω d))
+      (gFaceCohC X a n q Hq r Hr ε ω
+        (gFaceC X a n.+2 s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) θ d))
+      (gFaceCohC X a n r (Hr ↕ Hq) s Hs ω θ
+        (gFaceC X a n.+2 q.+2 (⇑ (⇑ Hq)) ε d)) with
   | 0 => fun q Hq r Hr s Hs ε ω θ d =>
       faceAtCoh2Up (νExt3At X) (νExt3At (next X)) a q Hq r Hr s Hs ε ω θ
         (deepCell (cohs3ChainDepsCohs2 (chainUp1 (νExt3At (next X))

@@ -371,21 +371,21 @@ Lemma pshFaceCohDimIrr_map {n q q' r r'} (eqQ: q = q') (eqR: r = r')
         (f_equal (psh.(GFace) n r' (Hr' ↕ Hq') ω)
           (pshFaceDimIrr (f_equal S eqQ)
             (Hq := ⇑ Hq) (Hq' := ⇑ Hq') ε X))) =
-  f_equal F
+  (f_equal F
     (pshFaceDimIrr eqQ (Hq := Hq) (Hq' := Hq') ε
       (psh.(GFace) n.+1 r (Hr ↕ (↑ Hq)) ω X))
-  • (f_equal F
+   • f_equal F
        (f_equal (psh.(GFace) n q' Hq' ε)
          (pshFaceDimIrr eqR
-           (Hq := Hr ↕ (↑ Hq)) (Hq' := Hr' ↕ (↑ Hq')) ω X))
-    • f_equal F (psh.(GFaceCoh) n q' Hq' r' Hr' ε ω X)).
+           (Hq := Hr ↕ (↑ Hq)) (Hq' := Hr' ↕ (↑ Hq')) ω X)))
+  • f_equal F (psh.(GFaceCoh) n q' Hq' r' Hr' ε ω X).
 Proof.
   pose proof (f_equal (fun p => f_equal F p)
     (pshFaceCohDimIrr eqQ eqR (Hq := Hq) (Hq' := Hq') (Hr := Hr) (Hr' := Hr')
       ε ω X)) as H.
   cbn beta in H.
   rewrite 4 (eq_trans_map_distr F) in H.
-  now rewrite <- eq_trans_assoc in H.
+  now exact H.
 Defined.
 
 (** The presheaf exchange hexagon in the form the fibre of a restriction-frame
@@ -400,16 +400,16 @@ Lemma pshFaceCoh2Paste {m} {q0 r0 p0: nat}
   {qq rr: nat} (e1: q0.+1 = qq) (e2: r0.+1 = rr) (e3: q0.+2 = qq.+1)
   (Hqq: qq <= m.+1) (Hrr: rr <= qq) (Hrr1: rr <= m.+1)
   (ε ω ζ: arity) (d: psh.(G0) m.+3):
-  f_equal (psh.(GFace) m q0 HQ ε)
+  (f_equal (psh.(GFace) m q0 HQ ε)
     (psh.(GFaceCoh) m.+1 r0 (HR ↕ ↑ HQ) p0 HS ω ζ d
      • eq_sym (f_equal (psh.(GFace) m.+1 p0 (HS ↕ (HR ↕ ↑ HQ)) ζ)
          (pshFaceDimIrr (eq_sym e2) (Hq := ↑ Hrr1) (Hq' := ⇑ (HR ↕ ↑ HQ)) ω d)))
-  • ((psh.(GFaceCoh) m q0 HQ p0 (HS ↕ HR) ε ζ (psh.(GFace) m.+2 rr (↑ Hrr1) ω d)
+   • (psh.(GFaceCoh) m q0 HQ p0 (HS ↕ HR) ε ζ (psh.(GFace) m.+2 rr (↑ Hrr1) ω d)
       • eq_sym (f_equal (psh.(GFace) m p0 (HS ↕ (HR ↕ HQ)) ζ)
           (pshFaceDimIrr (eq_sym e1) (Hq := Hqq) (Hq' := ⇑ HQ) ε
-             (psh.(GFace) m.+2 rr (↑ Hrr1) ω d))))
-     • f_equal (psh.(GFace) m p0 (HS ↕ (HR ↕ HQ)) ζ)
-         (psh.(GFaceCoh) m.+1 qq Hqq rr Hrr ε ω d))
+             (psh.(GFace) m.+2 rr (↑ Hrr1) ω d)))))
+  • f_equal (psh.(GFace) m p0 (HS ↕ (HR ↕ HQ)) ζ)
+    (psh.(GFaceCoh) m.+1 qq Hqq rr Hrr ε ω d)
   = psh.(GFaceCoh) m q0 HQ r0 HR ε ω
       (psh.(GFace) m.+2 p0 (↑ (↑ (HS ↕ (HR ↕ HQ)))) ζ d)
     • (f_equal (psh.(GFace) m r0 (HR ↕ HQ) ω)
@@ -443,7 +443,7 @@ Proof.
   rewrite (eq_trans_map_distr (psh.(GFace) m q0 HQ ε)),
     (eq_trans_map_distr (psh.(GFace) m r0 (HR ↕ HQ) ω)).
   rewrite <- 2 eq_sym_map_distr.
-  now exact (hex_paste_side_cells _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ HB HF (HC • eq_trans_assoc _ _ _)
+  now exact (hex_paste_side_cells _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ HB HF HC
     (psh.(GFaceCoh2) m q0 HQ r0 HR p0 HS ε ω ζ d)).
 Defined.
 
@@ -545,15 +545,15 @@ Definition mkPshRestrLayerCohType {m p k}
   (Q: mkPshRestrFramesType (proj1PshDepsCohs PC)): Type :=
   forall q (Hq: q <= k) r (Hr: r <= q) (Hqp: q.+1 + p <= m.+1)
     (ε ω: arity) (d: psh.(G0) m.+2),
-  f_equal PC.(_pshDeps).(_pshFrames).2
+  (f_equal PC.(_pshDeps).(_pshFrames).2
     (psh.(GFaceCoh) m (q + p) (⇓ Hqp) (r + p)
       (leR_add_mono_r Hr p) ε ω d)
-  • (PC.(_pshDeps).(_pshRestrs).2 r (Hr ↕ Hq)
+   • PC.(_pshDeps).(_pshRestrs).2 r (Hr ↕ Hq)
        (leR_add_mono_r Hr p ↕ (⇓ Hqp)) ω
-       (psh.(GFace) m.+1 (q.+1 + p) Hqp ε d)
+       (psh.(GFace) m.+1 (q.+1 + p) Hqp ε d))
   • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 r (Hr ↕ Hq) ω)
-      (Q.2 q.+1 (⇑ Hq) Hqp ε d)) =
-  PC.(_pshDeps).(_pshRestrs).2 q Hq (⇓ Hqp) ε
+      (Q.2 q.+1 (⇑ Hq) Hqp ε d)
+  = PC.(_pshDeps).(_pshRestrs).2 q Hq (⇓ Hqp) ε
     (psh.(GFace) m.+1 (r + p)
       (↑ (leR_add_mono_r Hr p ↕ (⇓ Hqp))) ω d)
   • (f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 q Hq ε)
@@ -663,16 +663,16 @@ Lemma mkPshRestrLayerFrameSquare {m p k} (PC: PshDepsCohs m p.+1 k)
   q (Hq: q <= k) {qq} (e: q.+1 + p = qq)
   (Hqq: qq <= m.+1) (Hqp: q.+1 + p <= m.+1)
   (ε: arity) (d: psh.(G0) m.+2) (ζ: arity):
-  f_equal PC.(_pshDeps).(_pshFrames).2
+  (f_equal PC.(_pshDeps).(_pshFrames).2
     (psh.(GFaceCoh) m (q + p) (⇓ Hqp) p (leR_add_l q) ε ζ d
      • eq_sym (f_equal (psh.(GFace) m p (⇓ PC.(_pshDeps).(_pshBound)) ζ)
          (pshFaceDimIrr (eq_sym e) (Hq := Hqq) (Hq' := Hqp) ε d)))
-  • (PC.(_pshDeps).(_pshRestrs).2 0 leR_O (⇓ PC.(_pshDeps).(_pshBound)) ζ
-       (psh.(GFace) m.+1 qq Hqq ε d)
-     • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O ζ)
-         (f_equal (fun a => (mkPshFrame PC.(_pshDeps) a).1)
-            (pshFaceDimIrr (eq_sym e) (Hq := Hqq) (Hq' := Hqp) ε d)
-          • Q.2 q.+1 (⇑ Hq) Hqp ε d))
+   • PC.(_pshDeps).(_pshRestrs).2 0 leR_O (⇓ PC.(_pshDeps).(_pshBound)) ζ
+       (psh.(GFace) m.+1 qq Hqq ε d))
+  • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O ζ)
+    (f_equal (fun a => (mkPshFrame PC.(_pshDeps) a).1)
+       (pshFaceDimIrr (eq_sym e) (Hq := Hqq) (Hq' := Hqp) ε d)
+     • Q.2 q.+1 (⇑ Hq) Hqp ε d)
   = PC.(_pshDeps).(_pshRestrs).2 q Hq (⇓ Hqp) ε
       (psh.(GFace) m.+1 (0 + p)
         (↑ (leR_add_mono_r leR_O p ↕ ⇓ Hqp)) ζ d)
@@ -733,14 +733,14 @@ Lemma mkPshRestrLayerChainB {m p k} (PC: PshDepsCohs m p.+1 k)
                (mkPshFrames (proj1PshDepsCohs PC).(_pshDeps)).1
                (mkPshPaintings (proj1PshDepsCohs PC).(_pshExtraDeps)).1)
             .(PshFramesDef) Q.1).2 d))
-  (Hsq: f_equal PC.(_pshDeps).(_pshFrames).2
+  (Hsq: (f_equal PC.(_pshDeps).(_pshFrames).2
      (psh.(GFaceCoh) m (q + p) (⇓ Hqp) p (leR_add_l q) ε ζ d
       • eq_sym (f_equal (psh.(GFace) m p (⇓ PC.(_pshDeps).(_pshBound)) ζ)
           (pshFaceDimIrr (eq_sym e) (Hq := Hqq) (Hq' := Hqp) ε d)))
-   • (PC.(_pshDeps).(_pshRestrs).2 0 leR_O
-        (⇓ PC.(_pshDeps).(_pshBound)) ζ (psh.(GFace) m.+1 qq Hqq ε d)
-      • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O ζ) b)
-   = PC.(_pshDeps).(_pshRestrs).2 q Hq (⇓ Hqp) ε
+   • PC.(_pshDeps).(_pshRestrs).2 0 leR_O
+        (⇓ PC.(_pshDeps).(_pshBound)) ζ (psh.(GFace) m.+1 qq Hqq ε d))
+  • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O ζ) b
+  = PC.(_pshDeps).(_pshRestrs).2 q Hq (⇓ Hqp) ε
        (psh.(GFace) m.+1 (0 + p)
          (↑ (leR_add_mono_r leR_O p ↕ ⇓ Hqp)) ζ d)
      • (f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 q Hq ε)
@@ -836,14 +836,14 @@ Lemma mkPshRestrLayerChainBsec {m p k} (PC: PshDepsCohs m p.+1 k)
                (mkPshFrames (proj1PshDepsCohs PC).(_pshDeps)).1
                (mkPshPaintings (proj1PshDepsCohs PC).(_pshExtraDeps)).1)
             .(PshFramesDef) Q.1).2 d))
-  (Hsq: f_equal PC.(_pshDeps).(_pshFrames).2
+  (Hsq: (f_equal PC.(_pshDeps).(_pshFrames).2
      (psh.(GFaceCoh) m (q + p) (⇓ Hqp) p (leR_add_l q) ε ζ d
       • eq_sym (f_equal (psh.(GFace) m p (⇓ PC.(_pshDeps).(_pshBound)) ζ)
           (pshFaceDimIrr (eq_sym e) (Hq := Hqq) (Hq' := Hqp) ε d)))
-   • (PC.(_pshDeps).(_pshRestrs).2 0 leR_O
-        (⇓ PC.(_pshDeps).(_pshBound)) ζ (psh.(GFace) m.+1 qq Hqq ε d)
-      • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O ζ) b)
-   = PC.(_pshDeps).(_pshRestrs).2 q Hq (⇓ Hqp) ε
+   • PC.(_pshDeps).(_pshRestrs).2 0 leR_O
+        (⇓ PC.(_pshDeps).(_pshBound)) ζ (psh.(GFace) m.+1 qq Hqq ε d))
+  • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O ζ) b
+  = PC.(_pshDeps).(_pshRestrs).2 q Hq (⇓ Hqp) ε
        (psh.(GFace) m.+1 (0 + p)
          (↑ (leR_add_mono_r leR_O p ↕ ⇓ Hqp)) ζ d)
      • (f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 q Hq ε)
@@ -989,14 +989,14 @@ Lemma mkPshRestrLayerChainBsplit {m p k} (PC: PshDepsCohs m p.+1 k)
                (mkPshFrames (proj1PshDepsCohs PC).(_pshDeps)).1
                (mkPshPaintings (proj1PshDepsCohs PC).(_pshExtraDeps)).1)
             .(PshFramesDef) Q.1).2 d))
-  (Hsq: f_equal PC.(_pshDeps).(_pshFrames).2
+  (Hsq: (f_equal PC.(_pshDeps).(_pshFrames).2
      (psh.(GFaceCoh) m (q + p) (⇓ Hqp) p (leR_add_l q) ε ζ d
       • eq_sym (f_equal (psh.(GFace) m p (⇓ PC.(_pshDeps).(_pshBound)) ζ)
           (pshFaceDimIrr (eq_sym e) (Hq := Hqq) (Hq' := Hqp) ε d)))
-   • (PC.(_pshDeps).(_pshRestrs).2 0 leR_O
-        (⇓ PC.(_pshDeps).(_pshBound)) ζ (psh.(GFace) m.+1 qq Hqq ε d)
-      • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O ζ) b)
-   = PC.(_pshDeps).(_pshRestrs).2 q Hq (⇓ Hqp) ε
+   • PC.(_pshDeps).(_pshRestrs).2 0 leR_O
+        (⇓ PC.(_pshDeps).(_pshBound)) ζ (psh.(GFace) m.+1 qq Hqq ε d))
+  • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O ζ) b
+  = PC.(_pshDeps).(_pshRestrs).2 q Hq (⇓ Hqp) ε
        (psh.(GFace) m.+1 (0 + p)
          (↑ (leR_add_mono_r leR_O p ↕ ⇓ Hqp)) ζ d)
      • (f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 q Hq ε)
@@ -1725,7 +1725,7 @@ Definition mkPshRestrPaintingCohType {m p k} (PC2: PshDepsCohs2 m p.+1 k)
     (ε ω: arity) (d: psh.(G0) m.+2),
   rew [fun π => rew [Pt] π in _ = _]
       (PC2.(_pshRestrCohs).2 q Hq r Hr Hqp ε ω d) in
-  (sigT_map_eq (Q := Pt)
+  ((sigT_map_eq (Q := Pt)
      (f := PC2.(_pshDepsCohs).(_pshDeps).(_pshFrames).2)
      (fun (_: psh.(G0) m) x => x)
      (f_equal_dep
@@ -1734,12 +1734,12 @@ Definition mkPshRestrPaintingCohType {m p k} (PC2: PshDepsCohs2 m p.+1 k)
         PC2.(_pshDepsCohs).(_pshDeps).(_pshPaintings).2
         (psh.(GFaceCoh) m (q + p) (⇓ Hqp) (r + p)
            (leR_add_mono_r Hr p) ε ω d))
-   ⊙[Pt] (PC2.(_pshDepsCohs).(_pshRestrPaintings).2 r (Hr ↕ Hq)
+    ⊙[Pt] PC2.(_pshDepsCohs).(_pshRestrPaintings).2 r (Hr ↕ Hq)
         (leR_add_mono_r Hr p ↕ (⇓ Hqp)) ω
-        (psh.(GFace) m.+1 (q.+1 + p) Hqp ε d)
-      ⊙[Pt] sigT_map_eq (Q := Pt)
+        (psh.(GFace) m.+1 (q.+1 + p) Hqp ε d))
+   ⊙[Pt] sigT_map_eq (Q := Pt)
           (PC2.(_pshDepsCohs).(_pRestrPaintings).2 r (Hr ↕ Hq) ω)
-          (mkPshRestrPainting (AddPshCohDep PC2 PCX) q.+1 (⇑ Hq) Hqp ε d))) =
+          (mkPshRestrPainting (AddPshCohDep PC2 PCX) q.+1 (⇑ Hq) Hqp ε d)) =
   PC2.(_pshDepsCohs).(_pshRestrPaintings).2 q Hq (⇓ Hqp) ε
     (psh.(GFace) m.+1 (r + p) (↑ (leR_add_mono_r Hr p ↕ (⇓ Hqp))) ω d)
   ⊙[Pt] (sigT_map_eq (Q := Pt)
@@ -1827,13 +1827,13 @@ Definition mkPshRestrLayerCohTypeAt {m p k}
   (e1: q + p = QQ) (e2: r + p = RR)
   (HQ: QQ <= m) (HRQ: RR <= QQ)
   (ε ω: arity) (d: psh.(G0) m.+2): Type :=
-  f_equal PC.(_pshDeps).(_pshFrames).2
+  (f_equal PC.(_pshDeps).(_pshFrames).2
     (psh.(GFaceCoh) m QQ HQ RR HRQ ε ω d)
-  • (pshRestrAt PC.(_pshDeps).(_pshRestrs) r (Hr ↕ Hq) e2 (HRQ ↕ HQ) ω
-       (psh.(GFace) m.+1 QQ.+1 (⇑ HQ) ε d)
+   • pshRestrAt PC.(_pshDeps).(_pshRestrs) r (Hr ↕ Hq) e2 (HRQ ↕ HQ) ω
+       (psh.(GFace) m.+1 QQ.+1 (⇑ HQ) ε d))
   • f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 r (Hr ↕ Hq) ω)
-      (pshRestrAt Q q.+1 (⇑ Hq) (f_equal S e1) (⇑ HQ) ε d)) =
-  pshRestrAt PC.(_pshDeps).(_pshRestrs) q Hq e1 HQ ε
+      (pshRestrAt Q q.+1 (⇑ Hq) (f_equal S e1) (⇑ HQ) ε d)
+  = pshRestrAt PC.(_pshDeps).(_pshRestrs) q Hq e1 HQ ε
     (psh.(GFace) m.+1 RR (↑ (HRQ ↕ HQ)) ω d)
   • (f_equal (PC.(_pshDeps).(_pdeps).(_restrFrames).2 q Hq ε)
       (pshRestrAt Q r (↑ (Hr ↕ Hq)) e2 (↑ (HRQ ↕ HQ)) ω d)
@@ -2431,7 +2431,7 @@ Definition mkPshRestrPaintingCohTypeAt {m p k} (PC2: PshDepsCohs2 m p.+1 k)
          (mkPshRestrFrames (proj1PshDepsCohs PC2.(_pshDepsCohs))
             PC2.(_pshRestrCohs).1)
          PC2.(_pshRestrCohs).2 q Hq r Hr e1 e2 HQ HRQ ε ω d) in
-  (sigT_map_eq (Q := Pt)
+  ((sigT_map_eq (Q := Pt)
      (f := PC2.(_pshDepsCohs).(_pshDeps).(_pshFrames).2)
      (fun (_: psh.(G0) m) x => x)
      (f_equal_dep
@@ -2439,14 +2439,14 @@ Definition mkPshRestrPaintingCohTypeAt {m p k} (PC2: PshDepsCohs2 m p.+1 k)
            (PC2.(_pshDepsCohs).(_pshDeps).(_pshFrames).2 y)))
         PC2.(_pshDepsCohs).(_pshDeps).(_pshPaintings).2
         (psh.(GFaceCoh) m QQ HQ RR HRQ ε ω d))
-   ⊙[Pt] (pshRestrPaintingAt PC2.(_pshDepsCohs).(_pshDeps)
+    ⊙[Pt] pshRestrPaintingAt PC2.(_pshDepsCohs).(_pshDeps)
         PC2.(_pshDepsCohs).(_pshExtraDeps)
         PC2.(_pshDepsCohs).(_pshRestrPaintings).2 r (Hr ↕ Hq) e2 (HRQ ↕ HQ) ω
-        (psh.(GFace) m.+1 QQ.+1 (⇑ HQ) ε d)
-      ⊙[Pt] sigT_map_eq (Q := Pt)
+        (psh.(GFace) m.+1 QQ.+1 (⇑ HQ) ε d))
+   ⊙[Pt] sigT_map_eq (Q := Pt)
           (PC2.(_pshDepsCohs).(_pRestrPaintings).2 r (Hr ↕ Hq) ω)
           (mkPshRestrPaintingAt (AddPshCohDep PC2 PCX) q.+1 (⇑ Hq)
-             (f_equal S e1) (⇑ HQ) ε d))) =
+             (f_equal S e1) (⇑ HQ) ε d)) =
   pshRestrPaintingAt PC2.(_pshDepsCohs).(_pshDeps)
     PC2.(_pshDepsCohs).(_pshExtraDeps)
     PC2.(_pshDepsCohs).(_pshRestrPaintings).2 q Hq e1 HQ ε
@@ -2770,8 +2770,8 @@ Proof.
       unfold hexagonal_coherence_dep.
       (* LHS second edge *)
       lazymatch goal with
-      | |- rew [_] _ in (_ ⊙ ((path_reindex_source (@rew_align_dep _ _ _ _ _ _ _ _ _ _ _ ?hcgB) _)
-             ⊙ _)) = _ =>
+      | |- rew [_] _ in ((_ ⊙ (path_reindex_source (@rew_align_dep _ _ _ _ _ _ _ _ _ _ _ ?hcgB) _))
+             ⊙ _) = _ =>
         pose (hcB := pshRestrAt_stepG PCq PC2.(_pshRestrCohs).1
           PC2.(_pshRestrCohs).2 r (⇓ Hr ↕ ⇓ Hq)
           (eq_sym (plus_n_Sm r p0)) (plus_n_Sm r p0) (HRR ↕ HQQ)
@@ -2798,8 +2798,8 @@ Proof.
       rewrite <- HED.
       (* LHS third edge *)
       lazymatch goal with
-      | |- rew [_] _ in (_ ⊙ (_ ⊙ @sigT_map_eq _ _ ?PC1 ?QC1 ?fC ?gC _ _ _ _ _
-            (path_reindex_source (@rew_align_dep _ _ _ _ _ _ _ _ _ _ _ ?hcgC) _))) = _ =>
+      | |- rew [_] _ in ((_ ⊙ _) ⊙ @sigT_map_eq _ _ ?PC1 ?QC1 ?fC ?gC _ _ _ _ _
+            (path_reindex_source (@rew_align_dep _ _ _ _ _ _ _ _ _ _ _ ?hcgC) _)) = _ =>
         pose (hcC := pshRestrAt_stepG PCn PC2n.(_pshRestrCohs).1
           PC2n.(_pshRestrCohs).2 q.+1 (⇑ (⇓ Hq))
           (f_equal S (eq_sym (plus_n_Sm q p0))) (plus_n_Sm q.+1 p0) (⇑ HQQ)

@@ -5,7 +5,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import RewLemmas.
 From Bonak Require Import HSet Notation LeSProp Funext.
-From Bonak Require Import νGpd.HGpd.
+From Bonak Require Import νGpd.HGpd νGpd.Pasting.
 From Bonak.Presheaf.Gpd Require Export Presentation.
 
 From Bonak.Category Require Import Category.
@@ -153,12 +153,12 @@ Defined.
 Lemma ofPsfCoh2 (FA: PathDiagramAssoc (Op (νSemiShape A)) ob F)
   n q (Hq: q <= n) r (Hr: r <= q) s (Hs: s <= r) (ε ω θ: A)
   (X: ob (S (S (S n)))):
-  f_equal (ofPsfFace n q Hq ε) (ofPsfCoh (S n) r (Hr ↕ (↑ Hq)) s Hs ω θ X)
-  • (ofPsfCoh n q Hq s (Hs ↕ Hr) ε θ
-      (ofPsfFace (S (S n)) (S r) (⇑ (Hr ↕ (↑ Hq))) ω X)
+  (f_equal (ofPsfFace n q Hq ε) (ofPsfCoh (S n) r (Hr ↕ (↑ Hq)) s Hs ω θ X)
+   • ofPsfCoh n q Hq s (Hs ↕ Hr) ε θ
+      (ofPsfFace (S (S n)) (S r) (⇑ (Hr ↕ (↑ Hq))) ω X))
   • f_equal (ofPsfFace n s (Hs ↕ (Hr ↕ Hq)) θ)
-      (ofPsfCoh (S n) (S q) (⇑ Hq) (S r) (⇑ Hr) ε ω X)) =
-  ofPsfCoh n q Hq r Hr ε ω (ofPsfFace (S (S n)) s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) θ X)
+      (ofPsfCoh (S n) (S q) (⇑ Hq) (S r) (⇑ Hr) ε ω X)
+  = ofPsfCoh n q Hq r Hr ε ω (ofPsfFace (S (S n)) s (↑ (↑ (Hs ↕ (Hr ↕ Hq)))) θ X)
   • (f_equal (ofPsfFace n r (Hr ↕ Hq) ω)
       (ofPsfCoh (S n) (S q) (⇑ Hq) s (↑ (Hs ↕ Hr)) ε θ X)
   • ofPsfCoh n r (Hr ↕ Hq) s Hs ω θ
@@ -175,11 +175,14 @@ Proof.
              ω ε θ X).
   rewrite (ofPsfCohWhiskerR FA n r (Hr ↕ Hq) s Hs (S (S q)) (⇑ (⇑ Hq))
              ω θ ε X).
-  rewrite !conjTrans3.
+  pose proof (@path_change_comp) as paste.
+  unfold path_change in paste.
+  rewrite 4 paste.
   apply conjCancel.
-  now apply (fEqualUIP
-    (fun x y h g => ((Op (νSemiShape A)).(CHom) (S (S (S n))) n).(UIP))
+  rewrite <- 4 (eq_trans_map_distr
     (fun z: (Op (νSemiShape A)).(CHom) (S (S (S n))) n => F.(phom) z X)).
+  apply f_equal.
+  now apply ((Op (νSemiShape A)).(CHom) (S (S (S n))) n).(UIP).
 Qed.
 
 End OfPsf.
