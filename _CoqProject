@@ -28,6 +28,15 @@ theories/Presheaf/Presentation.v
 theories/Presheaf/Roundtrip.v
 theories/Presheaf/SemiSimplicialShape.v
 theories/Presheaf/WordAction.v
+theories/SS2Gpd/Coh4Shapes.v
+theories/SS2Gpd/H2Gpd.v
+theories/SS2Gpd/Lemmas/Coh3Frame.v
+theories/SS2Gpd/Lemmas/Coh3Layer.v
+theories/SS2Gpd/Lemmas/Coh3Painting.v
+theories/SS2Gpd/Lemmas/Coh3Painting0.v
+theories/SS2Gpd/Pasting.v
+theories/SS2Gpd/SS2Gpd.v
+theories/SS2Gpd/SigmaPasting.v
 theories/SSGpd/Coh3Shapes.v
 theories/SSGpd/HGpd.v
 theories/SSGpd/Lemmas.v

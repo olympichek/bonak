@@ -9,4 +9,6 @@ coqdoc -t Bonak --no-lib-name --parse-comments --utf8 -d docs \
   _build/default/theories/Presheaf/*.v \
   _build/default/theories/Equiv/*.v \
   _build/default/theories/SSSet/*.v \
-  _build/default/theories/SSGpd/*.v
+  _build/default/theories/SSGpd/*.v \
+  _build/default/theories/SS2Gpd/*.v \
+  _build/default/theories/SS2Gpd/Lemmas/*.v
