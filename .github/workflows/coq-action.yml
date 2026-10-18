@@ -66,6 +66,9 @@ jobs:
       STDLIB_REPO: "https://github.com/rocq-prover/stdlib.git"
       STDLIB_REV: "b89635f66d5d5fe3c91a5755b389a30846411888"
       OCAML_COMPILER: "5.3"
+      # Bound both conversion caches to 4M entries per conversion session.
+      ROCQ_CONV_CACHE_MAX: "4194304"
+      ROCQ_CLOS_MEMO_MAX: "4194304"
     steps:
       - uses: "actions/checkout@v4"
         with:
