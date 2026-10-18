@@ -1,1 +1,2 @@
 theories/SSGpd/SSGpd.v
+theories/SS2Gpd/SS2Gpd.v

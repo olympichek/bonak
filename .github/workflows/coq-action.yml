@@ -19,7 +19,7 @@ on:
       - ".github/rocq-9.2-blacklist.txt"
       - ".github/workflows/coq-action.yml"
 jobs:
-  # Builds the project with the latest Rocq release, minus the files listed in
+  # Builds the project with Rocq 9.2, minus the files listed in
   # .github/rocq-9.2-blacklist.txt.
   rocq-release:
     name: "Rocq 9.2"
@@ -52,15 +52,15 @@ jobs:
               opam install --confirm-level=unsafe-yes -j 2 $PACKAGE --deps-only
             endGroup
 
-  # Builds the whole project with our patched Rocq, which carries the fixpoint
-  # refolding and conversion-cache patches the heavier files rely on.
+  # Builds the whole project with fixpoint refolding and the kernel/frontend
+  # conversion optimizations used by the higher-coherence constructions.
   rocq-patched:
-    name: "Rocq master+bonak-patches"
+    name: "Rocq master+bonak-patches-experimental"
     runs-on: "ubuntu-latest"
-    timeout-minutes: 120
+    timeout-minutes: 240
     env:
       ROCQ_REPO: "https://github.com/olympichek/rocq.git"
-      ROCQ_BRANCH: "master+bonak-patches"
+      ROCQ_BRANCH: "master+bonak-patches-experimental"
       # Rocq's stdlib lives in its own repository; this is the revision the
       # patched branch is developed against.
       STDLIB_REPO: "https://github.com/rocq-prover/stdlib.git"
@@ -81,9 +81,8 @@ jobs:
         with:
           ocaml-compiler: ${{ env.OCAML_COMPILER }}
           opam-pin: false
-      # The opam switch holding the patched Rocq is cached: rebuilding it from
-      # source costs about five minutes.  The key pins the exact Rocq and
-      # stdlib revisions, so moving either one invalidates the cache.
+      # Cache the opam switch by compiler and stdlib revision, so updating
+      # either source rebuilds the corresponding switch.
       - name: "Restore the opam switch"
         id: "switch"
         uses: "actions/cache@v4"
@@ -91,10 +90,12 @@ jobs:
           path: "_opam"
           key: "rocq-patched-${{ runner.os }}-ocaml-${{ env.OCAML_COMPILER }}-${{ steps.rocq.outputs.sha }}-${{ env.STDLIB_REV }}"
       - name: "Build the patched Rocq"
+        env:
+          ROCQ_REV: ${{ steps.rocq.outputs.sha }}
         if: steps.switch.outputs.cache-hit != 'true'
         run: |
-          opam pin add -y -n rocq-runtime "git+$ROCQ_REPO#$ROCQ_BRANCH"
-          opam pin add -y -n rocq-core "git+$ROCQ_REPO#$ROCQ_BRANCH"
+          opam pin add -y -n rocq-runtime "git+$ROCQ_REPO#$ROCQ_REV"
+          opam pin add -y -n rocq-core "git+$ROCQ_REPO#$ROCQ_REV"
           opam pin add -y -n rocq-stdlib "git+$STDLIB_REPO#$STDLIB_REV"
           opam install -y -j "$(nproc)" rocq-core rocq-stdlib
       - name: "Install the remaining dependencies"
