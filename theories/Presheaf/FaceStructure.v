@@ -7,43 +7,37 @@ Set Primitive Projections.
 Set Printing Projections.
 
 Section FaceStructure.
-Context (A: HSet).
 
 Record FaceStr := {
   S0: nat -> Type;
-  SFace n q (Hq: q <= n) (ε: A): S0 (S n) -> S0 n;
+  SFace n q (Hq: q <= n): S0 (S n) -> S0 n;
 }.
 
 Definition shiftStr (Q: FaceStr): FaceStr := {|
   S0 n := Q.(S0) (S n);
-  SFace n q Hq ε := Q.(SFace) (S n) q (↑ Hq) ε;
+  SFace n q Hq := Q.(SFace) (S n) q (↑ Hq);
 |}.
 
-(** The top face at level [n]: the one deleting dimension [n]. *)
+(** The top face at level [n]: the one deleting position [n]. *)
 
-Definition sTop (Q: FaceStr) (n: nat) (ε: A): Q.(S0) (S n) -> Q.(S0) n :=
-  Q.(SFace) n n leR_refl ε.
+Definition sTop (Q: FaceStr) (n: nat): Q.(S0) (S n) -> Q.(S0) n :=
+  Q.(SFace) n n leR_refl.
 
 End FaceStructure.
 
-Arguments S0 {_} _ _.
-Arguments SFace {_} _ _ _ _ _.
-Arguments shiftStr {A} Q.
-Arguments sTop {A} Q n ε.
+Definition CohOf (Q: FaceStr): Type :=
+  forall n q (Hq: q <= n) r (Hr: r <= q) (X: Q.(S0) (S (S n))),
+    Q.(SFace) n q Hq (Q.(SFace) (S n) r (Hr ↕ (↑ Hq)) X) =
+    Q.(SFace) n r (Hr ↕ Hq) (Q.(SFace) (S n) (S q) (⇑ Hq) X).
 
-Definition CohOf {A: HSet} (Q: FaceStr A): Type :=
-  forall n q (Hq: q <= n) r (Hr: r <= q) (ε ω: A) (X: Q.(S0) (S (S n))),
-    Q.(SFace) n q Hq ε (Q.(SFace) (S n) r (Hr ↕ (↑ Hq)) ω X) =
-    Q.(SFace) n r (Hr ↕ Hq) ω (Q.(SFace) (S n) (S q) (⇑ Hq) ε X).
-
-Definition cohShift {A: HSet} {Q: FaceStr A} (H: CohOf Q): CohOf (shiftStr Q) :=
-  fun n q Hq r Hr ε ω X => H (S n) q (↑ Hq) r Hr ε ω X.
+Definition cohShift {Q: FaceStr} (H: CohOf Q): CohOf (shiftStr Q) :=
+  fun n q Hq r Hr X => H (S n) q (↑ Hq) r Hr X.
 
 (** Exchanging a face with the top face preserves the index of the other
     face. *)
 
-Definition topCoh {A: HSet} {Q: FaceStr A} (H: CohOf Q):
-  forall k q (Hq: q <= k) (ε ω: A) (X: Q.(S0) (S (S k))),
-    sTop Q k ε (Q.(SFace) (S k) q (↑ Hq) ω X)
-    = Q.(SFace) k q Hq ω (sTop Q (S k) ε X) :=
-  fun k q Hq ε ω X => H k k leR_refl q Hq ε ω X.
+Definition topCoh {Q: FaceStr} (H: CohOf Q):
+  forall k q (Hq: q <= k) (X: Q.(S0) (S (S k))),
+    sTop Q k (Q.(SFace) (S k) q (↑ Hq) X)
+    = Q.(SFace) k q Hq (sTop Q (S k) X) :=
+  fun k q Hq X => H k k leR_refl q Hq X.

@@ -14,17 +14,16 @@
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT HSet LeSProp Notation νSet.Layer νSet.
-From Bonak Require Equiv.νSetEquiv.
+From Bonak Require Import SigT HSet LeSProp Notation SSSet.SSSet.
+From Bonak Require Equiv.SSSetEquiv.
 
 Set Primitive Projections.
 Set Printing Projections.
 Set Keyed Unification.
 
-Module FaceOn (A: LayerSig) (S: νSetSig A).
-Import A.
+Module Face.
 
-Module Export νSetEquiv := Bonak.Equiv.νSetEquiv.νSetEquivOn A S.
+Module Export SSSetEquiv := Bonak.Equiv.SSSetEquiv.SSSetEquiv.
 
 (** Chains of projections between frame stages *)
 
@@ -241,17 +240,17 @@ Fixpoint cohsChainLe {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
 (** The face maps of the indexed construction
 
     Given a full frame [d] one level up, project it down to
-    stage p+1, take the ε-component of its top layer — a painting over the
+    stage p+1, read its top layer — a painting over the
     restricted frame at stage p — and rebuild a full cell from it. This is
-    the [Face] operation of the presheaf associated to a [νSet]. *)
+    the [Face] operation of the presheaf associated to an [SSSet]. *)
 
-Definition νFace {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
-  (c: DepsCohsChain dcTop dc) (ε: arity)
+Definition ssFace {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
+  (c: DepsCohsChain dcTop dc)
   (d: mkFrame (mkDepsRestr (depsCohs := dcTop))):
   { d': mkFrame dcTop.(_deps) &T mkPainting dcTop.(_extraDeps) d' } :=
   getPainting (cohsChainExt c)
-    (mkRestrFrame (depsCohs := dc) 0 leR_O ε (getFrame (cohsChainNext c) d).1)
-    (nth (getFrame (cohsChainNext c) d).2 ε).
+    (mkRestrFrame (depsCohs := dc) 0 leR_O (getFrame (cohsChainNext c) d).1)
+    (getFrame (cohsChainNext c) d).2.
 
 (** Commutation of the projections with the restrictions
 
@@ -260,10 +259,10 @@ Definition νFace {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
     offset. *)
 
 Lemma getFrameRestr {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
-  (c: DepsCohsChain dcTop dc) (ε: arity)
+  (c: DepsCohsChain dcTop dc)
   (d: mkFrame (mkDepsRestr (depsCohs := dcTop)).(1)):
-  getFrame (cohsChainDeps c) (mkRestrFrame (depsCohs := dcTop) 0 leR_O ε d) =
-  mkRestrFrame (depsCohs := dc) (cohsChainLen c) (cohsChainLe c) ε
+  getFrame (cohsChainDeps c) (mkRestrFrame (depsCohs := dcTop) 0 leR_O d) =
+  mkRestrFrame (depsCohs := dc) (cohsChainLen c) (cohsChainLe c)
     (getFrame (cohsChainNext1 c) d).
 Proof.
   induction c.
@@ -332,16 +331,15 @@ Proof.
   induction b; cbn; [now reflexivity | now rewrite IHb].
 Defined.
 
-Lemma νFaceCompose {P K} {dcTop: DepsCohs P K}
+Lemma ssFaceCompose {P K} {dcTop: DepsCohs P K}
   {p k} {dcMid: DepsCohs p k} {p' k'} {dc: DepsCohs p' k'}
-  (a: DepsCohsChain dcTop dcMid) (b: DepsCohsChain dcMid dc)
-  (ε: arity) (d: mkFrame (mkDepsRestr (depsCohs := dcTop))):
-  νFace (cohsChainCompose a b) ε d =
+  (a: DepsCohsChain dcTop dcMid) (b: DepsCohsChain dcMid dc) (d: mkFrame (mkDepsRestr (depsCohs := dcTop))):
+  ssFace (cohsChainCompose a b) d =
   getPainting (cohsChainExt a)
-    (νFace b ε (getFrame (cohsChainNext a) d)).1
-    (νFace b ε (getFrame (cohsChainNext a) d)).2.
+    (ssFace b (getFrame (cohsChainNext a) d)).1
+    (ssFace b (getFrame (cohsChainNext a) d)).2.
 Proof.
-  unfold νFace.
+  unfold ssFace.
   rewrite cohsChainExtCompose, cohsChainNextCompose, <- getFrameCompose.
   apply getPaintingCompose.
 Defined.
@@ -394,39 +392,37 @@ Proof.
 Defined.
 
 Lemma mkRestrFrameLenIrr {p k} {dc: DepsCohs p k} {q q'} (e: q = q')
-  {Hq: q <= k} {Hq': q' <= k} (ε: arity)
+  {Hq: q <= k} {Hq': q' <= k}
   (x: mkFrame (mkDepsRestr (depsCohs := dc)).(1)):
-  mkRestrFrame (depsCohs := dc) q Hq ε x =
-  mkRestrFrame (depsCohs := dc) q' Hq' ε x.
+  mkRestrFrame (depsCohs := dc) q Hq x =
+  mkRestrFrame (depsCohs := dc) q' Hq' x.
 Proof.
   destruct e. now reflexivity.
 Defined.
 
-(** Reading the ε-layer after climbing a [DepsCohs2] chain equals climbing
-    the ε-restricted painting from the bottom stage; all index equalities
+(** Reading the layer after climbing a [DepsCohs2] chain equals climbing
+    the restricted painting from the bottom stage; all index equalities
     hold by conversion. *)
 
 Lemma getPaintingRestr2 {P K} {dc2Top: DepsCohs2 P K}
   {P' K'} {depsTopN: DepsRestr P' K'}
   {extTopN: DepsRestrExtension P' K' depsTopN}
   (cQ: ExtChain extTopN (dc2Top.(_depsCohs)).(_extraDeps))
-  {p k} {dc2: DepsCohs2 p k} (c: DepsCohs2Chain dc2Top dc2) (ε: arity):
+  {p k} {dc2: DepsCohs2 p k} (c: DepsCohs2Chain dc2Top dc2):
   forall (d: mkFrame (mkDepsRestr (depsCohs := dc2.(_depsCohs))).(1))
   (cp: mkPainting (AddRestrDep (mkDepsRestr (depsCohs := dc2.(_depsCohs)))
          (mkExtraDeps dc2.(_extraDepsCohs))) d),
   getPainting cQ
-    (mkRestrFrame (depsCohs := dc2Top.(_depsCohs)) 0 leR_O ε
+    (mkRestrFrame (depsCohs := dc2Top.(_depsCohs)) 0 leR_O
       ((getPainting (ExtChainCons (cohsChainExt (cohs2ChainCohs c))) d cp).1).1)
-    (nth
-      ((getPainting (ExtChainCons (cohsChainExt (cohs2ChainCohs c))) d cp).1).2
-      ε) =
+    ((getPainting (ExtChainCons (cohsChainExt (cohs2ChainCohs c))) d cp).1).2 =
   getPainting (extChainCompose cQ (cohsChainExt (cohs2ChainDepsCohs c)))
     (mkRestrFrame (depsCohs := dc2.(_depsCohs))
       (cohsChainLen (cohs2ChainDepsCohs c))
-      (cohsChainLe (cohs2ChainDepsCohs c)) ε d)
+      (cohsChainLe (cohs2ChainDepsCohs c)) d)
     (mkRestrPainting dc2.(_extraDepsCohs)
       (cohsChainLen (cohs2ChainDepsCohs c))
-      (cohsChainLe (cohs2ChainDepsCohs c)) ε d cp).
+      (cohsChainLe (cohs2ChainDepsCohs c)) d cp).
 Proof.
   induction c; intros d cp.
   - now reflexivity.
@@ -441,44 +437,38 @@ Lemma restrShiftPair {p k} {dc2: DepsCohs2 p k}
   {P' K'} {depsTopN: DepsRestr P' K'}
   {extTopN: DepsRestrExtension P' K' depsTopN}
   (E: ExtChain extTopN (dc2.(_depsCohs)).(_extraDeps))
-  (q: nat) (Hq: q <= k) (ε ω: arity)
+  (q: nat) (Hq: q <= k)
   (W: mkFrame (mkDepsRestr (depsCohs := mkDepsCohs dc2)).(1)):
   getPainting E
-    (mkRestrFrame (depsCohs := dc2.(_depsCohs)) q Hq ε
-       (mkRestrFrame (depsCohs := proj1DepsCohs (mkDepsCohs dc2)) 0 leR_O ω
-          W.1))
-    (mkRestrPainting dc2.(_extraDepsCohs) q Hq ε
-       (mkRestrFrame (depsCohs := proj1DepsCohs (mkDepsCohs dc2)) 0 leR_O ω
-          W.1)
-       (nth W.2 ω)) =
+    (mkRestrFrame (depsCohs := dc2.(_depsCohs)) q Hq
+      (mkRestrFrame (depsCohs := proj1DepsCohs (mkDepsCohs dc2)) 0 leR_O W.1))
+    (mkRestrPainting dc2.(_extraDepsCohs) q Hq
+      (mkRestrFrame (depsCohs := proj1DepsCohs (mkDepsCohs dc2)) 0 leR_O W.1) W.2) =
   getPainting E
-    (mkRestrFrame (depsCohs := dc2.(_depsCohs)) 0 leR_O ω
-       (mkRestrFrame (depsCohs := mkDepsCohs dc2) q Hq ε W).1)
-    (nth (mkRestrFrame (depsCohs := mkDepsCohs dc2) q Hq ε W).2 ω).
+    (mkRestrFrame (depsCohs := dc2.(_depsCohs)) 0 leR_O
+      (mkRestrFrame (depsCohs := mkDepsCohs dc2) q Hq W).1)
+    (mkRestrFrame (depsCohs := mkDepsCohs dc2) q Hq W).2.
 Proof.
   refine (f_equal (fun z: {d0: mkFrame (dc2.(_depsCohs)).(_deps) &T
       mkPainting (dc2.(_depsCohs)).(_extraDeps) d0} =>
     getPainting E z.1 z.2)
     (eq_existT_curried
-      ((mkDepsCohs dc2).(_cohs).2 q Hq 0 leR_O ε ω W.1) _)).
-  symmetry. now exact (nth_lmap _ W.2 ω).
+      ((mkDepsCohs dc2).(_cohs).2 q Hq 0 leR_O W.1) _)).
+  now reflexivity.
 Qed.
 
 (** The exchange law: erasing dimension q and then p equals erasing
     dimension p and then q+1, for p ≤ q. *)
 
-Lemma νFaceCoh {P K} {dc2Top: DepsCohs2 P K}
+Lemma ssFaceCoh {P K} {dc2Top: DepsCohs2 P K}
   {p k} {dc2Q: DepsCohs2 p k} (c1: DepsCohs2Chain dc2Top dc2Q)
   {p' k'} {dc2P: DepsCohs2 p' k'} (c2: DepsCohs2Chain dc2Q dc2P)
-  (ε ω: arity)
   (d: mkFrame (mkDepsRestr (depsCohs := mkDepsCohs dc2Top))):
-  νFace (cohs2ChainDepsCohs c1) ε
-    ((νFace (DepsCohsChainCons (cohs2ChainCohs (cohs2ChainCompose c1 c2)))
-       ω d).1) =
-  νFace (cohs2ChainDepsCohs (cohs2ChainCompose c1 c2)) ω
-    ((νFace (cohs2ChainCohs c1) ε d).1).
+  ssFace (cohs2ChainDepsCohs c1) ((ssFace (DepsCohsChainCons (cohs2ChainCohs (cohs2ChainCompose c1 c2)))
+       d).1) =
+  ssFace (cohs2ChainDepsCohs (cohs2ChainCompose c1 c2)) ((ssFace (cohs2ChainCohs c1) d).1).
 Proof.
-  unfold νFace.
+  unfold ssFace.
   rewrite cohs2ChainCohsCompose, cohs2ChainDepsCohsCompose.
   assert (A1: cohsChainExt (DepsCohsChainCons
       (cohsChainCompose (cohs2ChainCohs c1) (cohs2ChainCohs c2))) =
@@ -489,7 +479,7 @@ Proof.
   rewrite <- (cohs2ChainDepsNext c1).
   rewrite <- (extChainDepsExt (cohs2ChainCohs c1)).
   rewrite getFrameGetPainting'.
-  rewrite (getPaintingRestr2 (cohsChainExt (cohs2ChainDepsCohs c1)) c2 ε).
+  rewrite (getPaintingRestr2 (cohsChainExt (cohs2ChainDepsCohs c1)) c2).
   rewrite <- cohsChainExtCompose.
   rewrite cohsChainNextCompose.
   rewrite <- getFrameCompose.
@@ -497,25 +487,24 @@ Proof.
   rewrite <- (extChainDepsExt (cohs2ChainCohs c1)).
   rewrite getFrameGetPainting.
   rewrite <- (cohs2ChainDepsNext c2).
-  rewrite (getFrameRestr (cohs2ChainCohs c2) ε).
+  rewrite (getFrameRestr (cohs2ChainCohs c2)).
   rewrite <- getFrameNext1.
   rewrite getFrameCompose.
   rewrite <- (cohsChainNextCompose (cohs2ChainCohs c1) (cohs2ChainCohs c2)).
   rewrite (mkRestrFrameLenIrr (cohs2ChainLenEq c2)
     (Hq := cohsChainLe (cohs2ChainCohs c2))
-    (Hq' := cohsChainLe (cohs2ChainDepsCohs c2)) ε).
+    (Hq' := cohsChainLe (cohs2ChainDepsCohs c2))).
   rewrite restrShiftPair.
   now reflexivity.
 Qed.
 
-(** A full frame is determined by its faces
+(** A full frame is determined by its faces.
 
-    [getPaintingEq]: rebuilding cells is injective. [layerEqNth]:
-    the ε-components of the layers of two projected frames agree along the
-    frame equality whenever the ε-faces agree — the UIP collapse happens
-    here, in the frame HSet. [frameEqStep] climbs one stage using
-    [ext]; [frameEqDescend] descends a chain accumulating stages; and
-    [νFaceEq] grounds the descent at the stage-0 frame, which is [unit]. *)
+    Rebuilding cells is injective ([getPaintingEq]). Equal faces identify
+    the layers of projected frames ([layerEq]), using UIP in the frame
+    h-set to align the transports. [frameEqStep] climbs one stage and
+    [frameEqDescend] repeats this along a chain. [ssFaceEq] starts at the
+    stage-zero frame, which is [unit]. *)
 
 Lemma getPaintingEq {P K} {depsTop: DepsRestr P K}
   {extTop: DepsRestrExtension P K depsTop}
@@ -534,27 +523,23 @@ Proof.
       (IHc (d; cp.1) (d'; cp'.1) cp.2 cp'.2 H)).
 Qed.
 
-Lemma layerEqNth {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
+Lemma layerEq {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
   (c: DepsCohsChain dcTop dc)
-  (d d': mkFrame (mkDepsRestr (depsCohs := dcTop))) (ε: arity)
+  (d d': mkFrame (mkDepsRestr (depsCohs := dcTop)))
   (H: (getFrame (cohsChainNext c) d).1 = (getFrame (cohsChainNext c) d').1)
-  (Hface: νFace c ε d = νFace c ε d'):
-  nth
-    (rew [mkLayer mkRestrFrames] H in (getFrame (cohsChainNext c) d).2) ε =
-  nth (getFrame (cohsChainNext c) d').2 ε.
+  (Hface: ssFace c d = ssFace c d'):
+  rew [mkLayer mkRestrFrames] H in (getFrame (cohsChainNext c) d).2 =
+  (getFrame (cohsChainNext c) d').2.
 Proof.
   pose proof (getPaintingEq (cohsChainExt c) _ _ _ _ Hface) as PE.
   etransitivity.
-  { now exact (eq_sym (map_subst (P := mkLayer mkRestrFrames)
-      (fun x l => nth l ε) H _)). }
-  etransitivity.
   { now exact (rew_map (fun y => ((mkPaintings dc.(_extraDeps)).2 y).(Dom))
-      (fun x => mkRestrFrames.2 0 leR_O ε x) H
-      (nth (getFrame (cohsChainNext c) d).2 ε)). }
+      (fun x => mkRestrFrames.2 0 leR_O x) H
+      (getFrame (cohsChainNext c) d).2). }
   etransitivity.
   { now exact (f_equal (fun e => rew [fun y =>
         ((mkPaintings dc.(_extraDeps)).2 y).(Dom)] e in
-      nth (getFrame (cohsChainNext c) d).2 ε)
+      (getFrame (cohsChainNext c) d).2)
       ((mkFrame dc.(_deps)).(UIP) (g := projT1_eq PE))). }
   now exact (projT2_eq PE).
 Qed.
@@ -562,18 +547,17 @@ Qed.
 Lemma frameEqStep {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
   (c: DepsCohsChain dcTop dc)
   (d d': mkFrame (mkDepsRestr (depsCohs := dcTop)))
-  (Hfaces: forall ε, νFace c ε d = νFace c ε d')
+  (Hfaces: ssFace c d = ssFace c d')
   (H: (getFrame (cohsChainNext c) d).1 = (getFrame (cohsChainNext c) d').1):
   getFrame (cohsChainNext c) d = getFrame (cohsChainNext c) d'.
 Proof.
-  refine (eq_existT_curried H _).
-  now exact (ext _ _ (fun θ => layerEqNth c d d' θ H (Hfaces θ))).
+  now exact (eq_existT_curried H (layerEq c d d' H Hfaces)).
 Qed.
 
 Lemma frameEqDescend {P K} {dcTop: DepsCohs P K}
   (d d': mkFrame (mkDepsRestr (depsCohs := dcTop)))
-  (Hfaces: forall p k (dc: DepsCohs p k) (c: DepsCohsChain dcTop dc) ε,
-    νFace c ε d = νFace c ε d')
+  (Hfaces: forall p k (dc: DepsCohs p k) (c: DepsCohsChain dcTop dc),
+    ssFace c d = ssFace c d')
   {p k} {dc: DepsCohs p k} (c: DepsCohsChain dcTop dc):
   getFrame (cohsChainNext c) d = getFrame (cohsChainNext c) d' -> d = d'.
 Proof.
@@ -592,10 +576,10 @@ Fixpoint fullCohsChainSig {P}: forall {K} (dcTop: DepsCohs P K),
         cohsChainCompose (DepsCohsChainCons DepsCohsChainNil) s.2.2))
   end.
 
-Lemma νFaceEq {P K} {dcTop: DepsCohs P K}
+Lemma ssFaceEq {P K} {dcTop: DepsCohs P K}
   (d d': mkFrame (mkDepsRestr (depsCohs := dcTop)))
-  (Hfaces: forall p k (dc: DepsCohs p k) (c: DepsCohsChain dcTop dc) ε,
-    νFace c ε d = νFace c ε d'):
+  (Hfaces: forall p k (dc: DepsCohs p k) (c: DepsCohsChain dcTop dc),
+    ssFace c d = ssFace c d'):
   d = d'.
 Proof.
   pose (s := fullCohsChainSig dcTop).
@@ -604,12 +588,4 @@ Proof.
   now exact (hunit_ext _ _).
 Qed.
 
-End FaceOn.
-
-Module Face (A: LayerSig).
-Module Base := νSet.νSet A.
-Include FaceOn A Base.
 End Face.
-
-Module FaceSimplicial := Face SimplicialLayer.
-Module FaceCubical := Face CubicalLayer.

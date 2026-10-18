@@ -1,35 +1,33 @@
 (** The forward round trip [g ∘ f] of the correspondence between the
-    fibred presentation ([νSetPresentation]) and the indexed construction
-    ([νSet]): [gf: PresheafEquiv (g (f psh)) psh]. Levelwise, projecting a
+    fibred presentation ([SSSetPresentation]) and the indexed construction
+    ([SSSet]): [gf: PresheafEquiv (g (f psh)) psh]. Levelwise, projecting a
     candidate-filled cell to its [psh]-cell is an equivalence, and it
-    commutes with the face maps by [pshνFace]. *)
+    commutes with the face maps by [pshSSFace]. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT HSet LeSProp NatLemmas Notation νSet.Layer
-  νSet Face Presheaf.Presentation Equiv.νSetOfPresheaf Equiv.PresheafOfνSet Equiv.νSetRoundtrip Limit.
-From Bonak.Lib Require Import Equiv.
-
-From Bonak.νSet Require Import νSet.
+From Bonak.Lib Require Import SigT HSet LeSProp NatLemmas Notation Limit Equiv.
+From Bonak.SSSet Require Import SSSet.
+From Bonak.Presheaf Require Import Presentation.
+From Bonak.Equiv Require Import Face SSSetOfPresheaf PresheafOfSSSet SSSetRoundtrip.
 
 Set Primitive Projections.
 Set Printing Projections.
 Set Keyed Unification.
 
-Module PresheafRoundtripOn (A: LayerSig) (S: νSetSig A).
-Import A.
+Module PresheafRoundtrip.
 
-Module Export νSetRoundtrip := νSetRoundtrip.νSetRoundtripOn A S.
+Module Export SSSetRoundtrip := Bonak.Equiv.SSSetRoundtrip.SSSetRoundtrip.
 
 Section RoundTripGF.
 
-Variable psh: νSetPresentation arity.
+Variable psh: SSSetPresentation.
 
 (** Aligning [g]'s synthesized chains with the presheaf-equipped ones
 
     [g]'s faces use chains synthesized at the [DepsCohs2] level
     ([chain2Down]); on candidate-built cells they must be recognized as
     images of chains of presheaf-equipped stages ([PshCohsChain]), so
-    that [pshνFace] applies. *)
+    that [pshSSFace] applies. *)
 
 Definition PshPack {M P K} (PCTop: PshDepsCohs psh M P K): Type :=
   {p: nat &T {k: nat &T
@@ -77,7 +75,7 @@ Proof.
 Qed.
 
 Lemma gfChainAlign (m j: nat):
-  dc2PackDeps (chain2Down (νDepsCohs2At (pshFrom psh m.+1)) j) =
+  dc2PackDeps (chain2Down (ssDepsCohs2At (pshFrom psh m.+1)) j) =
   pshPackDC (pshChain2Down (towerPshDepsCohs psh (pshTw psh m)
     (pshTwRp psh m)) j).
 Proof.
@@ -89,37 +87,35 @@ Qed.
 (** The face naturality at the bottom of the descent
 
     The face of a candidate-filled cell projects to the [psh]-face of its
-    cell: align the chain, apply [pshνFace], fix the dimension. *)
+    cell: align the chain, apply [pshSSFace], fix the dimension. *)
 
 Lemma gfFaceBottom (m: nat)
-  (dim: nat) (Hdim: dim <= m.+1) (ε: arity)
-  (x: νTotal (next (pshFrom psh m.+1))):
-  (νFaceFuel (pshFrom psh m.+1) (m.+1 - dim) ε x).2.1 =
-  psh.(Face) m.+1 dim Hdim ε x.2.1.
+  (dim: nat) (Hdim: dim <= m.+1) (x: ssTotal (next (pshFrom psh m.+1))):
+  (ssFaceFuel (pshFrom psh m.+1) (m.+1 - dim) x).2.1 =
+  psh.(Face) m.+1 dim Hdim x.2.1.
 Proof.
   destruct x as (D, (d, e)).
-  unfold νFaceFuel.
+  unfold ssFaceFuel.
   rewrite e.
   rewrite (gfChainAlign m (m.+1 - dim)).
   assert (SE: (pshChain2Down (towerPshDepsCohs psh (pshTw psh m)
     (pshTwRp psh m)) (m.+1 - dim)).1 = dim).
   { rewrite pshChain2DownStage. now exact (subSubCancel Hdim). }
-  rewrite (pshνFace psh
+  rewrite (pshSSFace psh
     ((pshChain2Down (towerPshDepsCohs psh (pshTw psh m) (pshTwRp psh m))
       (m.+1 - dim)).2.2.2)
-    (leR_eq (eq_sym SE) Hdim) ε d).
-  now exact (pshFaceDimIrr psh SE ε d).
+    (leR_eq (eq_sym SE) Hdim) d).
+  now exact (pshFaceDimIrr psh SE d).
 Qed.
 
-Lemma gfFaceBottom0 (dim: nat) (Hdim: dim <= 0) (ε: arity)
-  (x: νTotal (next (f psh))):
-  (νFaceFuel (f psh) (0 - dim) ε x).2.1 = psh.(Face) 0 dim Hdim ε x.2.1.
+Lemma gfFaceBottom0 (dim: nat) (Hdim: dim <= 0) (x: ssTotal (next (f psh))):
+  (ssFaceFuel (f psh) (0 - dim) x).2.1 = psh.(Face) 0 dim Hdim x.2.1.
 Proof.
   destruct dim. 2: destruct (leR_O_contra Hdim).
   destruct x as (D, (d, e)).
-  unfold νFaceFuel, νFace.
+  unfold ssFaceFuel, ssFace.
   rewrite e.
-  now rewrite nth_lam.
+  now reflexivity.
 Qed.
 
 (** The levelwise equivalences and the naturality descent
@@ -135,7 +131,7 @@ Fixpoint gfEquiv (m n: nat) {struct n}:
   match n return forall (L: nat), L = n + m.+1 ->
     Equiv (gF0 (pshFrom psh m.+1) n) (psh.(F0) L) with
   | 0 => fun L HL =>
-      rew [fun l => Equiv (νTotal (pshFrom psh m.+1)) (psh.(F0) l)]
+      rew [fun l => Equiv (ssTotal (pshFrom psh m.+1)) (psh.(F0) l)]
         (eq_sym HL) in
       fillerEquiv (mkPshFrame psh (towerPshDeps psh (pshTw psh m)))
   | S n => fun L HL => gfEquiv m.+1 n L (HL • plus_n_Sm n m.+1)
@@ -153,10 +149,9 @@ Qed.
 
 Fixpoint gfFaceEquiv (m n: nat) {struct n}:
   forall (L: nat) (HL: L = n + m.+1) (HL2: L.+1 = n.+1 + m.+1)
-    (dim: nat) (Hd: dim <= n + m.+1) (Hd': dim <= L) (ε: arity)
-    (x: gF0 (pshFrom psh m.+1) n.+1),
-  gfEquiv m n L HL (gFace (pshFrom psh m.+1) n dim Hd ε x) =
-  psh.(Face) L dim Hd' ε (gfEquiv m n.+1 L.+1 HL2 x).
+    (dim: nat) (Hd: dim <= n + m.+1) (Hd': dim <= L) (x: gF0 (pshFrom psh m.+1) n.+1),
+  gfEquiv m n L HL (gFace (pshFrom psh m.+1) n dim Hd x) =
+  psh.(Face) L dim Hd' (gfEquiv m n.+1 L.+1 HL2 x).
 Proof.
   destruct n; intros.
   - set (HLs := eq_sym HL).
@@ -165,11 +160,11 @@ Proof.
     destruct HLs.
     cbn [gfEquiv].
     rewrite (natUIP (HL2 • plus_n_Sm 0 m.+1) eq_refl).
-    now exact (gfFaceBottom m dim Hd' ε x).
+    now exact (gfFaceBottom m dim Hd' x).
   - now exact (gfFaceEquiv m.+1 n L
       (HL • plus_n_Sm n m.+1)
       (HL2 • plus_n_Sm n.+1 m.+1)
-      dim (leR_eq_r (plus_n_Sm n m.+1) Hd) Hd' ε x).
+      dim (leR_eq_r (plus_n_Sm n m.+1) Hd) Hd' x).
 Qed.
 
 (** Assembly: the [g ∘ f] round trip *)
@@ -177,27 +172,26 @@ Qed.
 Definition gfF0Equiv (n: nat): Equiv (gF0 (f psh) n) (psh.(F0) n) :=
   match n with
   | 0 => fillerEquiv
-      (B := mkFrame (toDepsRestr ((νSetAt 0).(data) tt).(restrFrames)))
+      (B := mkFrame (toDepsRestr ((SSSetAt 0).(data) tt).(restrFrames)))
       (fun _: psh.(F0) 0 => tt)
   | S n => gfEquiv 0 n n.+1
       (f_equal S (plus_n_O n) • plus_n_Sm n 0)
   end.
 
-Lemma gfFaceEquivTop (n q: nat) (Hq: q <= n) (ε: arity)
-  (x: gF0 (f psh) n.+1):
-  gfF0Equiv n ((g (f psh)).(Face) n q Hq ε x) =
-  psh.(Face) n q Hq ε (gfF0Equiv n.+1 x).
+Lemma gfFaceEquivTop (n q: nat) (Hq: q <= n) (x: gF0 (f psh) n.+1):
+  gfF0Equiv n ((g (f psh)).(Face) n q Hq x) =
+  psh.(Face) n q Hq (gfF0Equiv n.+1 x).
 Proof.
   destruct n.
   - unfold gfF0Equiv.
     rewrite (gfEquivIrr 0 0 _
       (f_equal S (plus_n_O 0) • plus_n_Sm 0 0) eq_refl).
-    now exact (gfFaceBottom0 q Hq ε x).
+    now exact (gfFaceBottom0 q Hq x).
   - now exact (gfFaceEquiv 0 n n.+1
       (f_equal S (plus_n_O n) • plus_n_Sm n 0)
       (f_equal S (plus_n_O n.+1) • plus_n_Sm n.+1 0)
       q (leR_eq_r (f_equal S (plus_n_O n) • plus_n_Sm n 0) Hq)
-      Hq ε x).
+      Hq x).
 Qed.
 
 Definition gf: PresheafEquiv (g (f psh)) psh :=
@@ -205,12 +199,4 @@ Definition gf: PresheafEquiv (g (f psh)) psh :=
 
 End RoundTripGF.
 
-End PresheafRoundtripOn.
-
-Module PresheafRoundtrip (A: LayerSig).
-Module Base := νSet.νSet A.
-Include PresheafRoundtripOn A Base.
 End PresheafRoundtrip.
-
-Module PresheafRoundtripSimplicial := PresheafRoundtrip SimplicialLayer.
-Module PresheafRoundtripCubical := PresheafRoundtrip CubicalLayer.

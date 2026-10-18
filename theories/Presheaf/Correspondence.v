@@ -4,34 +4,28 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet.
 From Bonak.Lib Require Import Equiv Univalence.
 From Bonak.Category Require Import Category HSetCat CategoryEq.
-From Bonak.Presheaf Require Import νSemiShape.
+From Bonak.Presheaf Require Import SemiSimplicialShape.
 From Bonak.Presheaf Require Export Roundtrip.
 
 Set Primitive Projections.
 Set Printing Projections.
 
 Section Correspondence.
-Context (A: HSet).
 
 Definition pshEquivFunctor:
-  Equiv (νSetPresentation A) (Functor (Op (νSemiShape A)) HSetCat) :=
-  qinvEquiv (toFunctor A) (ofFunctor A) (ofToFunctor A) (toOfFunctor A).
+  Equiv SSSetPresentation (Functor (Op SemiSimplicialShape) HSetCat) :=
+  qinvEquiv toFunctor ofFunctor ofToFunctor toOfFunctor.
 
 End Correspondence.
 
 (** The set-level correspondence as an equality of types, by univalence. *)
 
-Definition pshEqFunctor (A: HSet):
-  νSetPresentation A = Functor (Op (νSemiShape A)) HSetCat :=
-  ua (pshEquivFunctor A).
+Definition pshEqFunctor:
+  SSSetPresentation = Functor (Op SemiSimplicialShape) HSetCat :=
+  ua pshEquivFunctor.
 
-(** The correspondence at the augmented semi-simplicial and semi-cubical
-    arities, as equalities of types. *)
+(** The correspondence for augmented semi-simplicial sets. *)
 
 Definition simplicialPresheafEqFunctor:
-  AugmentedSemiSimplicialPresentation = Functor (Op (νSemiShape hunit)) HSetCat :=
-  pshEqFunctor hunit.
-
-Definition cubicalPresheafEqFunctor:
-  SemiCubicalPresentation = Functor (Op (νSemiShape hbool)) HSetCat :=
-  pshEqFunctor hbool.
+  AugmentedSemiSimplicialPresentation =
+  Functor (Op SemiSimplicialShape) HSetCat := pshEqFunctor.

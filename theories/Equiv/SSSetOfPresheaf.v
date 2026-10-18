@@ -1,6 +1,6 @@
 (** The forward direction of the correspondence between the fibred
-    presentation ([νSetPresentation]) and the indexed construction ([νSet]):
-    [f: νSetPresentation -> νSets].
+    presentation ([SSSetPresentation]) and the indexed construction ([SSSet]):
+    [f: SSSetPresentation -> SSSets].
 
     The definitions are organized by dependency stage. Each [Psh*] record
     augments the corresponding construction record with presheaf frame maps,
@@ -9,23 +9,22 @@
     proof irrelevance removes dependence on the bound witnesses. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT RewLemmas HSet LeSProp Notation νSet.Layer
-  νSet Face Presheaf.Presentation Equiv.PresheafEquiv Limit.
-
-From Bonak.νSet Require Import νSet.
+From Bonak.Lib Require Import SigT RewLemmas HSet LeSProp Notation Limit.
+From Bonak.SSSet Require Import SSSet.
+From Bonak.Presheaf Require Import Presentation.
+From Bonak.Equiv Require Import Face PresheafEquiv.
 
 Set Primitive Projections.
 Set Printing Projections.
 Set Keyed Unification.
 
-Module νSetOfPresheafOn (A: LayerSig) (S: νSetSig A).
-Import A.
+Module SSSetOfPresheaf.
 
-Module Export Face := Face.FaceOn A S.
-Module Export PshEq := PresheafEquiv.PresheafEquiv A.
+Module Export Face := Bonak.Equiv.Face.Face.
+Module Export PshEq := Bonak.Equiv.PresheafEquiv.PresheafEquiv.
 
-Section νSetOfPresheaf.
-Variable psh: νSetPresentation arity.
+Section SSSetOfPresheaf.
+Variable psh: SSSetPresentation.
 
 (** Presentation-side lists over the staged dependency construction *)
 
@@ -67,11 +66,11 @@ Definition mkPshRestrTypesStep {m p k} {frames: mkFrameTypes p.+1 k}
   (prevPsh: PshRestrBlock m pshFrames.1 prev)
   (R: mkRestrFrameTypesStep frames prev): Type :=
   { Q: prevPsh.(PshRestrTypesDef) R.1 &T
-    forall q (Hq: q <= k) (Hqp: q + p <= m) (ε: arity) (d: psh.(F0) m.+1),
-      pshFrames.2 (psh.(Face) m (q + p) Hqp ε d) =
-      R.2 q Hq ε ((prevPsh.(PshFramesDef) Q).2 d) }.
+    forall q (Hq: q <= k) (Hqp: q + p <= m) (d: psh.(F0) m.+1),
+      pshFrames.2 (psh.(Face) m (q + p) Hqp d) =
+      R.2 q Hq ((prevPsh.(PshFramesDef) Q).2 d) }.
 
-(** The presheaf layer: the level-m painting at the ε-face, transported
+(** The presheaf layer: the level-m painting at the zero face, transported
     along the diagonal restr coherence *)
 
 Definition mkPshLayer {m p k} {frames: mkFrameTypes p.+1 k}
@@ -84,9 +83,8 @@ Definition mkPshLayer {m p k} {frames: mkFrameTypes p.+1 k}
   (Q: mkPshRestrTypesStep pshFrames prevPsh R)
   (Hp: p <= m) (d: psh.(F0) m.+1):
   mkLayer (paintings := paintings) R ((prevPsh.(PshFramesDef) Q.1).2 d) :=
-  lam (fun ε =>
-    rew [paintings.2] Q.2 0 leR_O Hp ε d in
-    pshPaintings.2 (psh.(Face) m p Hp ε d)).
+  rew [paintings.2] Q.2 0 leR_O Hp d in
+  pshPaintings.2 (psh.(Face) m p Hp d).
 
 Fixpoint mkPshRestrTypesAndFrames (m: nat) {p k}:
   forall (Hp: p <= m.+1)
@@ -212,8 +210,8 @@ Definition mkPshPaintings {m p k} {P: PshDepsRestr m p k}
     bound needs an equational form. *)
 
 Lemma pshFaceDimIrr {n q q'} (e: q = q') {Hq: q <= n} {Hq': q' <= n}
-  (ε: arity) (X: psh.(F0) n.+1):
-  psh.(Face) n q Hq ε X = psh.(Face) n q' Hq' ε X.
+  (X: psh.(F0) n.+1):
+  psh.(Face) n q Hq X = psh.(Face) n q' Hq' X.
 Proof.
   now destruct e.
 Qed.
@@ -226,10 +224,10 @@ Qed.
 Definition mkPshRestrPaintingType {m p k} (P: PshDepsRestr m p.+1 k)
   {X: DepsRestrExtension p.+1 k P.(_pdeps)} (PX: PshDepsExtension m P X)
   (restrPaintings: mkRestrPaintingTypes X): Type :=
-  forall q (Hq: q <= k) (Hqp: q + p <= m) (ε: arity) (d: psh.(F0) m.+1),
-  rew [P.(_pdeps).(_paintings).2] P.(_pshRestrs).2 q Hq Hqp ε d in
-    P.(_pshPaintings).2 (psh.(Face) m (q + p) Hqp ε d) =
-  restrPaintings.2 q Hq ε (mkPshFrame (proj1PshDepsRestr P) d)
+  forall q (Hq: q <= k) (Hqp: q + p <= m) (d: psh.(F0) m.+1),
+  rew [P.(_pdeps).(_paintings).2] P.(_pshRestrs).2 q Hq Hqp d in
+    P.(_pshPaintings).2 (psh.(Face) m (q + p) Hqp d) =
+  restrPaintings.2 q Hq (mkPshFrame (proj1PshDepsRestr P) d)
     (mkPshPainting (AddPshDep P PX) d).
 
 Fixpoint mkPshRestrPaintingTypes {m p k}:
@@ -294,8 +292,7 @@ Definition mkPshFramesNext {m p k} (PC: PshDepsCohs m p k)
 
 (** The next-level restriction coherences
 
-    In the layer case ([mkPshRestrLayer]), componentwise equality ([ext])
-    reduces the goal to a transport chain. Restricting the presheaf layer
+    In the layer case ([mkPshRestrLayer]), restricting the presheaf layer
     gives the presheaf painting at the exchanged face pair.
     [FaceCoh] on the presheaf side matches the stored
     coherence [_pCohs] on the construction side, and the two transport
@@ -304,39 +301,33 @@ Definition mkPshFramesNext {m p k} (PC: PshDepsCohs m p k)
 
 Lemma mkPshRestrLayer {m p k} (PC: PshDepsCohs m p.+1 k)
   (Q: mkPshRestrFramesType (proj1PshDepsCohs PC))
-  q (Hq: q <= k) (Hqp: q.+1 + p <= m.+1) (ε: arity) (d: psh.(F0) m.+2):
+  q (Hq: q <= k) (Hqp: q.+1 + p <= m.+1) (d: psh.(F0) m.+2):
   rew [mkLayer PC.(_pshDeps).(_pdeps).(_restrFrames)]
-      (Q.2 q.+1 (⇑ Hq) Hqp ε d) in
+      (Q.2 q.+1 (⇑ Hq) Hqp d) in
     mkPshLayer PC.(_pshDeps).(_pshPaintings) PC.(_pshDeps).(_pshRestrs)
-      (⇓ PC.(_pshDeps).(_pshBound)) (psh.(Face) m.+1 (q.+1 + p) Hqp ε d)
-  = mkRestrLayer PC.(_pRestrPaintings) PC.(_pCohs) q Hq ε
+      (⇓ PC.(_pshDeps).(_pshBound)) (psh.(Face) m.+1 (q.+1 + p) Hqp d)
+  = mkRestrLayer PC.(_pRestrPaintings) PC.(_pCohs) q Hq
       ((mkPshFramesNext (proj1PshDepsCohs PC) Q).2 d).1
       ((mkPshFramesNext (proj1PshDepsCohs PC) Q).2 d).2.
 Proof.
-  apply ext; intros ω.
-  rewrite <- (map_subst (P := mkLayer _) (fun x l => nth l ω)
-    (Q.2 q.+1 (⇑ Hq) Hqp ε d)).
-  unfold mkPshLayer at 1.
-  rewrite nth_lam.
+  unfold mkPshLayer.
   unfold mkRestrLayer.
-  rewrite nth_lmap.
-  rewrite nth_lam.
   rewrite <- map_subst with
-    (f := fun x => PC.(_pRestrPaintings).2 q Hq ε x).
-  rewrite <- (PC.(_pshRestrPaintings).2 q Hq (⇓ Hqp) ε
+    (f := fun x => PC.(_pRestrPaintings).2 q Hq x).
+  rewrite <- (PC.(_pshRestrPaintings).2 q Hq (⇓ Hqp)
     (psh.(Face) m.+1 p
-      (⇓ (⇑ (proj1PshDepsCohs PC).(_pshDeps).(_pshBound))) ω d)).
+      (⇓ (⇑ (proj1PshDepsCohs PC).(_pshDeps).(_pshBound))) d)).
   rewrite <- (f_equal_dep _ PC.(_pshDeps).(_pshPaintings).2
-    (psh.(FaceCoh) m (q + p) (⇓ Hqp) p (leR_add_l q) ε ω d)).
+    (psh.(FaceCoh) m (q + p) (⇓ Hqp) p (leR_add_l q) d)).
   eapply (rew_cohLayer_hex
     (P := fun x => PC.(_pshDeps).(_pdeps).(_paintings).2 x)
-    (rf0 := fun x => PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O ω x)
+    (rf0 := fun x => PC.(_pshDeps).(_pdeps).(_restrFrames).2 0 leR_O x)
     (rfF := fun x => PC.(_pshDeps).(_pshFrames).2 x)
-    (rfG := fun x => PC.(_pshDeps).(_pdeps).(_restrFrames).2 q Hq ε x)
+    (rfG := fun x => PC.(_pshDeps).(_pdeps).(_restrFrames).2 q Hq x)
     (S2 := fun m => PC.(_pshDeps).(_pdeps).(_paintings).2
       (PC.(_pshDeps).(_pshFrames).2 m))
     (S3 := fun n => PC.(_pshDeps).(_pdeps).(_paintings).2
-      (PC.(_pshDeps).(_pdeps).(_restrFrames).2 q Hq ε n))
+      (PC.(_pshDeps).(_pdeps).(_restrFrames).2 q Hq n))
     (F := fun _ a => a) (G := fun _ a => a)).
   now trivial.
   now apply PC.(_pshDeps).(_pdeps).(_frames).2.(UIP).
@@ -348,24 +339,24 @@ Qed.
 
 Lemma mkPshRestrFrameStep {m p k} (PC: PshDepsCohs m p.+1 k)
   (Q: mkPshRestrFramesType (proj1PshDepsCohs PC))
-  q (Hq: q <= k) (Hqp: q + p.+1 <= m.+1) (ε: arity) (d: psh.(F0) m.+2):
-  mkPshFrame PC.(_pshDeps) (psh.(Face) m.+1 (q + p.+1) Hqp ε d) =
-  (mkRestrFrames (depsCohs := pshDepsCohs PC)).2 q Hq ε
+  q (Hq: q <= k) (Hqp: q + p.+1 <= m.+1) (d: psh.(F0) m.+2):
+  mkPshFrame PC.(_pshDeps) (psh.(Face) m.+1 (q + p.+1) Hqp d) =
+  (mkRestrFrames (depsCohs := pshDepsCohs PC)).2 q Hq
     ((mkPshFramesNext (proj1PshDepsCohs PC) Q).2 d).
 Proof.
   etransitivity.
   - now exact (f_equal (mkPshFrame PC.(_pshDeps))
       (pshFaceDimIrr (eq_sym (plus_n_Sm q p))
-        (Hq' := leR_add_shift Hqp) ε d)).
+        (Hq' := leR_add_shift Hqp) d)).
   - now exact (eq_existT_curried
-      (Q.2 q.+1 (⇑ Hq) (leR_add_shift Hqp) ε d)
-      (mkPshRestrLayer PC Q q Hq (leR_add_shift Hqp) ε d)).
+      (Q.2 q.+1 (⇑ Hq) (leR_add_shift Hqp) d)
+      (mkPshRestrLayer PC Q q Hq (leR_add_shift Hqp) d)).
 Qed.
 
 Fixpoint mkPshRestrFrames {m p k} (PC: PshDepsCohs m p k) {struct p}:
   mkPshRestrFramesType PC :=
   match p return forall (PC: PshDepsCohs m p k), mkPshRestrFramesType PC with
-  | 0 => fun PC => (tt; fun q Hq Hqp ε d => eq_refl)
+  | 0 => fun PC => (tt; fun q Hq Hqp d => eq_refl)
   | S p => fun PC =>
       (mkPshRestrFrames (proj1PshDepsCohs PC);
        mkPshRestrFrameStep PC (mkPshRestrFrames (proj1PshDepsCohs PC)))
@@ -424,41 +415,41 @@ Fixpoint mkPshExtraDeps {m p k} {PC: PshDepsCohs m p k}
 Fixpoint mkPshRestrPainting {m p k} {PC: PshDepsCohs m p k}
   {XC: DepsCohsExtension p k (pshDepsCohs PC)}
   (PCX: PshDepsCohsExtension m PC XC) q {struct q}:
-  forall (Hq: q <= k) (Hqp: q + p <= m.+1) (ε: arity) (d: psh.(F0) m.+2),
+  forall (Hq: q <= k) (Hqp: q + p <= m.+1) (d: psh.(F0) m.+2),
   rew [(mkDepsRestr (depsCohs := pshDepsCohs PC)).(_paintings).2]
-      (mkPshRestrFrames PC).2 q Hq Hqp ε d in
-    mkPshPainting PC.(_pshExtraDeps) (psh.(Face) m.+1 (q + p) Hqp ε d) =
-  (mkRestrPaintings XC).2 q Hq ε
+      (mkPshRestrFrames PC).2 q Hq Hqp d in
+    mkPshPainting PC.(_pshExtraDeps) (psh.(Face) m.+1 (q + p) Hqp d) =
+  (mkRestrPaintings XC).2 q Hq
     (mkPshFrame (proj1PshDepsRestr (mkPshDepsRestr PC)) d)
     (mkPshPainting (AddPshDep (mkPshDepsRestr PC) (mkPshExtraDeps PCX)) d).
 Proof.
   destruct q; intros.
-  - now exact (eq_sym (nth_lam _ ε)).
+  - now reflexivity.
   - destruct PCX as [| p' k' PC' XC' PCX'].
     + now destruct (leR_O_contra Hq).
     + unshelve eapply (eq_existT_curried_dep
         (Q := mkPainting PC'.(_pExtraDeps))).
       * now exact (mkPshRestrLayer PC'
-          (mkPshRestrFrames (proj1PshDepsCohs PC')) q (⇓ Hq) Hqp ε d).
+          (mkPshRestrFrames (proj1PshDepsCohs PC')) q (⇓ Hq) Hqp d).
       * etransitivity.
         2: now exact (mkPshRestrPainting m p'.+1 k' PC' XC' PCX' q (⇓ Hq)
-             (leR_eq (plus_n_Sm q p') Hqp) ε d).
+             (leR_eq (plus_n_Sm q p') Hqp) d).
         apply (rew_align
           (P := fun x => mkPainting PC'.(_pExtraDeps) x)
           (f_equal (mkPshFrame PC'.(_pshDeps))
             (pshFaceDimIrr (plus_n_Sm q p') (Hq := Hqp)
-              (Hq' := leR_eq (plus_n_Sm q p') Hqp) ε d))).
+              (Hq' := leR_eq (plus_n_Sm q p') Hqp) d))).
         { now exact (eq_trans
             (eq_sym (rew_map
               (fun a => mkPainting PC'.(_pExtraDeps) a)
               (mkPshFrame PC'.(_pshDeps))
               (pshFaceDimIrr (plus_n_Sm q p') (Hq := Hqp)
-                (Hq' := leR_eq (plus_n_Sm q p') Hqp) ε d)
+                (Hq' := leR_eq (plus_n_Sm q p') Hqp) d)
               (mkPshPainting PC'.(_pshExtraDeps)
-                (psh.(Face) m.+1 (q.+1 + p') Hqp ε d))))
+                (psh.(Face) m.+1 (q.+1 + p') Hqp d))))
             (f_equal_dep _ (mkPshPainting PC'.(_pshExtraDeps))
               (pshFaceDimIrr (plus_n_Sm q p') (Hq := Hqp)
-                (Hq' := leR_eq (plus_n_Sm q p') Hqp) ε d))). }
+                (Hq' := leR_eq (plus_n_Sm q p') Hqp) d))). }
         now apply (mkFrame PC'.(_pshDeps).(_pdeps)).(UIP).
 Defined.
 
@@ -498,9 +489,9 @@ Definition mkPshRestrPaintings {m p k} {PC: PshDepsCohs m p k}
     [pshDepsCohs] is a [DepsCohsChain] (definitionally, since [pshDepsCohs]
     commutes with the projections). Along such a chain, the [getFrame]/
     [getPainting] operations of [Face.v] compute on presheaf-built frames and
-    paintings ([pshGetFrame], [pshGetPainting]), and [νFace] computes on
-    candidate-built frames ([pshνFace]) — the key computation of the [g ∘ f]
-    round trip. *)
+    paintings ([pshGetFrame], [pshGetPainting]), and [ssFace] computes on
+    candidate-built frames ([pshSSFace]), identifying their faces with the
+    original presheaf faces. *)
 
 Inductive PshCohsChain {m P K} (PCTop: PshDepsCohs m P K):
   forall {p k}, PshDepsCohs m p k -> Type :=
@@ -546,27 +537,26 @@ Proof.
   induction C; [now reflexivity | now exact IHC].
 Qed.
 
-(** The [ε]-face of a candidate-built cell is the
-    candidate-built cell of the [ε]-face — one application of the stored
+(** A face of a candidate-built cell is the
+    candidate-built cell of the corresponding face — one application of the stored
     restr coherence, cancelled against the layer's transport. *)
 
-Lemma pshνFace {m P K} {PCTop: PshDepsCohs m P K}
+Lemma pshSSFace {m P K} {PCTop: PshDepsCohs m P K}
   {p k} {PC: PshDepsCohs m p k} (C: PshCohsChain PCTop PC)
-  (Hp: p <= m.+1) (ε: arity) (d: psh.(F0) m.+2):
-  νFace (pshCohsChainCohs C) ε (mkPshFrame (mkPshDepsRestr PCTop) d) =
-  (mkPshFrame PCTop.(_pshDeps) (psh.(Face) m.+1 p Hp ε d);
-   mkPshPainting PCTop.(_pshExtraDeps) (psh.(Face) m.+1 p Hp ε d)).
+  (Hp: p <= m.+1) (d: psh.(F0) m.+2):
+  ssFace (pshCohsChainCohs C) (mkPshFrame (mkPshDepsRestr PCTop) d) =
+  (mkPshFrame PCTop.(_pshDeps) (psh.(Face) m.+1 p Hp d);
+   mkPshPainting PCTop.(_pshExtraDeps) (psh.(Face) m.+1 p Hp d)).
 Proof.
-  unfold νFace.
+  unfold ssFace.
   rewrite pshGetFrame.
-  rewrite nth_lam.
   refine (f_equal (fun z: {d0: mkFrame PC.(_pshDeps).(_pdeps) &T
       mkPainting PC.(_pExtraDeps) d0} =>
     getPainting (cohsChainExt (pshCohsChainCohs C)) z.1 z.2)
     (eq_existT_curried
-      (eq_sym ((mkPshRestrFrames PC).2 0 leR_O Hp ε d))
+      (eq_sym ((mkPshRestrFrames PC).2 0 leR_O Hp d))
       (rew_sym_cancel _ _)) • _).
-  now exact (pshGetPainting C (psh.(Face) m.+1 p Hp ε d)).
+  now exact (pshGetPainting C (psh.(Face) m.+1 p Hp d)).
 Qed.
 
 (** The tower and the final construction
@@ -576,10 +566,10 @@ Qed.
     needed by [towerPshDepsCohs], and [towerStep] constructs the state at
     the candidate extension. *)
 
-Definition mkTowerDeps {m} (X: (νSetAt m.+1).(prefix)): DepsRestr m.+1 0 :=
-  toDepsRestr ((νSetAt m.+1).(data) X).(restrFrames).
+Definition mkTowerDeps {m} (X: (SSSetAt m.+1).(prefix)): DepsRestr m.+1 0 :=
+  toDepsRestr ((SSSetAt m.+1).(data) X).(restrFrames).
 
-Class PshTower (m: nat) (X: (νSetAt m.+1).(prefix)) := {
+Class PshTower (m: nat) (X: (SSSetAt m.+1).(prefix)) := {
   _twFrames: mkPshFrameTypes m (mkTowerDeps X).(_frames);
   _twPaintings: mkPshPaintingTypes m _twFrames (mkTowerDeps X).(_paintings);
   _twRestrs: (mkPshRestrTypesAndFrames m leR_refl _twFrames
@@ -599,7 +589,7 @@ Definition towerPshDeps {m X} (T: PshTower m X): PshDepsRestr m m.+1 0 := {|
 
 Definition PshTowerRestrPaintings {m X} (T: PshTower m X): Type :=
   mkPshRestrPaintingTypes (towerPshDeps T) TopPshDep
-    (((νSetAt m.+1).(data) X).(restrPaintings)
+    (((SSSetAt m.+1).(data) X).(restrPaintings)
       (mkPshFiller (towerPshDeps T))).
 
 Definition towerPshDepsCohs {m X} (T: PshTower m X)
@@ -607,14 +597,14 @@ Definition towerPshDepsCohs {m X} (T: PshTower m X)
   _pshDeps := towerPshDeps T;
   _pExtraDeps := TopRestrDep (mkPshFiller (towerPshDeps T));
   _pshExtraDeps := TopPshDep;
-  _pRestrPaintings := ((νSetAt m.+1).(data) X).(restrPaintings)
+  _pRestrPaintings := ((SSSetAt m.+1).(data) X).(restrPaintings)
     (mkPshFiller (towerPshDeps T));
   _pshRestrPaintings := rp;
-  _pCohs := ((νSetAt m.+1).(data) X).(cohFrames)
+  _pCohs := ((SSSetAt m.+1).(data) X).(cohFrames)
     (mkPshFiller (towerPshDeps T));
 |}.
 
-(** The level step corresponding to [mkνSetData]: every field is one of the
+(** The level step corresponding to [mkSSSetData]: every field is one of the
     rebuilt data above, taken at the candidate extension *)
 
 Definition towerStep {m X} (T: PshTower m X) (rp: PshTowerRestrPaintings T):
@@ -634,7 +624,7 @@ Definition towerStepRestrPaintings {m X} (T: PshTower m X)
     [unit] prefixes and constant frame maps. *)
 
 Definition pshFiller0:
-  mkFrame (toDepsRestr ((νSetAt 0).(data) tt).(restrFrames)) -> HSet :=
+  mkFrame (toDepsRestr ((SSSetAt 0).(data) tt).(restrFrames)) -> HSet :=
   fun D => {d': psh.(F0) 0 & hEq D tt}.
 
 Definition tower1: PshTower 0 (tt; pshFiller0).
@@ -642,15 +632,15 @@ Proof.
   unshelve esplit.
   - now exact (tt; fun _ => tt).
   - now exact (tt; fun d => (d; eq_refl)).
-  - now exact (tt; fun q Hq Hqp ε d => eq_refl).
+  - now exact (tt; fun q Hq Hqp d => eq_refl).
 Defined.
 
 Definition tower1RestrPaintings: PshTowerRestrPaintings tower1.
 Proof.
   unshelve esplit.
   - now exact tt.
-  - intros q Hq Hqp ε d. destruct q.
-    + cbn. now rewrite nth_lam.
+  - intros q Hq Hqp d. destruct q.
+    + now reflexivity.
     + now destruct (leR_O_contra Hq).
 Defined.
 
@@ -661,28 +651,28 @@ Defined.
     [this] and [next] of the resulting tower compute to the candidate
     filler and to the tower one level up. *)
 
-Definition PshState (l: nat): (νSetAt l).(prefix) -> Type :=
+Definition PshState (l: nat): (SSSetAt l).(prefix) -> Type :=
   match l with
   | 0 => fun _ => unit
   | l.+1 => fun X => {T: PshTower l X &T PshTowerRestrPaintings T}
   end.
 
 Definition pshExtend (l: nat):
-  forall (X: (νSetAt l).(prefix)), PshState l X ->
+  forall (X: (SSSetAt l).(prefix)), PshState l X ->
   {E: mkExtensionType X &T PshState l.+1 (X; E)} :=
-  match l return forall X: (νSetAt l).(prefix), PshState l X ->
+  match l return forall X: (SSSetAt l).(prefix), PshState l X ->
     {E: mkExtensionType X &T PshState l.+1 (X; E)} with
   | 0 => fun X =>
     match X as X0 return PshState 0 X0 ->
-      {E: mkExtensionType (X0: (νSetAt 0).(prefix)) &T
-       PshState 1 ((X0: (νSetAt 0).(prefix)); E)} with
+      {E: mkExtensionType (X0: (SSSetAt 0).(prefix)) &T
+       PshState 1 ((X0: (SSSetAt 0).(prefix)); E)} with
     | tt => fun _ => (pshFiller0; (tower1; tower1RestrPaintings))
     end
   | l.+1 => fun X s => (mkPshFiller (towerPshDeps s.1);
       (towerStep s.1 s.2; towerStepRestrPaintings s.1 s.2))
   end.
 
-Fixpoint pshChain (l: nat): {X: (νSetAt l).(prefix) &T PshState l X} :=
+Fixpoint pshChain (l: nat): {X: (SSSetAt l).(prefix) &T PshState l X} :=
   match l with
   | 0 => (tt; tt)
   | l.+1 =>
@@ -691,7 +681,7 @@ Fixpoint pshChain (l: nat): {X: (νSetAt l).(prefix) &T PshState l X} :=
     ((s.1; e.1); e.2)
   end.
 
-Definition pshApprox (l: nat): (νSetAt l).(prefix) := (pshChain l).1.
+Definition pshApprox (l: nat): (SSSetAt l).(prefix) := (pshChain l).1.
 
 Definition pshTw (m: nat): PshTower m (pshApprox m.+1) := (pshChain m.+1).2.1.
 
@@ -701,22 +691,14 @@ Definition pshTwRp (m: nat): PshTowerRestrPaintings (pshTw m) :=
 (** [pshApprox] is definitionally coherent, so its bonding proof is
     reflexivity. *)
 
-Definition pshFrom (n: nat): νSetFrom n (pshApprox n) :=
-  ofChain (T := νSetTel) pshApprox (fun _ => eq_refl) n.
+Definition pshFrom (n: nat): SSSetFrom n (pshApprox n) :=
+  ofChain (T := SSSetTel) pshApprox (fun _ => eq_refl) n.
 
-Definition f: νSets := pshFrom 0.
+Definition f: SSSets := pshFrom 0.
 
-End νSetOfPresheaf.
+End SSSetOfPresheaf.
 
 Arguments PshCohsChainNil {psh m P K PCTop}.
 Arguments PshCohsChainCons {psh m P K PCTop p k PC} _.
 
-End νSetOfPresheafOn.
-
-Module νSetOfPresheaf (A: LayerSig).
-Module Base := νSet.νSet A.
-Include νSetOfPresheafOn A Base.
-End νSetOfPresheaf.
-
-Module νSetOfPresheafSimplicial := νSetOfPresheaf SimplicialLayer.
-Module νSetOfPresheafCubical := νSetOfPresheaf CubicalLayer.
+End SSSetOfPresheaf.

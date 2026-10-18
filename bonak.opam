@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "bonak"
-synopsis: "An indexed construction of semi-simplicial and semi-cubical types"
+synopsis: "Indexed constructions of semi-simplicial sets and higher groupoids"
 maintainer: "Ramkumar Ramachandra <r@artagnon.com>"
 authors: [ "Ramkumar Ramachandra <r@artagnon.com>"
           "Hugo Herbelin <hugo.herbelin@inria.fr>" ]

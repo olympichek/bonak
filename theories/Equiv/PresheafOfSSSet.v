@@ -1,67 +1,64 @@
 (** The backward direction of the correspondence between the fibred
-    presentation ([νSetPresentation]) and the indexed construction ([νSet]):
-    [g: νSets -> νSetPresentation].
+    presentation ([SSSetPresentation]) and the indexed construction ([SSSet]):
+    [g: SSSets -> SSSetPresentation].
 
     The presheaf reads off the tower directly: the total spaces of the
-    ω-limit tower as [F0], [νFace] as the face maps, and [νFaceCoh]
+    ω-limit tower as [F0], [ssFace] as the face maps, and [ssFaceCoh]
     as the exchange law. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT HSet LeSProp NatLemmas Notation νSet.Layer
-  νSet Face Presheaf.Presentation Equiv.νSetOfPresheaf Limit.
-
-From Bonak.νSet Require Import νSet.
+From Bonak Require Import SigT HSet LeSProp NatLemmas Notation SSSet.SSSet
+  Equiv.Face Presheaf.Presentation Equiv.SSSetOfPresheaf Limit.
 
 Set Primitive Projections.
 Set Printing Projections.
 Set Keyed Unification.
 
-Module PresheafOfνSetOn (A: LayerSig) (S: νSetSig A).
-Import A.
+Module PresheafOfSSSet.
 
-Module Export νSetOfPresheaf := νSetOfPresheaf.νSetOfPresheafOn A S.
+Module Export SSSetOfPresheaf := Bonak.Equiv.SSSetOfPresheaf.SSSetOfPresheaf.
 
 (** The tower data at a position
 
-    [νSetFrom m Xpre] holds the fillers of all levels [>= m] over the prefix
-    [Xpre]. The [νSetData] at the position ([νDataAt], from [νSetEquiv.v]),
+    [SSSetFrom m Xpre] holds the fillers of all levels [>= m] over the prefix
+    [Xpre]. The [SSSetData] at the position ([ssDataAt], from [SSSetEquiv.v]),
     together with the current and next fillers, assembles the
     [DepsCohs]/[DepsCohs2] that the face operations of [Face.v] consume;
     [mkDepsCohs] of the latter is definitionally the former one level up. *)
 
-Definition νDepsCohsAt {m} {Xpre: (νSetAt m).(prefix)}
-  (X: νSetFrom m Xpre): DepsCohs m 0 := {|
-  _deps := toDepsRestr (νDataAt Xpre).(restrFrames);
+Definition ssDepsCohsAt {m} {Xpre: (SSSetAt m).(prefix)}
+  (X: SSSetFrom m Xpre): DepsCohs m 0 := {|
+  _deps := toDepsRestr (ssDataAt Xpre).(restrFrames);
   _extraDeps := TopRestrDep (this X);
-  _restrPaintings := (νDataAt Xpre).(restrPaintings) (this X);
-  _cohs := (νDataAt Xpre).(cohFrames) (this X);
+  _restrPaintings := (ssDataAt Xpre).(restrPaintings) (this X);
+  _cohs := (ssDataAt Xpre).(cohFrames) (this X);
 |}.
 
-Definition νDepsCohs2At {m} {Xpre: (νSetAt m).(prefix)}
-  (X: νSetFrom m Xpre): DepsCohs2 m 0 := {|
-  _depsCohs := νDepsCohsAt X;
+Definition ssDepsCohs2At {m} {Xpre: (SSSetAt m).(prefix)}
+  (X: SSSetFrom m Xpre): DepsCohs2 m 0 := {|
+  _depsCohs := ssDepsCohsAt X;
   _extraDepsCohs := TopCohDep (this (next X));
-  _cohPaintings := (νDataAt Xpre).(cohPaintings) (this X)
+  _cohPaintings := (ssDataAt Xpre).(cohPaintings) (this X)
     (this (next X));
 |}.
 
-Definition νTotal {m} {Xpre: (νSetAt m).(prefix)} (X: νSetFrom m Xpre):
+Definition ssTotal {m} {Xpre: (SSSetAt m).(prefix)} (X: SSSetFrom m Xpre):
   HSet :=
-  {D: mkFrame (toDepsRestr (νDataAt Xpre).(restrFrames)) & (this X) D}.
+  {D: mkFrame (toDepsRestr (ssDataAt Xpre).(restrFrames)) & (this X) D}.
 
 (** [F0]: the total spaces down the tower *)
 
-Fixpoint gF0 {m} {Xpre: (νSetAt m).(prefix)} (X: νSetFrom m Xpre)
+Fixpoint gF0 {m} {Xpre: (SSSetAt m).(prefix)} (X: SSSetFrom m Xpre)
   (n: nat): HSet :=
   match n with
-  | 0 => νTotal X
+  | 0 => ssTotal X
   | S n => gF0 (next X) n
   end.
 
 (** Chain synthesis
 
     [Face.v]'s operations take chains, which carry the number of stages to
-    descend. The [νSetPresentation] interface supplies only an SProp bound [q <= n], and
+    descend. The [SSSetPresentation] interface supplies only an SProp bound [q <= n], and
     nothing can be extracted from it. So [g] synthesizes the chains from the
     fuel [level - dim]: [chain2Down] descends a [DepsCohs2Chain] from a top
     [DepsCohs2] by [j] stages (stalling at stage 0), packaged with its endpoint. *)
@@ -111,34 +108,34 @@ Definition dc2PackCohs {P K} {T: DepsCohs2 P K} (s: Chain2Pack T):
   DCPack (mkDepsCohs T) :=
   (s.1.+1; (s.2.1; (mkDepsCohs s.2.2.1; cohs2ChainCohs s.2.2.2))).
 
-(** The face at the bottom of the relative descent: [νFace] along the
+(** The face at the bottom of the relative descent: [ssFace] along the
     lower image of the synthesized chain — its result type does not
     depend on the chain's endpoint. Erases dimension [m - j]. *)
 
-Definition νFaceFuel {m} {Xpre: (νSetAt m).(prefix)} (X: νSetFrom m Xpre)
-  (j: nat) (ε: arity) (d: νTotal (next X)): νTotal X :=
-  νFace ((dc2PackDeps (chain2Down (νDepsCohs2At X) j)).2.2.2) ε d.1.
+Definition ssFaceFuel {m} {Xpre: (SSSetAt m).(prefix)} (X: SSSetFrom m Xpre)
+  (j: nat) (d: ssTotal (next X)): ssTotal X :=
+  ssFace ((dc2PackDeps (chain2Down (ssDepsCohs2At X) j)).2.2.2) d.1.
 
-(** The face maps: relative descent, then [νFaceFuel] *)
+(** The face maps: relative descent, then [ssFaceFuel] *)
 
-Fixpoint gFace {m} {Xpre: (νSetAt m).(prefix)} (X: νSetFrom m Xpre)
+Fixpoint gFace {m} {Xpre: (SSSetAt m).(prefix)} (X: SSSetFrom m Xpre)
   (n: nat) {struct n}:
-  forall (dim: nat), dim <= n + m -> arity -> gF0 X n.+1 -> gF0 X n :=
+  forall (dim: nat), dim <= n + m -> gF0 X n.+1 -> gF0 X n :=
   match n return
-    forall (dim: nat), dim <= n + m -> arity -> gF0 X n.+1 -> gF0 X n with
-  | 0 => fun dim Hdim ε d => νFaceFuel X (m - dim) ε d
-  | S n => fun dim Hdim ε d =>
-      gFace (next X) n dim (leR_eq_r (plus_n_Sm n m) Hdim) ε d
+    forall (dim: nat), dim <= n + m -> gF0 X n.+1 -> gF0 X n with
+  | 0 => fun dim Hdim d => ssFaceFuel X (m - dim) d
+  | S n => fun dim Hdim d =>
+      gFace (next X) n dim (leR_eq_r (plus_n_Sm n m) Hdim) d
   end.
 
 (** The exchange law
 
-    [νFaceCoh] is stated over chains; the synthesized fuels are aligned
+    [ssFaceCoh] is stated over chains; the synthesized fuels are aligned
     with its chain forms by the package algebra below: packages compose
     ([chain2DownCat]), stages track the fuel ([chain2DownStage]), and —
     the crux — the level-[m.+1] synthesized chain is the [cohs2ChainCohs]
     image of the level-[m] one, for fuels within bound ([packLevelCross],
-    resting on [νDepsCohsAt (X.(next)) ≡ mkDepsCohs (νDepsCohs2At X)]). *)
+    resting on [ssDepsCohsAt (X.(next)) ≡ mkDepsCohs (ssDepsCohs2At X)]). *)
 
 Definition chain2Cat {P K} {T: DepsCohs2 P K} (s1: Chain2Pack T)
   (s2: Chain2Pack s1.2.2.1): Chain2Pack T :=
@@ -187,75 +184,67 @@ Proof.
   - cbn. now rewrite IHj2, chain2CatStep.
 Qed.
 
-Lemma packLevelCross {m} {Xpre: (νSetAt m).(prefix)} (X: νSetFrom m Xpre)
+Lemma packLevelCross {m} {Xpre: (SSSetAt m).(prefix)} (X: SSSetFrom m Xpre)
   (j: nat) (Hj: j <= m):
-  dc2PackDeps (chain2Down (νDepsCohs2At (next X)) j) =
-  dc2PackCohs (chain2Down (νDepsCohs2At X) j).
+  dc2PackDeps (chain2Down (ssDepsCohs2At (next X)) j) =
+  dc2PackCohs (chain2Down (ssDepsCohs2At X) j).
 Proof.
   revert Hj; induction j; intro Hj.
   - now reflexivity.
   - rewrite dc2PackDepsStep, (IHj (↓ Hj)).
     symmetry.
-    now exact (dc2PackCohsStep (chain2Down (νDepsCohs2At X) j) (m - j.+1)
-      (chain2DownStage (νDepsCohs2At X) j • subPos Hj)).
+    now exact (dc2PackCohsStep (chain2Down (ssDepsCohs2At X) j) (m - j.+1)
+      (chain2DownStage (ssDepsCohs2At X) j • subPos Hj)).
 Qed.
 
 (** The exchange law at the bottom of the relative descent: after fuel
-    arithmetic and package alignment, this is exactly [νFaceCoh]. *)
+    arithmetic and package alignment, this is exactly [ssFaceCoh]. *)
 
-Lemma νFaceFuelCoh {m} {Xpre: (νSetAt m).(prefix)} (X: νSetFrom m Xpre)
-  (q: nat) (Hq: q <= m) (r: nat) (Hr: r <= q) (ε ω: arity)
-  (d: νTotal (next (next X))):
-  νFaceFuel X (m - q) ε (νFaceFuel (next X) (m.+1 - r) ω d) =
-  νFaceFuel X (m - r) ω (νFaceFuel (next X) (m - q) ε d).
+Lemma ssFaceFuelCoh {m} {Xpre: (SSSetAt m).(prefix)} (X: SSSetFrom m Xpre)
+  (q: nat) (Hq: q <= m) (r: nat) (Hr: r <= q)
+  (d: ssTotal (next (next X))):
+  ssFaceFuel X (m - q) (ssFaceFuel (next X) (m.+1 - r) d) =
+  ssFaceFuel X (m - r) (ssFaceFuel (next X) (m - q) d).
 Proof.
-  unfold νFaceFuel.
+  unfold ssFaceFuel.
   rewrite (subSuccL (Hr ↕ Hq)).
   rewrite (subSplit Hr Hq).
   rewrite (packLevelCross X (m - q) (sub_leR m q)).
   rewrite dc2PackDepsStep.
   rewrite (packLevelCross X ((q - r) + (m - q))
     (leR_eq (subSplit Hr Hq) (sub_leR m r))).
-  rewrite (chain2DownCat (νDepsCohs2At X) (m - q) (q - r)).
-  now exact (νFaceCoh
-    ((chain2Down (νDepsCohs2At X) (m - q)).2.2.2)
-    ((chain2Down (chain2Down (νDepsCohs2At X) (m - q)).2.2.1 (q - r)).2.2.2)
-    ε ω d.1).
+  rewrite (chain2DownCat (ssDepsCohs2At X) (m - q) (q - r)).
+  now exact (ssFaceCoh
+    ((chain2Down (ssDepsCohs2At X) (m - q)).2.2.2)
+    ((chain2Down (chain2Down (ssDepsCohs2At X) (m - q)).2.2.1 (q - r)).2.2.2)
+    d.1).
 Qed.
 
 (** The relative descent of the exchange law corresponding to [gFace] *)
 
-Fixpoint gFaceCoh {m} {Xpre: (νSetAt m).(prefix)} (X: νSetFrom m Xpre)
+Fixpoint gFaceCoh {m} {Xpre: (SSSetAt m).(prefix)} (X: SSSetFrom m Xpre)
   (n: nat) {struct n}:
-  forall (q: nat) (Hq: q <= n + m) (r: nat) (Hr: r <= q) (ε ω: arity)
+  forall (q: nat) (Hq: q <= n + m) (r: nat) (Hr: r <= q)
     (d: gF0 X n.+2),
-  gFace X n q Hq ε (gFace X n.+1 r (Hr ↕ (↑ Hq)) ω d) =
-  gFace X n r (Hr ↕ Hq) ω (gFace X n.+1 q.+1 (⇑ Hq) ε d) :=
+  gFace X n q Hq (gFace X n.+1 r (Hr ↕ (↑ Hq)) d) =
+  gFace X n r (Hr ↕ Hq) (gFace X n.+1 q.+1 (⇑ Hq) d) :=
   match n return
-    forall (q: nat) (Hq: q <= n + m) (r: nat) (Hr: r <= q) (ε ω: arity)
+    forall (q: nat) (Hq: q <= n + m) (r: nat) (Hr: r <= q)
       (d: gF0 X n.+2),
-    gFace X n q Hq ε (gFace X n.+1 r (Hr ↕ (↑ Hq)) ω d) =
-    gFace X n r (Hr ↕ Hq) ω (gFace X n.+1 q.+1 (⇑ Hq) ε d) with
-  | 0 => fun q Hq r Hr ε ω d => νFaceFuelCoh X q Hq r Hr ε ω d
-  | S n => fun q Hq r Hr ε ω d =>
-      gFaceCoh (next X) n q (leR_eq_r (plus_n_Sm n m) Hq) r Hr ε ω d
+    gFace X n q Hq (gFace X n.+1 r (Hr ↕ (↑ Hq)) d) =
+    gFace X n r (Hr ↕ Hq) (gFace X n.+1 q.+1 (⇑ Hq) d) with
+  | 0 => fun q Hq r Hr d => ssFaceFuelCoh X q Hq r Hr d
+  | S n => fun q Hq r Hr d =>
+      gFaceCoh (next X) n q (leR_eq_r (plus_n_Sm n m) Hq) r Hr d
   end.
 
-(** The presheaf of a ν-set *)
+(** The presheaf of a semi-simplicial set *)
 
-Definition g (X: νSets): νSetPresentation arity := {|
+Definition g (X: SSSets): SSSetPresentation := {|
   F0 := gF0 X;
-  Face := fun n q Hq ε => gFace X n q (leR_eq_r (plus_n_O n) Hq) ε;
-  FaceCoh := fun n q Hq r Hr ε ω d =>
-    gFaceCoh X n q (leR_eq_r (plus_n_O n) Hq) r Hr ε ω d;
+  Face := fun n q Hq => gFace X n q (leR_eq_r (plus_n_O n) Hq);
+  FaceCoh := fun n q Hq r Hr d =>
+    gFaceCoh X n q (leR_eq_r (plus_n_O n) Hq) r Hr d;
 |}.
 
-End PresheafOfνSetOn.
-
-Module PresheafOfνSet (A: LayerSig).
-Module Base := νSet.νSet A.
-Include PresheafOfνSetOn A Base.
-End PresheafOfνSet.
-
-Module PresheafOfνSetSimplicial := PresheafOfνSet SimplicialLayer.
-Module PresheafOfνSetCubical := PresheafOfνSet CubicalLayer.
+End PresheafOfSSSet.

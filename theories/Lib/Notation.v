@@ -5,7 +5,7 @@ Notation "x .+2" := (S (S x)) (at level 1, left associativity, format "x .+2").
 Notation "x .+3" := (S (S (S x)))
   (at level 1, left associativity, format "x .+3").
 
-(** This is in Program.Basics for some strange reason *)
+(** Make the type argument of [id] implicit. *)
 Arguments id {A} x.
 
 (** Notations for rew *)

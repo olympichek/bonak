@@ -105,6 +105,18 @@ Proof.
   now destruct q, p.
 Defined.
 
+(** Transport a lifted path before or after applying its dependent map. *)
+Lemma sigT_map_eq_transport {X Y: Type} {P: X->Type} {Q: Y->Type}
+  {f: X->Y} (F: forall x, P x -> Q (f x))
+  {x y: X} {p q: x=y} (H: p=q) {u: P x} {v: P y}
+  (h: rew [P] p in u=v):
+  rew [fun e=>rew [Q] e in F x u=F y v]
+    f_equal (fun e=>f_equal f e) H in sigT_map_eq F h =
+  sigT_map_eq F (rew [fun e=>rew [P] e in u=v] H in h).
+Proof.
+  now destruct H.
+Defined.
+
 Lemma sigT_map_eq_refl {A B: Type} {P: A -> Type} {Q: B -> Type}
   {f: A -> B} (g: forall a, P a -> Q (f a))
   {x: A} {u v: P x} (q: u = v):
@@ -245,6 +257,59 @@ Proof.
   now exact (rew_opp_r _ H _).
 Defined.
 
+(** Cancel a fixed final dependent path. *)
+Definition sigT_trans_eq_inv_r {X: Type} {P: X -> Type}
+  {x y z: X} {p: x = y} {q: y = z}
+  {u: P x} {v: P y} {w: P z}
+  (hq: rew [P] q in v = w)
+  (h: rew [P] (p • q) in u = w): rew [P] p in u = v.
+Proof. now destruct hq, q. Defined.
+
+Lemma sigT_trans_eq_inv_r_comp {X: Type} {P: X -> Type}
+  {x y z: X} {p: x = y} {q: y = z}
+  {u: P x} {v: P y} {w: P z}
+  (hq: rew [P] q in v = w) (h: rew [P] p in u = v):
+  sigT_trans_eq_inv_r hq (h ⊙ hq) = h.
+Proof.
+  destruct q, hq, p.
+  change (sigT_trans_eq (P := P) (p := eq_refl) h (p' := eq_refl) eq_refl = h).
+  rewrite sigT_trans_eq_refl. now exact (eq_trans_refl_r h).
+Defined.
+
+Lemma sigT_trans_eq_inv_r_cancel {X: Type} {P: X -> Type}
+  {x y z: X} {p: x = y} {q: y = z}
+  {u: P x} {v: P y} {w: P z}
+  (hq: rew [P] q in v = w) (h: rew [P] p • q in u = w):
+  sigT_trans_eq_inv_r hq h ⊙ hq = h.
+Proof.
+  destruct q, hq, p.
+  change (sigT_trans_eq (P := P) (p := eq_refl) h (p' := eq_refl) eq_refl = h).
+  rewrite sigT_trans_eq_refl. now exact (eq_trans_refl_r h).
+Defined.
+
+(** Fill the opposite dependent edge by removing the supplied suffix. *)
+Definition sigT_square_fill_upper {X: Type} {P: X -> Type}
+  {x0 x1 y0 y1: X}
+  {a: x0 = x1} {c: y0 = y1} {p: x0 = y0} {q: x1 = y1}
+  (H: p • c = a • q)
+  {u0: P x0} {u1: P x1} {v0: P y0} {v1: P y1}
+  (hp: rew [P] p in u0 = v0) (hc: rew [P] c in v0 = v1)
+  (hq: rew [P] q in u1 = v1):
+  rew [P] a in u0 = u1 :=
+  sigT_trans_eq_inv_r hq
+    (rew [fun e => rew [P] e in u0 = v1] H in (hp ⊙ hc)).
+
+Lemma sigT_square_fill_upper_boundary {X: Type} {P: X -> Type}
+  {x0 x1 y0 y1: X}
+  {a: x0 = x1} {c: y0 = y1} {p: x0 = y0} {q: x1 = y1}
+  (H: p • c = a • q)
+  {u0: P x0} {u1: P x1} {v0: P y0} {v1: P y1}
+  (hp: rew [P] p in u0 = v0) (hc: rew [P] c in v0 = v1)
+  (hq: rew [P] q in u1 = v1):
+  rew [fun e => rew [P] e in u0 = v1] H in (hp ⊙ hc) =
+    sigT_square_fill_upper H hp hc hq ⊙ hq.
+Proof. now exact (eq_sym (sigT_trans_eq_inv_r_cancel hq _)). Defined.
+
 (** Naturality of dependent path composition in each argument. *)
 Lemma rew_sigT_trans_eq_l {A: Type} {P: A -> Type}
   {x y z: A} {u: P x} {v: P y} {w: P z}
@@ -342,3 +407,189 @@ Proof.
   destruct p. rewrite 2 sigT_map_eq_id.
   cbn [rew_map eq_sym]. now rewrite 2 eq_trans_refl_l.
 Defined.
+
+Definition sigT_sym_eq {X: Type} {P: X -> Type} {x y: X}
+  {p: x = y} {u: P x} {v: P y} (h: rew [P] p in u = v):
+  rew [P] eq_sym p in v = u.
+Proof. now destruct p, h. Defined.
+
+(** Inverting a dependent path agrees with reversing its transport and
+    substituting the supplied fiber equality. *)
+Lemma sigT_sym_eq_rew {A: Type} (P: A -> Type) {x y: A} (p: x = y)
+  {u: P x} {v: P y} (H: rew [P] p in u = v):
+  sigT_sym_eq H = eq_ind (rew [P] p in u)
+    (fun v => rew [P] eq_sym p in v = u) (rew_opp_l P p u) v H.
+Proof. now destruct p, H. Defined.
+
+Lemma sigT_map_eq_sym {X Y: Type} {P: X -> Type} {Q: Y -> Type}
+  {f: X -> Y} (F: forall x, P x -> Q (f x))
+  {x y: X} {p: x = y} {u: P x} {v: P y} (h: rew [P] p in u = v):
+  rew [fun e => rew [Q] e in F y v = F x u]
+    eq_sym (eq_sym_map_distr f p) in sigT_map_eq F (sigT_sym_eq h) =
+  sigT_sym_eq (sigT_map_eq F h).
+Proof. now destruct p, h. Defined.
+
+Lemma sigT_sym_eq_map {X Y: Type} {P: X -> Type} {Q: Y -> Type}
+  {f: X -> Y} (F: forall x, P x -> Q (f x))
+  {x y: X} {p: x = y} {u: P x} {v: P y} (h: rew [P] p in u = v):
+  rew [fun e => rew [Q] e in F y v = F x u]
+    eq_sym_map_distr f p in sigT_sym_eq (sigT_map_eq F h) =
+  sigT_map_eq F (sigT_sym_eq h).
+Proof. now destruct p, h. Defined.
+
+Lemma sigT_trans_eq_units {X: Type} {P: X -> Type} {x y: X}
+  {p: x = y} {u: P x} {v: P y} (h: rew [P] p in u = v):
+  rew [fun e => rew [P] e in u = v] eq_sym (eq_trans_refl_l p) in
+    sigT_trans_eq h (p' := eq_refl) eq_refl =
+  sigT_trans_eq (p := eq_refl) eq_refl h.
+Proof. now destruct p, h. Defined.
+
+Lemma sigT_trans_eq_assoc_l {X: Type} {P: X -> Type}
+  {x y z t: X} {p: x = y} {q: y = z} {r: z = t}
+  {a: P x} {b: P y} {c: P z} {d: P t}
+  (h: rew [P] p in a = b) (j: rew [P] q in b = c) (k: rew [P] r in c = d):
+  rew [fun e => rew [P] e in a = d] eq_trans_assoc p q r in
+    (h ⊙ (j ⊙ k)) = (h ⊙ j) ⊙ k.
+Proof. now destruct p, q, r, h, j, k. Defined.
+
+Definition sigT_map_eq_retract {X Y: Type} {P: X -> Type} {Q: Y -> Type}
+  {f: X -> Y} (F: forall x, P x -> Q (f x))
+  (G: forall x, Q (f x) -> P x) (R: forall x a, G x (F x a) = a)
+  {x y: X} (p: x = y) {a: P x} {b: P y}
+  (H: rew [Q] f_equal f p in F x a = F y b): rew [P] p in a = b.
+Proof.
+  destruct p. now exact (eq_sym (R x a) • (f_equal (G x) H • R x b)).
+Defined.
+
+Lemma sigT_map_eq_retract_section {X Y: Type} {P: X -> Type} {Q: Y -> Type}
+  {f: X -> Y} (F: forall x, P x -> Q (f x))
+  (G: forall x, Q (f x) -> P x) (R: forall x a, G x (F x a) = a)
+  {x y: X} {p: x = y} {a: P x} {b: P y} (H: rew [P] p in a = b):
+  sigT_map_eq_retract F G R p (sigT_map_eq F H) = H.
+Proof.
+  destruct p, H. cbn [sigT_map_eq_retract sigT_map_eq f_equal].
+  rewrite eq_trans_refl_l. now exact (eq_trans_sym_inv_l (R x a)).
+Defined.
+
+Lemma sigT_trans_eq_inv_l_comp {X: Type} {P: X -> Type} {x y z: X}
+  {p: x = y} {q: y = z} {a: P x} {b: P y} {c: P z}
+  (h: rew [P] p in a = b) (k: rew [P] q in b = c):
+  sigT_trans_eq_inv_l h (h ⊙ k) = k.
+Proof. now destruct p, q, h, k. Defined.
+
+Lemma sigT_trans_eq_unit_r {X: Type} {P: X -> Type} {x y: X}
+  {p: x = y} {u: P x} {v: P y} (h: rew [P] p in u = v):
+  sigT_trans_eq h (p' := eq_refl) eq_refl = h.
+Proof. now destruct p, h. Defined.
+
+Lemma sigT_trans_eq_unit_l {X: Type} {P: X -> Type} {x y: X}
+  {p: x = y} {u: P x} {v: P y} (h: rew [P] p in u = v):
+  rew [fun e => rew [P] e in u = v] eq_trans_refl_l p in
+    sigT_trans_eq (p := eq_refl) eq_refl h = h.
+Proof. now destruct p, h. Defined.
+
+Lemma sigT_trans_eq_assoc_inverse {X: Type} {P: X -> Type}
+  {x y z t: X} {p: x = y} {q: y = z} {r: z = t}
+  {a: P x} {b: P y} {c: P z} {d: P t}
+  (h: rew [P] p in a = b) (j: rew [P] q in b = c) (k: rew [P] r in c = d):
+  sigT_sym_eq (sigT_trans_eq_assoc_l h j k) = sigT_trans_eq_assoc h j k.
+Proof. now destruct p, q, r, h, j, k. Defined.
+
+Lemma sigT_trans_eq_ind {A: Type} {P: A -> Type} {x y z: A}
+  {p: x = y} {q: y = z} {u: P x} {v: P y} {w: P z}
+  (h: rew [P] p in u = v) (k: rew [P] q in v = w):
+  h ⊙ k = eq_ind (rew [P] q in rew [P] p in u) (fun z => z = w)
+    (eq_ind_r (fun v => rew [P] q in v = w) k h)
+    (rew [P] (p • q) in u) (rew_compose P p q u).
+Proof. now destruct q, k, p, h. Defined.
+
+(** A dependent map preserves endpoint changes of a lifted path. *)
+
+Lemma sigT_map_eq_conjugate {X Y:Type}{P:X->Type}{Q:Y->Type}
+  {f:X->Y}(F:forall x,P x->Q(f x))
+  {x y:X}(H:x=y){a a':P x}{b b':P y}
+  (L:a=a')(R:b=b')(M:rew[P]H in a'=b'):
+  sigT_map_eq F
+    (f_equal(fun z=>rew[P]H in z)L •(M •eq_sym R)) =
+  f_equal(fun z=>rew[Q]f_equal f H in z)(f_equal(F x)L) •
+    (sigT_map_eq F M •eq_sym(f_equal(F y)R)).
+Proof.
+  destruct L,R. cbn [f_equal eq_sym].
+  now rewrite 2 eq_trans_refl_l.
+Defined.
+
+(** A fiberwise left inverse of a dependent map. Its section law recovers
+    each source witness after mapping. *)
+Record fiber_retraction {X Y: Type} {P: X -> Type} {Q: Y -> Type}
+  {f: X -> Y} (F: forall x, P x -> Q (f x)) := {
+  fiber_back: forall x, Q (f x) -> P x;
+  fiber_section: forall x a, fiber_back x (F x a) = a
+}.
+Arguments fiber_back {X Y P Q f F} _ _ _.
+Arguments fiber_section {X Y P Q f F} _ _ _.
+
+(** Compose fiber retractions in the order of their forward maps. *)
+Definition compose_retraction {X Y Z: Type}
+  {P: X -> Type} {Q: Y -> Type} {R: Z -> Type}
+  {f: X -> Y} {g: Y -> Z}
+  {F: forall x, P x -> Q (f x)} {H: forall y, Q y -> R (g y)}
+  (r: fiber_retraction F) (s: fiber_retraction H):
+  fiber_retraction (fun x a => H (f x) (F x a)).
+Proof.
+  refine {| fiber_back := fun x a => fiber_back r x (fiber_back s (f x) a) |}.
+  intros x a.
+  now exact (f_equal (fiber_back r x) (fiber_section s (f x) (F x a)) •
+    fiber_section r x a).
+Defined.
+
+(** Lift a fiber retraction to dependent paths. *)
+Definition path_retraction {X Y: Type} {P: X -> Type} {Q: Y -> Type}
+  {f: X -> Y} {F: forall x, P x -> Q (f x)}
+  (r: fiber_retraction F) {x y: X} (a: P x) (b: P y):
+  fiber_retraction (f := fun p: x = y => f_equal f p)
+    (P := fun p => rew [P] p in a = b)
+    (Q := fun p => rew [Q] p in F x a = F y b)
+    (fun (p: x = y) (h: rew [P] p in a = b) => sigT_map_eq (f := f) (Q := Q) F h).
+Proof.
+  refine {| fiber_back := fun p h =>
+    sigT_map_eq_retract F (fiber_back r) (fiber_section r) p h |}.
+  intros p h.
+  now exact (sigT_map_eq_retract_section F (fiber_back r) (fiber_section r) h).
+Defined.
+
+Definition prefix_retraction {X: Type} (P: X -> Type)
+  {x0 x1 x2: X} (p: x0 = x1) {a: P x0} {b: P x1} (hp: rew [P] p in a = b)
+  (c: P x2):
+  fiber_retraction (f := fun e: x1 = x2 => p • e)
+    (P := fun e => rew [P] e in b = c) (Q := fun e => rew [P] e in a = c)
+    (fun (e: x1 = x2) (h: rew [P] e in b = c) => hp ⊙ h) :=
+  {| fiber_back := fun _ h => sigT_trans_eq_inv_l hp h;
+     fiber_section := fun _ h => sigT_trans_eq_inv_l_comp hp h |}.
+
+Definition suffix_retraction {X: Type} (P: X -> Type)
+  {x0 x1 x2: X} (q: x1 = x2) {b: P x1} {c: P x2}
+  (hq: rew [P] q in b = c) (a: P x0):
+  fiber_retraction (f := fun e: x0 = x1 => e • q)
+    (P := fun e => rew [P] e in a = b) (Q := fun e => rew [P] e in a = c)
+    (fun (e: x0 = x1) (h: rew [P] e in a = b) => h ⊙ hq) :=
+  {| fiber_back := fun _ h => sigT_trans_eq_inv_r hq h;
+     fiber_section := fun _ h => sigT_trans_eq_inv_r_comp hq h |}.
+
+(** Retract the pullback path map using transport composition. *)
+Definition pullback_path_retraction {X Y: Type} (f: Y -> X) (P: X -> Type)
+  {x y: Y} (a: P (f x)) (b: P (f y)):
+  fiber_retraction (f := fun e: x = y => f_equal f e)
+    (P := fun e => rew [fun y => P (f y)] e in a = b)
+    (Q := fun e => rew [P] e in a = b)
+    (fun (e: x = y) (h: rew [fun y => P (f y)] e in a = b) =>
+      sigT_map_eq (f := f) (Q := P) (fun _ u => u) h).
+Proof.
+  refine {| fiber_back := fun e h => rew_map P f e a • h |}.
+  intros e h. rewrite sigT_map_eq_id.
+  rewrite eq_trans_assoc, eq_trans_sym_inv_r.
+  now apply eq_trans_refl_l.
+Defined.
+
+Definition fiber_recovery {X Y: Type} {P: X -> Type} {Q: Y -> Type}
+  {f: X -> Y} {F: forall x, P x -> Q (f x)} (r: fiber_retraction F) :=
+  forall x b, F x (fiber_back r x b) = b.
