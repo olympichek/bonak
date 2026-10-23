@@ -2,7 +2,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation RewLemmas.
-From Bonak.Category Require Import Category.
+From Bonak.Category Require Export Category.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 Set Primitive Projections.
 Set Printing Projections.
@@ -180,3 +180,29 @@ Lemma ncompRewOn {C D: Category} {Fo Ko: C.(CObj) -> D.(CObj)}
   (rew [fun k => NatTrans (ofFunctorOn wF) k] q in
    rew [fun f => NatTrans f (ofFunctorOn zK)] p in α).(ncomp) x = α.(ncomp) x.
 Proof. now rewrite ncompRew, hp, hq. Qed.
+
+(** Functors form an h-set when the target has an h-set of objects. *)
+Unset Universe Minimization ToSet.
+
+Section FunctorSet.
+Context (C D: Category)
+  (objectUIP: forall (x y: D.(CObj)) (p q: x = y), p = q).
+
+Local Definition functorData: HSet :=
+  hsigT (A := hpiT (fun _: C.(CObj) => {| Dom := D.(CObj); UIP := objectUIP |})) (fun o =>
+  hsigT (A := hforall x y, hpiT (fun _: C.(CHom) x y => D.(CHom) (o x) (o y)))
+    (fun m => prodSet
+      (hforall x, hEq (m x x (C.(cid) x)) (D.(cid) (o x)))
+      (hforall x y z (f: C.(CHom) x y) (g: C.(CHom) y z),
+        hEq (m x z (f ⨟ g)) (m x y f ⨟ m y z g)))).
+
+Definition functorSet: HSet := {|
+  Dom := Functor C D;
+  UIP := retract_UIP (B := functorData)
+    (fun F => (F.(fobj); (fun x y f => F.(fhom) f;
+      (fun x => F.(fid) x, fun x y z f g => F.(fcomp) f g))))
+    (fun d => {| fobj := d.1; fhom x y f := d.2.1 x y f;
+      fid x := fst d.2.2 x; fcomp x y z f g := snd d.2.2 x y z f g |})
+    (fun F => eq_refl);
+|}.
+End FunctorSet.

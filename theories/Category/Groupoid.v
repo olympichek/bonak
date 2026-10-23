@@ -132,6 +132,32 @@ Proof.
   exact (inverseL (G.(groupoidInvertibility) a b f)).
 Qed.
 
+(** Functors preserve inverses without any assumption on object paths. *)
+Lemma functorInv {G H: Groupoid} (F: Functor G H) {x y} (f: G.(CHom) x y):
+  F.(fhom) (ginv f) = ginv (F.(fhom) f).
+Proof.
+  rewrite <- (H.(cidr) (F.(fhom) (ginv f))), <- (ginvR (F.(fhom) f)).
+  rewrite <- H.(cassoc), <- F.(fcomp), ginvL, F.(fid).
+  now apply H.(cidl).
+Defined.
+
+(** Cancellation by an invertible arrow. *)
+Lemma groupoidCancelL {G: Groupoid} {a b c} (f: G.(CHom) a b)
+  (u v: G.(CHom) b c) (e: f ⨟ u = f ⨟ v): u = v.
+Proof.
+  pose proof (f_equal (fun z => ginv f ⨟ z) e) as q.
+  change (ginv f ⨟ (f ⨟ u) = ginv f ⨟ (f ⨟ v)) in q.
+  now rewrite <- 2 cassoc, ginvL, 2 cidl in q.
+Qed.
+
+Lemma groupoidCancelR {G: Groupoid} {a b c} (f: G.(CHom) b c)
+  (u v: G.(CHom) a b) (e: u ⨟ f = v ⨟ f): u = v.
+Proof.
+  pose proof (f_equal (fun z => z ⨟ ginv f) e) as q.
+  change ((u ⨟ f) ⨟ ginv f = (v ⨟ f) ⨟ ginv f) in q.
+  now rewrite 2 cassoc, ginvR, 2 cidr in q.
+Qed.
+
 (** Conjugating a commuting square by the inverses of its vertical sides *)
 
 Lemma ginvCancel {G: Groupoid} {a b c d: G.(CObj)} (u: G.(CHom) a b)
@@ -141,6 +167,27 @@ Proof.
   rewrite <- (G.(cidr) u), <- (ginvR n), <- (G.(cassoc) u n (ginv n)), E.
   rewrite (G.(cassoc) m v (ginv n)), <- (G.(cassoc) (ginv m) m (v ⨟ ginv n)).
   rewrite (ginvL m). now apply G.(cidl).
+Qed.
+
+(** Conjugation by arrows preserves identities and composition. *)
+
+Definition conjugateArrow {U: Groupoid} {a a' b b'}
+  (u: U.(CHom) a a') (v: U.(CHom) b b') (f: U.(CHom) a b):
+  U.(CHom) a' b' := ginv u ⨟ (f ⨟ v).
+
+Lemma conjugateId {U: Groupoid} {a a'} (u: U.(CHom) a a'):
+  conjugateArrow u u (cid a) = cid a'.
+Proof. unfold conjugateArrow. rewrite cidl. now apply ginvL. Qed.
+
+Lemma conjugateComp {U: Groupoid} {a a' b b' c c'}
+  (u: U.(CHom) a a') (v: U.(CHom) b b') (w: U.(CHom) c c')
+  (f: U.(CHom) a b) (g: U.(CHom) b c):
+  conjugateArrow u v f ⨟ conjugateArrow v w g = conjugateArrow u w (f ⨟ g).
+Proof.
+  unfold conjugateArrow.
+  rewrite (U.(cassoc) (ginv u) (f ⨟ v)), (U.(cassoc) f v).
+  rewrite <- (U.(cassoc) v (ginv v)), ginvR, cidl.
+  now rewrite <- (U.(cassoc) f g w).
 Qed.
 
 (** A natural transformation between functors into a groupoid is invertible:
@@ -160,6 +207,13 @@ Proof.
   - apply natTransEq; intro x. apply ginvR.
   - apply natTransEq; intro x. apply ginvL.
 Defined.
+
+(** Functors into a groupoid form a groupoid. *)
+Unset Universe Minimization ToSet.
+
+Definition functorGroupoid (C: Category) (H: Groupoid): Groupoid :=
+  {| gcat := functorCategory C H;
+     groupoidInvertibility F G α := natInvertible α |}.
 
 (** Invertibility and univalence are properties, so univalent groupoids
     with equal underlying categories are equal. *)

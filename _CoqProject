@@ -15,8 +15,15 @@ theories/Category/Bicategory/PseudofunctorPasting.v
 theories/Category/Bicategory/UnivGpd2Cat.v
 theories/Category/Category.v
 theories/Category/CategoryEq.v
+theories/Category/Full.v
+theories/Category/FullyFaithful.v
+theories/Category/FunctorAlgebra.v
+theories/Category/FunctorPointwise.v
+theories/Category/FunctorUnivalence.v
 theories/Category/Groupoid.v
 theories/Category/HSetCat.v
+theories/Category/UnivalenceFacts.v
+theories/Category/Yoneda.v
 theories/Equiv/Correspondence.v
 theories/Equiv/Dgn/Correspondence.v
 theories/Equiv/Dgn/PresheafEquiv.v

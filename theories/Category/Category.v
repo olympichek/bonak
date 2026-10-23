@@ -257,6 +257,30 @@ Proof.
     (fun _ => eq_refl)).
 Defined.
 
+(** Composition and functorial action on isomorphisms. *)
+
+Definition functorIso {C D: Category} (F: Functor C D) {a b} (i: Iso C a b):
+  Iso D (F.(fobj) a) (F.(fobj) b).
+Proof.
+  refine (@Build_Iso D _ _ (F.(fhom) i.(isoHom))
+    (@Build_IsInvertible D _ _ _ (F.(fhom) (inverse i.(isoInvertible))) _ _)).
+  - now rewrite <- F.(fcomp), inverseR, F.(fid).
+  - now rewrite <- F.(fcomp), inverseL, F.(fid).
+Defined.
+
+Definition composeInvertible {C: Category} {a b c: C.(CObj)}
+  {f: C.(CHom) a b} {g: C.(CHom) b c} (u: IsInvertible f) (v: IsInvertible g):
+  IsInvertible (f ⨟ g).
+Proof.
+  refine (@Build_IsInvertible C a c (f ⨟ g) (inverse v ⨟ inverse u) _ _).
+  - rewrite cassoc, <- (C.(cassoc) g (inverse v)), inverseR, cidl. now apply inverseR.
+  - rewrite cassoc, <- (C.(cassoc) (inverse u) f), inverseL, cidl. now apply inverseL.
+Defined.
+
+Definition composeIso {C: Category} {a b c: C.(CObj)} (u: Iso C a b) (v: Iso C b c): Iso C a c :=
+  @Build_Iso C a c (u.(isoHom) ⨟ v.(isoHom))
+    (composeInvertible u.(isoInvertible) v.(isoInvertible)).
+
 Definition idToHom {C: Category} {a b: C.(CObj)} (p: a = b): C.(CHom) a b :=
   rew [fun x => C.(CHom) a x] p in C.(cid) a.
 
@@ -281,6 +305,47 @@ Lemma fhomIdToHom {C D: Category} (F: Functor C D)
   F.(fhom) (idToHom p) = idToHom (f_equal F.(fobj) p).
 Proof. destruct p. now apply F.(fid). Qed.
 
+(** Natural isomorphisms are equivalently natural families of component
+    isomorphisms. *)
+
+Definition natIsoComponent {C D: Category} {F G: Functor C D}
+  (i: Iso (functorCategory C D) F G) (x: C.(CObj)):
+  Iso D (F.(fobj) x) (G.(fobj) x).
+Proof.
+  refine (@Build_Iso D _ _ (i.(isoHom).(ncomp) x)
+    (@Build_IsInvertible D _ _ _ ((inverse i.(isoInvertible)).(ncomp) x) _ _)).
+  - now exact (f_equal (fun α => α.(ncomp) x) (inverseR i.(isoInvertible))).
+  - now exact (f_equal (fun α => α.(ncomp) x) (inverseL i.(isoInvertible))).
+Defined.
+
+Lemma inverseNaturality {D: Category} {a b c d: D.(CObj)}
+  (u: D.(CHom) a b) (v: D.(CHom) c d) (i: Iso D a c) (j: Iso D b d)
+  (e: u ⨟ j.(isoHom) = i.(isoHom) ⨟ v):
+  v ⨟ inverse j.(isoInvertible) = inverse i.(isoInvertible) ⨟ u.
+Proof.
+  rewrite <- (D.(cidr) u), <- (inverseR j.(isoInvertible)).
+  rewrite <- (D.(cassoc) u j.(isoHom) (inverse j.(isoInvertible))), e.
+  rewrite (D.(cassoc) i.(isoHom) v (inverse j.(isoInvertible))).
+  rewrite <- (D.(cassoc) (inverse i.(isoInvertible)) i.(isoHom)
+    (v ⨟ inverse j.(isoInvertible))), inverseL.
+  now rewrite cidl.
+Qed.
+
+Definition natIsoFromComponents {C D: Category} {F G: Functor C D}
+  (i: forall x, Iso D (F.(fobj) x) (G.(fobj) x))
+  (n: forall a b (f: C.(CHom) a b),
+    F.(fhom) f ⨟ (i b).(isoHom) = (i a).(isoHom) ⨟ G.(fhom) f):
+  Iso (functorCategory C D) F G.
+Proof.
+  pose (α := Build_NatTrans C D F G (fun x => (i x).(isoHom)) n).
+  pose (β := Build_NatTrans C D G F (fun x => inverse (i x).(isoInvertible))
+    (fun a b f => inverseNaturality (F.(fhom) f) (G.(fhom) f) (i a) (i b) (n a b f))).
+  refine (@Build_Iso (functorCategory C D) F G α
+    (@Build_IsInvertible (functorCategory C D) F G α β _ _)).
+  - apply natTransEq; intro x. now apply inverseR.
+  - apply natTransEq; intro x. now apply inverseL.
+Defined.
+
 (** Categorical univalence identifies object paths with isomorphisms.
     It is stated as contractibility of the fibres of the canonical map. *)
 
@@ -304,3 +369,6 @@ Proof.
   - intro p. exact (f_equal (fun z => z.1) ((u a b (idToIso p)).2 (p; eq_refl))).
   - intro f. exact (u a b f).1.2.
 Defined.
+
+Definition categoryIsoPath {C: Category} (u: IsUnivalentCategory C)
+  {a b} (i: Iso C a b): a = b := invEq (idToIsoEquiv u a b) i.
