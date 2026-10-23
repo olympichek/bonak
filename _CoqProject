@@ -21,6 +21,12 @@ theories/Category/FunctorAlgebra.v
 theories/Category/FunctorPointwise.v
 theories/Category/FunctorUnivalence.v
 theories/Category/Groupoid.v
+theories/Category/Groupoid/Family.v
+theories/Category/Groupoid/GraphFiber.v
+theories/Category/Groupoid/Map.v
+theories/Category/Groupoid/Product.v
+theories/Category/Groupoid/Section.v
+theories/Category/Groupoid/SetBased.v
 theories/Category/HSetCat.v
 theories/Category/UnivalenceFacts.v
 theories/Category/Yoneda.v
