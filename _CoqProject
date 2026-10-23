@@ -26,7 +26,9 @@ theories/Category/FunctorPointwise.v
 theories/Category/FunctorUnivalence.v
 theories/Category/Groupoid.v
 theories/Category/Groupoid/Completion.v
+theories/Category/Groupoid/CompletionAction.v
 theories/Category/Groupoid/CompletionUniqueness.v
+theories/Category/Groupoid/CompletionPseudofunctor.v
 theories/Category/Groupoid/Descent.v
 theories/Category/Groupoid/Family.v
 theories/Category/Groupoid/FamilyIdentity.v
