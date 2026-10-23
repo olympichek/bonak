@@ -63,6 +63,11 @@ theories/Equiv/Gpd/νGpdRoundtrip/Translation.v
 theories/Equiv/PresheafEquiv.v
 theories/Equiv/PresheafOfνSet.v
 theories/Equiv/PresheafRoundtrip.v
+theories/Equiv/StrictGpd/Constructions.v
+theories/Equiv/StrictGpd/Face.v
+theories/Equiv/StrictGpd/PresheafOfνStrictGpd.v
+theories/Equiv/StrictGpd/Tower.v
+theories/Equiv/StrictGpd/νStrictGpdOfPresheaf.v
 theories/Equiv/νSetEquiv.v
 theories/Equiv/νSetOfPresheaf.v
 theories/Equiv/νSetRoundtrip.v
