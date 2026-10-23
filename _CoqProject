@@ -132,6 +132,11 @@ theories/Presheaf/StrictGpd/Roundtrip.v
 theories/Presheaf/WordAction.v
 theories/Presheaf/WordCoherence.v
 theories/Presheaf/νSemiShape.v
+theories/Strictification/Completion.v
+theories/Strictification/DiagramCompletion.v
+theories/Strictification/DiagramCompletionUnit.v
+theories/Strictification/DiagramDescent.v
+theories/Strictification/DiagramEvaluation.v
 theories/νGpd/HGpd.v
 theories/νGpd/Layer.v
 theories/νGpd/Lemmas.v
