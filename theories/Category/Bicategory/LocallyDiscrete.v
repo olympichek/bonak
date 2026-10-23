@@ -1,8 +1,10 @@
 (** A category as a bicategory whose 2-cells are equalities of arrows.
     Since the hom-types are h-sets, parallel 2-cells agree. *)
+Set Universe Polymorphism.
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas.
 From Bonak.Category.Bicategory Require Export Bicategory.
+From Bonak.Category.Bicategory Require Import BicategoryEq.
 Set Primitive Projections.
 Set Printing Projections.
 
@@ -91,3 +93,15 @@ Definition locallyDiscrete (C: Category): Bicategory := {|
 
 Definition locallyDiscreteGroupoid (C: Category): IsLocallyGroupoid (locallyDiscrete C) :=
   fun a b f g α => discreteHomInvertible α.
+
+(** Ordinary functors act on the locally discrete bicategories of their
+    source and target. The functor laws supply the preservation paths. *)
+Definition locallyDiscreteFunctor {C D: Category} (F: Functor C D):
+  BicategoryStructureMap (locallyDiscrete C) (locallyDiscrete D).
+Proof.
+  refine (@Build_BicategoryStructureMap (locallyDiscrete C) (locallyDiscrete D)
+    F.(fobj) (fun a b f => F.(fhom) f) (fun a => F.(fid) a)
+    (fun a b c f g => F.(fcomp) f g)
+    (fun a b f g p => f_equal F.(fhom) p) _ _ _ _ _ _ _);
+    intros; now apply UIP.
+Defined.

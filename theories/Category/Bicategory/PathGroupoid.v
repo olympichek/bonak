@@ -350,6 +350,8 @@ Definition hgpd2CatHom2Eq (A B: HGpd) (f g: (Hom HGpd2Cat) A B):
              (piOne.(f2hom) f) (piOne.(f2hom) g))
     (piOneHom2Equiv f g).
 
+Unset Universe Minimization ToSet.
+
 Lemma hgpd2CatEqUnivGpd2Cat: HGpd2Cat = UnivGpd2Cat.
 Proof.
   unshelve refine (bicategoryEq HGpd2Cat UnivGpd2Cat piOne hgpdEqUnivalentGroupoid _

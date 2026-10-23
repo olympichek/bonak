@@ -5,6 +5,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Category Require Export Category.
 From Bonak.Lib Require Import HSet SigT Contractible Notation.
+Set Universe Polymorphism.
 Set Primitive Projections.
 Set Printing Projections.
 

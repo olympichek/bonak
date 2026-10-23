@@ -13,6 +13,7 @@
     function and the icon's components are reflexivity; the two axioms then
     read off directly as equalities of the remaining fields. *)
 
+Set Universe Polymorphism.
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import RewLemmas.
 From Bonak Require Import HSet Notation Funext.

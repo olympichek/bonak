@@ -6,6 +6,7 @@
     into the equality paths stored by [PathDiagram]. The comparison has
     equality round trips for the complete records. *)
 
+Set Universe Polymorphism.
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation Funext Equiv RewLemmas.
 From Bonak.νGpd Require Import HGpd.
@@ -16,7 +17,7 @@ From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Category.Bicategory Require Import PathDiagram.
 
 From Bonak.Category.Bicategory Require Import HGpd2Cat.
-From Bonak.Category.Bicategory Require Import Pseudofunctor.
+From Bonak.Category.Bicategory Require Import Pseudofunctor Pseudonatural.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -236,3 +237,39 @@ Proof.
     exact (f_equal (Build_Pseudofunctor (locallyDiscrete C) HGpd2Cat ob) (secEq (locallyDiscretePsfEquiv C ob) F)).
 Defined.
 
+(** Pseudonatural transformations between path diagrams from their
+    pointwise naturality, unit, and composition equations. *)
+Definition pathDiagramTransformation {C: Category}
+  (F G: PathDiagramFamily C)
+  (k: forall a, F.(pfObj) a -> G.(pfObj) a)
+  (n: forall a b (f: C.(CHom) a b) x,
+    k b ((pathData _ _ F.(pfStr)).(phom) f x) =
+    (pathData _ _ G.(pfStr)).(phom) f (k a x))
+  (nu: forall a x,
+    f_equal (k a) (happly ((pathData _ _ F.(pfStr)).(pid) a) x) =
+    n a a (C.(cid) a) x • happly ((pathData _ _ G.(pfStr)).(pid) a) (k a x))
+  (np: forall a b c (f: C.(CHom) a b) (g: C.(CHom) b c) x,
+    f_equal (k c) ((pathData _ _ F.(pfStr)).(pcomp) f g x) • n a c (f ⨟ g) x =
+    n b c g ((pathData _ _ F.(pfStr)).(phom) f x) •
+      (f_equal ((pathData _ _ G.(pfStr)).(phom) g) (n a b f x) •
+        (pathData _ _ G.(pfStr)).(pcomp) f g (k a x))):
+  Pseudonatural (expandPseudofunctor F) (expandPseudofunctor G).
+Proof.
+  refine (@Build_Pseudonatural (locallyDiscrete C) HGpd2Cat
+    (expandPseudofunctor F) (expandPseudofunctor G) k
+    (fun a b f => Build_Iso (hgpdHomCategory (F.(pfObj) a) (G.(pfObj) b)) _ _
+      (n a b f) (hgpdLocallyGroupoid _ _ _ _ (n a b f))) _ _ _).
+  - intros a b f g p. destruct p.
+    apply functional_extensionality_dep. intro x.
+    now apply eq_trans_refl_l.
+  - intro a. apply functional_extensionality_dep. intro x.
+    change (f_equal (k a)
+      (@idTo2 HGpd2Cat (F.(pfObj) a) (F.(pfObj) a) _ _
+        ((pathData _ _ F.(pfStr)).(pid) a) x) =
+      n a a (C.(cid) a) x •
+        @idTo2 HGpd2Cat (G.(pfObj) a) (G.(pfObj) a) _ _
+          ((pathData _ _ G.(pfStr)).(pid) a) (k a x)).
+    rewrite 2 idTo2Point. now apply nu.
+  - intros a b c f g. apply functional_extensionality_dep. intro x.
+    cbn. rewrite 3 eq_trans_refl_l. now apply np.
+Defined.

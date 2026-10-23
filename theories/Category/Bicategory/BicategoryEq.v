@@ -6,6 +6,7 @@ From Bonak.Lib Require Import HSet Notation RewLemmas Funext.
 From Bonak.Category Require Import CategoryEq.
 From Bonak.Category.Bicategory Require Export Bicategory.
 From Stdlib Require Import Logic.FunctionalExtensionality.
+Set Universe Polymorphism.
 Set Primitive Projections.
 Set Printing Projections.
 

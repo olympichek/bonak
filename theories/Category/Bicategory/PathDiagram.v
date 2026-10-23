@@ -5,6 +5,7 @@
     paths and the three coherence laws. The object family is kept as a
     parameter, so icons compare diagrams without transporting their objects. *)
 
+Set Universe Polymorphism.
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation.
 From Bonak.Category Require Import Category.

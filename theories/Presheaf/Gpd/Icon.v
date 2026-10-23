@@ -26,7 +26,7 @@ From Bonak.Presheaf Require Import νSemiShape WordAction.
 From Bonak.Presheaf.Gpd Require Import Pseudofunctor.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 
-From Bonak.Category.Bicategory Require Import PathDiagramPasting.
+From Bonak.Category.Bicategory Require Import PathDiagramLemmas.
 
 From Bonak.Category.Bicategory Require Import HGpd2Cat.
 Set Primitive Projections.
