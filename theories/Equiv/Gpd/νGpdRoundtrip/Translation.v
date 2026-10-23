@@ -23,15 +23,20 @@ From Bonak.Lib Require Import Equiv.
 From Bonak Require Import Limit.
 From Bonak.Equiv.Gpd Require Export PathAlgebra Filler.
 
-From Bonak.Equiv.Gpd Require PathTactics.
+From Bonak.Equiv.Gpd Require PathTactics Constructions.
 
 Set Primitive Projections.
 Set Keyed Unification.
 
-Module Translation (A: LayerGpdSig) (Base: PresheafOfνGpd.ConstructionsSig A)
-  (Translations: νGpdEquiv.TranslationSig A Base).
+Module Translation (A: LayerGpdSig) (S: νGpdSig A)
+  (Base: Constructions.ConstructionsSig A S)
+  (Translations: νGpdEquiv.TranslationSig A S).
 Import A.
 
+Module Export Core := S.
+Module Export Faces := Base.Faces.
+Module Export Reconstruction := Base.Reconstruction.
+Module Export Extraction := Base.Extraction.
 Module Export Tr := Translations.
 
 Section FG.

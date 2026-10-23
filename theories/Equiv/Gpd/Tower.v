@@ -6,10 +6,10 @@ From Bonak Require Import SigT HSet LeSProp Notation Limit νGpd.HGpd νGpd.Laye
 Set Primitive Projections.
 Set Keyed Unification.
 
-Module Tower (A: LayerGpdSig).
+Module TowerOn (A: LayerGpdSig) (Core: νGpdSig A).
 Import A.
 
-Module Export νGpd := νGpd.νGpd A.
+Module Export νGpd := Core.
 
 Definition νDataAt {m} (Xpre: (νGpdAt m).(prefix)): νGpdData m :=
   (νGpdAt m).(data) Xpre.
@@ -43,4 +43,9 @@ Fixpoint νGpdPack (m: nat) (S: νGpds):
             next ((νGpdPack m S).2))
   end.
 
+End TowerOn.
+
+Module Tower (A: LayerGpdSig).
+Module Core := νGpd.νGpd A.
+Include TowerOn A Core.
 End Tower.

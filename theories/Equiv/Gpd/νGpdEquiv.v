@@ -24,15 +24,17 @@ Set Warnings "-notation-overridden".
 From Bonak Require Import SigT RewLemmas HSet LeSProp Notation Limit νGpd.HGpd
   νGpd.Layer νGpd.Lemmas νGpd.
 From Bonak.Lib Require Import Equiv.
-From Bonak.Equiv.Gpd Require Import PresheafOfνGpd PathAlgebra.
+From Bonak.Equiv.Gpd Require Import PathAlgebra.
+
+From Bonak.Equiv.Gpd Require Tower.
 
 Set Primitive Projections.
 Set Keyed Unification.
 
-Module νGpdEquiv (A: LayerGpdSig) (Base: PresheafOfνGpd.ConstructionsSig A).
+Module νGpdEquiv (A: LayerGpdSig) (Core: νGpdSig A).
 Import A.
 
-Module Export PresheafOfνGpd := Base.
+Module Export Tower := Tower.TowerOn A Core.
 
 (** Lifting equivalences through the layer former
 
@@ -1278,7 +1280,7 @@ Definition νGpdsEquiv (SA SB: νGpds): Type := Limit (trTel SA SB) 0 tt.
 
 End νGpdEquiv.
 
-(** Translation data over a fixed instance of the two constructions. *)
-Module Type TranslationSig (A: LayerGpdSig) (Base: PresheafOfνGpd.ConstructionsSig A).
-Include νGpdEquiv A Base.
+(** Translation data over a fixed indexed core. *)
+Module Type TranslationSig (A: LayerGpdSig) (Core: νGpdSig A).
+Include νGpdEquiv A Core.
 End TranslationSig.

@@ -6,6 +6,8 @@ From Bonak.Equiv.Gpd Require Import Face νGpdOfPresheaf PresheafOfνGpd νGpdEq
 From Bonak.Equiv.Gpd.νGpdRoundtrip Require Import Translation Canonical.
 From Bonak.Lib Require Import Equiv.
 From Bonak Require Import Limit.
+From Bonak.Equiv.Gpd Require Constructions.
+
 Set Primitive Projections.
 Set Keyed Unification.
 Local Lemma restriction_index_cell_dep {U V W: Type} {S: V -> Type} {P: W -> Type}
@@ -220,10 +222,10 @@ Proof.
 Defined.
 
 
-Module SelectedNaturality (A: LayerGpdSig)
-  (Base: PresheafOfνGpd.ConstructionsSig A) (Translations: νGpdEquiv.TranslationSig A Base).
+Module SelectedNaturality (A: LayerGpdSig) (S: νGpdSig A)
+  (Base: Constructions.ConstructionsSig A S) (Translations: νGpdEquiv.TranslationSig A S).
 Import A.
-Module Export C := Canonical.Canonical A Base Translations.
+Module Export C := Canonical.Canonical A S Base Translations.
 #[local] Arguments Desc {X} {n} {Xpre} _.
 #[local] Arguments DescS {X} {n} {Xpre} {S0} _.
 #[local] Arguments FgFrp {X} m W frt.

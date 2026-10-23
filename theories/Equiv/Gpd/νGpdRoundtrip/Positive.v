@@ -12,6 +12,8 @@ From Bonak.Lib Require Import Equiv.
 From Bonak Require Import Limit.
 From Bonak.Equiv.Gpd Require Import PathAlgebra νGpdOfPresheaf PresheafOfνGpd νGpdEquiv.
 From Bonak.Equiv.Gpd.νGpdRoundtrip Require Import Translation Canonical SelectedNaturality Exchange Coherence.
+From Bonak.Equiv.Gpd Require Constructions.
+
 Set Primitive Projections.
 Set Keyed Unification.
 Local Lemma residue_component_boundary {Y T1 D: Type} (P: T1 -> Type) {Dp: D -> Type}
@@ -637,12 +639,13 @@ Proof.
   now exact (H2 ⊙ H3).
 Defined.
 
-Module Positive (A: LayerGpdSig) (Base: PresheafOfνGpd.ConstructionsSig A)
-  (Translations: νGpdEquiv.TranslationSig A Base).
+Module Positive (A: LayerGpdSig) (S: νGpdSig A)
+  (Base: Constructions.ConstructionsSig A S)
+  (Translations: νGpdEquiv.TranslationSig A S).
 Import A.
 Module K.
 Import A.
-Module Export SN := SelectedNaturality.SelectedNaturality A Base Translations.
+Module Export SN := SelectedNaturality.SelectedNaturality A S Base Translations.
 Module C := SN.C.
 Module Core := C.Association.Succ.RT.
 Module MapKit.
@@ -1407,8 +1410,8 @@ Import K.
 Module Export SN := K.SN.
 Module C := K.C.
 Module Core := K.Core.
-Module SharedExchange := Exchange.ExchangeOn A Base Translations C.
-Module Geometry := Coherence.CoherenceOn A Base Translations C SharedExchange.
+Module SharedExchange := Exchange.ExchangeOn A S Base Translations C.
+Module Geometry := Coherence.CoherenceOn A S Base Translations C SharedExchange.
 #[local] Arguments Desc {X} {n} {Xpre} _.
 #[local] Arguments DescS {X} {n} {Xpre} {S0} _.
 #[local] Arguments FgFrp {X} m W frt.

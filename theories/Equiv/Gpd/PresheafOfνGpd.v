@@ -11,18 +11,18 @@ Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT HSet LeSProp Notation νGpd.HGpd νGpd.Layer νGpd Presheaf.Gpd.Presentation.
-From Bonak.Equiv.Gpd Require Import Face νGpdOfPresheaf.
+From Bonak.Equiv.Gpd Require Import Face.
 
 From Bonak Require Import Limit.
 
 Set Primitive Projections.
 Set Keyed Unification.
 
-Module PresheafOfνGpd (A: LayerGpdSig).
+Module PresheafOfνGpdOn (A: LayerGpdSig) (Core: νGpdSig A)
+  (Faces: FaceSig A Core).
 Import A.
 
-Module Export νGpdOfPresheaf :=
-  Bonak.Equiv.Gpd.νGpdOfPresheaf.νGpdOfPresheaf A.
+Module Export Face := Faces.
 
 (** The tower data at a position
 
@@ -213,9 +213,20 @@ Proof.
     [now reflexivity | now rewrite IHc].
 Defined.
 
+End PresheafOfνGpdOn.
+
+Module Type ExtractionSig (A: LayerGpdSig) (Core: νGpdSig A)
+  (Faces: FaceSig A Core).
+Include PresheafOfνGpdOn A Core Faces.
+End ExtractionSig.
+
+Module PresheafOfνGpd (A: LayerGpdSig).
+Module Core := νGpd.νGpd A.
+Module Faces := FaceOn A Core.
+Include PresheafOfνGpdOn A Core Faces.
 End PresheafOfνGpd.
 
-(** The two constructions, shared by the equivalence and round-trip proofs. *)
-Module Type ConstructionsSig (A: LayerGpdSig).
-Include PresheafOfνGpd A.
-End ConstructionsSig.
+Module PresheafOfνGpdSimplicial :=
+  PresheafOfνGpdOn SimplicialGpdLayer νGpdSimplicial FaceSimplicial.
+Module PresheafOfνGpdCubical :=
+  PresheafOfνGpdOn CubicalGpdLayer νGpdCubical FaceCubical.

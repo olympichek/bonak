@@ -28,10 +28,10 @@ From Bonak Require Import νGpd.Pasting.
 
 Set Keyed Unification.
 
-Module Face (A: LayerGpdSig).
+Module FaceOn (A: LayerGpdSig) (Core: νGpdSig A).
 Import A.
 
-Module Export Tower := Bonak.Equiv.Gpd.Tower.Tower A.
+Module Export Tower := Tower.TowerOn A Core.
 
 (** Chains of projections between frame stages *)
 
@@ -999,7 +999,16 @@ End Hex.
 Definition dcPackOf {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
   (c: DepsCohsChain dcTop dc): DCPack dcTop := (p; (k; (dc; c))).
 
+End FaceOn.
+
+Module Type FaceSig (A: LayerGpdSig) (Core: νGpdSig A).
+Include FaceOn A Core.
+End FaceSig.
+
+Module Face (A: LayerGpdSig).
+Module Core := νGpd.νGpd A.
+Include FaceOn A Core.
 End Face.
 
-Module FaceSimplicial := Face SimplicialGpdLayer.
-Module FaceCubical := Face CubicalGpdLayer.
+Module FaceSimplicial := FaceOn SimplicialGpdLayer νGpdSimplicial.
+Module FaceCubical := FaceOn CubicalGpdLayer νGpdCubical.

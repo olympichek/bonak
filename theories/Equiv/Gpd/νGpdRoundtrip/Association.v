@@ -9,15 +9,16 @@ From Bonak.Lib Require Import Equiv.
 From Bonak Require Import Limit.
 Import Logic.EqNotations.
 
-From Bonak.Equiv.Gpd Require PathTactics.
+From Bonak.Equiv.Gpd Require PathTactics Constructions.
 
 Set Primitive Projections.
 Set Keyed Unification.
-Module Association (A: LayerGpdSig) (Base: PresheafOfνGpd.ConstructionsSig A)
-  (Translations: νGpdEquiv.TranslationSig A Base).
+Module Association (A: LayerGpdSig) (S: νGpdSig A)
+  (Base: Constructions.ConstructionsSig A S)
+  (Translations: νGpdEquiv.TranslationSig A S).
 Import A.
 
-Module Export Succ := Bonak.Equiv.Gpd.νGpdRoundtrip.Successor.Successor A Base Translations.
+Module Export Succ := Successor.Successor A S Base Translations.
 #[local] Arguments Desc {X n Xpre}.
 #[local] Arguments FrtDeps {X} M {XpB0 S0} HD {p k dcB}.
 #[local] Arguments FrtFramesType {X M XpB0 S0 HD p k dcB cB}.

@@ -25,8 +25,8 @@ From Bonak.Equiv.Gpd Require Import PathAlgebra.
 Set Primitive Projections.
 Set Keyed Unification.
 
-Module Extensionality (A: LayerGpdSig) (Base: PresheafOfνGpd.ConstructionsSig A)
-  (Translations: νGpdEquiv.TranslationSig A Base).
+Module Extensionality (A: LayerGpdSig) (Core: νGpdSig A)
+  (Translations: νGpdEquiv.TranslationSig A Core).
 Import A.
 Module Export Tr := Translations.
 

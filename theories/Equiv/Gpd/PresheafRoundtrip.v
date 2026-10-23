@@ -19,6 +19,8 @@ From Bonak Require Import Limit.
 
 From Bonak.Equiv.Gpd Require Import PathAlgebra.
 
+From Bonak.Equiv.Gpd Require Constructions PresheafEquiv.
+
 Set Primitive Projections.
 From Bonak Require Import νGpd.Pasting.
 
@@ -29,10 +31,15 @@ Local Definition index_cell {I: Type} (Cell: I -> Type)
   {i j: I} (e: i = j) (K: Cell i): Cell j :=
   match e with eq_refl => K end.
 
-Module PresheafRoundtrip (A: LayerGpdSig) (Base: PresheafOfνGpd.ConstructionsSig A).
+Module PresheafRoundtrip (A: LayerGpdSig) (S: νGpdSig A)
+  (Base: Constructions.ConstructionsSig A S).
 Import A.
 
-Module Export PresheafOfνGpd := Base.
+Module Export Core := S.
+Module Export Faces := Base.Faces.
+Module Export Reconstruction := Base.Reconstruction.
+Module Export Extraction := Base.Extraction.
+Module Export PshEq := PresheafEquiv.PresheafEquiv A.
 
 (** A [DepsCohs3Chain] out of a fixed source moves its stage down by its
     length, so the stage it lands on is determined by that length. *)

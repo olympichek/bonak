@@ -13,7 +13,7 @@ Import Logic.EqNotations.
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT RewLemmas HSet LeSProp Notation νGpd.HGpd νGpd.Layer
   νGpd.Lemmas νGpd.Pasting νGpd Presheaf.Gpd.Presentation Equiv.Gpd.PathAlgebra.
-From Bonak.Equiv.Gpd Require Import Face PresheafEquiv.
+From Bonak.Equiv.Gpd Require Import Face.
 
 From Bonak Require Import Limit.
 
@@ -22,13 +22,13 @@ From Bonak.Lib Require Import NatLemmas.
 Set Primitive Projections.
 Set Keyed Unification.
 
-Module νGpdOfPresheaf (A: LayerGpdSig).
+Module νGpdOfPresheafOn (A: LayerGpdSig) (Core: νGpdSig A)
+  (Faces: FaceSig A Core).
 Import A.
 
-Include Bonak.Equiv.Gpd.PathAlgebra.
+Include PathAlgebra.
 
-Module Export Face := Bonak.Equiv.Gpd.Face.Face A.
-Module Export PshEq := Bonak.Equiv.Gpd.PresheafEquiv.PresheafEquiv A.
+Module Export Face := Faces.
 
 Section Construction.
 Variable psh: νGpdPresentation arity.
@@ -3227,7 +3227,20 @@ Proof.
     (mkPshRestrPainting ps PCX q Hq Hdim ε d)).
 Defined.
 
+End νGpdOfPresheafOn.
+
+Module Type ReconstructionSig (A: LayerGpdSig) (Core: νGpdSig A)
+  (Faces: FaceSig A Core).
+Include νGpdOfPresheafOn A Core Faces.
+End ReconstructionSig.
+
+Module νGpdOfPresheaf (A: LayerGpdSig).
+Module Core := νGpd.νGpd A.
+Module Faces := FaceOn A Core.
+Include νGpdOfPresheafOn A Core Faces.
 End νGpdOfPresheaf.
 
-Module νGpdOfPresheafSimplicial := νGpdOfPresheaf SimplicialGpdLayer.
-Module νGpdOfPresheafCubical := νGpdOfPresheaf CubicalGpdLayer.
+Module νGpdOfPresheafSimplicial :=
+  νGpdOfPresheafOn SimplicialGpdLayer νGpdSimplicial FaceSimplicial.
+Module νGpdOfPresheafCubical :=
+  νGpdOfPresheafOn CubicalGpdLayer νGpdCubical FaceCubical.

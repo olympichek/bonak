@@ -1199,6 +1199,10 @@ Definition νGpds := νGpdFrom 0 tt.
 
 End νGpd.
 
+Module Type νGpdSig (A: LayerGpdSig).
+Include νGpd A.
+End νGpdSig.
+
 Module νGpdSimplicial := νGpd SimplicialGpdLayer.
 Module νGpdCubical := νGpd CubicalGpdLayer.
 

@@ -11,14 +11,17 @@ From Bonak.Equiv.Gpd Require Import PathAlgebra.
 From Bonak Require Import Limit.
 Import Logic.EqNotations.
 
+From Bonak.Equiv.Gpd Require Constructions.
+
 Set Primitive Projections.
 From Bonak Require Import νGpd.Pasting.
 
 Set Keyed Unification.
 
-Module ExchangeOn (A: LayerGpdSig) (Base: PresheafOfνGpd.ConstructionsSig A)
-  (Translations: νGpdEquiv.TranslationSig A Base)
-  (CanonicalBase: Bonak.Equiv.Gpd.νGpdRoundtrip.Canonical.CanonicalSig A Base Translations).
+Module ExchangeOn (A: LayerGpdSig) (S: νGpdSig A)
+  (Base: Constructions.ConstructionsSig A S)
+  (Translations: νGpdEquiv.TranslationSig A S)
+  (CanonicalBase: Canonical.CanonicalSig A S Base Translations).
 Import A.
 
 Module Export Canonical := CanonicalBase.
@@ -347,9 +350,9 @@ End PairExchangeAtoms.
 
 End ExchangeOn.
 
-Module Type ExchangeSig (A: LayerGpdSig)
-  (Base: PresheafOfνGpd.ConstructionsSig A)
-  (Translations: νGpdEquiv.TranslationSig A Base)
-  (CanonicalBase: Bonak.Equiv.Gpd.νGpdRoundtrip.Canonical.CanonicalSig A Base Translations).
-Include ExchangeOn A Base Translations CanonicalBase.
+Module Type ExchangeSig (A: LayerGpdSig) (S: νGpdSig A)
+  (Base: Constructions.ConstructionsSig A S)
+  (Translations: νGpdEquiv.TranslationSig A S)
+  (CanonicalBase: Canonical.CanonicalSig A S Base Translations).
+Include ExchangeOn A S Base Translations CanonicalBase.
 End ExchangeSig.

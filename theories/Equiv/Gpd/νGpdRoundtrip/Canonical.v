@@ -11,15 +11,18 @@ From Bonak.Lib Require Import Equiv.
 From Bonak Require Import Limit.
 Import Logic.EqNotations.
 
+From Bonak.Equiv.Gpd Require Constructions.
+
 Set Primitive Projections.
 From Bonak Require Import νGpd.Pasting.
 
 Set Keyed Unification.
-Module Canonical (A: LayerGpdSig) (Base: PresheafOfνGpd.ConstructionsSig A)
-  (Translations: νGpdEquiv.TranslationSig A Base).
+Module Canonical (A: LayerGpdSig) (S: νGpdSig A)
+  (Base: Constructions.ConstructionsSig A S)
+  (Translations: νGpdEquiv.TranslationSig A S).
 Import A.
 
-Module Export Association := Bonak.Equiv.Gpd.νGpdRoundtrip.Association.Association A Base Translations.
+Module Export Association := Association.Association A S Base Translations.
 #[local] Arguments Desc {X n Xpre}.
 #[local] Arguments descChain {X n Xpre S0}.
 #[local] Arguments descCell {X m XpB SB}.
@@ -715,8 +718,8 @@ End FG.
 End Canonical.
 
 (** Canonical constructions shared by the higher correspondence proofs. *)
-Module Type CanonicalSig (A: LayerGpdSig)
-  (Base: PresheafOfνGpd.ConstructionsSig A)
-  (Translations: νGpdEquiv.TranslationSig A Base).
-Include Canonical A Base Translations.
+Module Type CanonicalSig (A: LayerGpdSig) (S: νGpdSig A)
+  (Base: Constructions.ConstructionsSig A S)
+  (Translations: νGpdEquiv.TranslationSig A S).
+Include Canonical A S Base Translations.
 End CanonicalSig.

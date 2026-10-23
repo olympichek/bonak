@@ -42,6 +42,7 @@ theories/Equiv/Dgn/νDgnSetEquiv.v
 theories/Equiv/Dgn/νDgnSetOfPresheaf.v
 theories/Equiv/Dgn/νDgnSetRoundtrip.v
 theories/Equiv/Face.v
+theories/Equiv/Gpd/Constructions.v
 theories/Equiv/Gpd/Correspondence.v
 theories/Equiv/Gpd/Extensionality.v
 theories/Equiv/Gpd/Face.v
