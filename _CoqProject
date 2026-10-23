@@ -65,6 +65,7 @@ theories/Lib/NatLemmas.v
 theories/Lib/Notation.v
 theories/Lib/RewLemmas.v
 theories/Lib/SigT.v
+theories/Lib/Truncation.v
 theories/Lib/Univalence.v
 theories/Presheaf/Correspondence.v
 theories/Presheaf/Dgn/Correspondence.v
