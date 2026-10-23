@@ -12,7 +12,7 @@ Import Logic.EqNotations.
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak Require Import SigT RewLemmas HSet LeSProp Notation Funext Univalence
-  νGpd.HGpd νGpd.HGpdEq νGpd.Layer Presheaf.Gpd.Presentation.
+  νGpd.HGpd νGpd.Layer Presheaf.Gpd.Presentation.
 From Bonak.Lib Require Import Equiv.
 
 From Bonak.Equiv.Gpd Require Import PathAlgebra.

@@ -17,6 +17,7 @@ Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT HSet Notation RewLemmas.
+From Bonak.Lib Require Import Contractible.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -359,4 +360,27 @@ Proof.
     (fun c => ((D; c); eq_refl)) _ _).
   - intros ((D0, c0), e); cbn in e. now destruct e.
   - intros c. now reflexivity.
+Defined.
+
+(** Equivalence fibres and identity systems. *)
+Definition equivFibers {A B: Type} (e: Equiv A B) (b: B):
+  Contr {a: A &T e a = b}.
+Proof.
+  pose (E := sigTEquivFst (B := fun y: B => y = b) e).
+  exists (invEq E (b; eq_refl)); intro x.
+  refine (f_equal (invEq E) _ • retEq E x).
+  destruct (E x) as [y p]. now destruct p.
+Defined.
+
+(** A contractible total space characterizes an identity family. *)
+Definition identitySystemEquiv {A: Type} (a: A) (R: A -> Type)
+  (r: R a) (c: Contr {b: A &T R b}) (b: A): Equiv (a = b) (R b).
+Proof.
+  pose (h := fun b (s: R b) => eq_sym (c.2 (a; r)) • c.2 (b; s)).
+  refine (qinvEquiv (fun p => rew [R] p in r)
+    (fun s => projT1_eq (h b s)) _ _).
+  - intro p. destruct p. unfold h.
+    now exact (f_equal (fun q: (a; r) = (a; r) => projT1_eq q)
+      (contrUIP c (eq_sym (c.2 (a; r)) • c.2 (a; r)) eq_refl)).
+  - intro s. now exact (projT2_eq (h b s)).
 Defined.

@@ -26,23 +26,43 @@ Notation "x .2" := (projT2 x) (at level 1, left associativity, format "x .2").
 
 Import Logic.EqNotations.
 
-Definition eq_existT_uncurried {A: Type} {P: A -> Type} {u1 v1: A}
+Polymorphic Definition eq_existT_uncurried {A: Type} {P: A -> Type} {u1 v1: A}
   {u2: P u1} {v2: P v1} (pq: { p: u1 = v1 &T rew p in u2 = v2 }):
   (u1; u2) = (v1; v2).
 Proof.
   now destruct pq as [p q], q, p.
 Defined.
 
-Definition eq_sigT_uncurried {A: Type} {P: A -> Type} (u v: { a: A &T P a })
+Polymorphic Definition eq_sigT_uncurried {A: Type} {P: A -> Type} (u v: { a: A &T P a })
   (pq: { p: u.1 = v.1 &T rew p in u.2 = v.2 }): u = v.
 Proof.
   destruct u, v; now apply eq_existT_uncurried.
 Defined.
 
-Lemma eq_existT_curried {A: Type} {P: A -> Type} {u1 v1: A} {u2: P u1}
+Polymorphic Lemma eq_existT_curried {A: Type} {P: A -> Type} {u1 v1: A} {u2: P u1}
   {v2: P v1} (p: u1 = v1) (q: rew p in u2 = v2): (u1; u2) = (v1; v2).
 Proof.
-  apply eq_sigT_uncurried; now exists p.
+  apply eq_existT_uncurried; now exists p.
+Defined.
+
+(** Componentwise equality for a constant dependent-pair family. *)
+Polymorphic Definition eq_existT_nondep {A B: Type} {x x': A} {y y': B}
+  (p: x = x') (q: y = y'): ((x; y): {_: A &T B}) = (x'; y').
+Proof. now destruct p, q. Defined.
+
+(** Transport in the second component determines an equality of total pairs. *)
+Polymorphic Definition eq_existT_rew {A: Type} {B: A -> Type} {x y: A}
+  (p: x = y) (a: B x): (y; rew [B] p in a) = (x; a).
+Proof. now destruct p. Defined.
+
+(** Equality of pairs carrying an h-proposition-valued third component. *)
+Polymorphic Lemma eq_sigT_nondep_hprop {X Y: Type} {P: X -> Y -> Type}
+  (irr: forall x y (p q: P x y), p = q)
+  (s t: {x: X &T {y: Y &T P x y}})
+  (h: s.1 = t.1) (k: s.2.1 = t.2.1): s = t.
+Proof.
+  destruct s as [x [y p]], t as [x' [y' q]]; cbn in *.
+  destruct h, k. f_equal. f_equal. now apply irr.
 Defined.
 
 Definition projT1_eq {A} {P: A -> Type} {u v: { a: A &T P a }} (p: u = v):

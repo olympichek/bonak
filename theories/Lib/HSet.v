@@ -1,4 +1,4 @@
-(** This file defines HSet and provides unit, sigT and forall on HSet *)
+(** Propositions and h-sets, with dependent sums and products. *)
 
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Stdlib Require Import Logic.Eqdep_dec. (* UIP_refl_unit *)
@@ -11,6 +11,15 @@ From Bonak Require Import SigT.
 Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
+
+(** Mere propositions and their dependent products. *)
+Definition IsHProp (A: Type): Type := forall x y: A, x = y.
+
+Lemma piHProp {A: Type} {P: A -> Type}
+  (h: forall x, IsHProp (P x)): IsHProp (forall x, P x).
+Proof.
+  intros f g. apply functional_extensionality_dep; intro x. now apply h.
+Qed.
 
 Record HSet := {
   Dom:> Type;
@@ -177,3 +186,19 @@ Defined.
 
 Definition prodSet (X Y: HSet): HSet :=
   {| Dom := X * Y; UIP := prodUIP |}.
+
+(** Equal dependent pairs over the same h-set element have equal second components. *)
+Lemma sigTSecond {A: HSet} {B: A -> Type} {x: A} {u v: B x}
+  (e: (x; u) = (x; v)): u = v.
+Proof.
+  pose proof (projT2_eq e) as h.
+  rewrite (@UIP A _ _ (projT1_eq e) eq_refl) in h. now exact h.
+Defined.
+
+(** Being an h-set is a property. *)
+Lemma uipProp {A: Type}
+  (p q: forall (x y: A) (u v: x = y), u = v): p = q.
+Proof.
+  repeat (apply functional_extensionality_dep; intro).
+  now apply (eq_hprop_UIP (p _ _)).
+Qed.

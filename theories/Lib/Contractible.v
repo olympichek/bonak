@@ -30,3 +30,14 @@ Proof.
   apply functional_extensionality_dep; intro x. now apply (contrUIP u).
 Qed.
 
+(** Dependent products and retracts of contractible types. *)
+Definition piContr {A: Type} {P: A -> Type} (c: forall x, Contr (P x)):
+  Contr (forall x, P x).
+Proof.
+  exists (fun x => (c x).1); intro f.
+  apply functional_extensionality_dep; intro x. now apply (c x).2.
+Defined.
+
+Definition retractContr {A B: Type} (f: A -> B) (g: B -> A)
+  (r: forall a, g (f a) = a) (c: Contr B): Contr A :=
+  (g c.1; fun a => f_equal g (c.2 (f a)) • r a).

@@ -4,6 +4,8 @@ Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT HSet.
+From Bonak.Lib Require Import Notation RewLemmas Equiv Univalence.
+From Stdlib Require Import Logic.FunctionalExtensionality.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -144,3 +146,85 @@ Set Warnings "-notation-overridden".
 
 Notation "{ x & P }" := (gsigT (fun x => P%type)): type_scope.
 Notation "{ x : A & P }" := (gsigT (A := A) (fun x => P%type)): type_scope.
+
+(** Equality of [HGpd]s from equivalence of their carriers.
+
+    As for [HSet], univalence supplies the path between the carrier types.
+    The remaining [GUIP] fields are propositions pointwise: either field
+    identifies any two inhabitants of an equality between paths.  Functional
+    extensionality therefore identifies the transported fields. *)
+
+Monomorphic Definition hgpdEqIntro (g1 g2: HGpd) (p: g1.(GDom) = g2.(GDom)): g1 = g2.
+Proof.
+  destruct g1 as [d1 u1], g2 as [d2 u2]; cbn in p; destruct p.
+  apply (f_equal (fun u => {| GDom := d1; GUIP := u |})).
+  apply functional_extensionality_dep_good; intro x.
+  apply functional_extensionality_dep_good; intro y.
+  apply functional_extensionality_dep_good; intro h.
+  apply functional_extensionality_dep_good; intro g.
+  apply functional_extensionality_dep_good; intro a.
+  apply functional_extensionality_dep_good; intro b.
+  now apply (eq_hprop_UIP (@u1 x y h g)).
+Defined.
+
+Monomorphic Definition hgpdEq {g1 g2: HGpd} (e: Equiv g1 g2): g1 = g2 :=
+  hgpdEqIntro g1 g2 (ua e).
+
+Monomorphic Lemma hgpdEqIntroRew (g1 g2: HGpd) (p: g1.(GDom) = g2.(GDom)) (x: g1):
+  rew [GDom] (hgpdEqIntro g1 g2 p) in x =
+  rew [fun T: Type => T] p in x.
+Proof.
+  destruct g1 as [d1 u1], g2 as [d2 u2]; cbn in p; destruct p; cbn.
+  rewrite <- (rew_map GDom (fun u => {| GDom := d1; GUIP := u |})).
+  now apply rew_const.
+Qed.
+
+Monomorphic Lemma hgpdEqRew {g1 g2: HGpd} (e: Equiv g1 g2) (x: g1):
+  rew [GDom] (hgpdEq e) in x = e x.
+Proof.
+  unfold hgpdEq. rewrite hgpdEqIntroRew. now apply uaRew.
+Qed.
+
+Monomorphic Lemma hgpdEqRewSym {g1 g2: HGpd} (e: Equiv g1 g2) (x: g2):
+  rew [GDom] (eq_sym (hgpdEq e)) in x = invEq e x.
+Proof.
+  apply (eqvInj e).
+  now exact (eq_sym (hgpdEqRew e _)
+    • (rew_sym_cancel_r (P := GDom) (hgpdEq e) x • eq_sym (secEq e x))).
+Qed.
+
+(** Univalence as induction on equivalences of 1-types and their families. *)
+
+Definition hgpdEquivInd (A: HGpd)
+  (P: forall B: HGpd, Equiv A B -> Type) (h: P A idEquiv)
+  (B: HGpd) (e: Equiv A B): P B e.
+Proof.
+  destruct A as [A u], B as [B v]. cbn in e.
+  revert v. refine (equivInd
+    (fun B e => forall v, P {| GDom := B; GUIP := v |} e) _ e).
+  intro v.
+  assert (q: u = v).
+  { repeat (apply functional_extensionality_dep; intro).
+    now apply (eq_hprop_UIP (u _ _ _ _)). }
+  destruct q. now exact h.
+Defined.
+
+Definition hgpdEquivContr (A B: HGpd) (e: Equiv A B):
+  existT (fun C: HGpd => Equiv A C) A idEquiv = (B; e) :=
+  hgpdEquivInd A (fun B e =>
+    existT (fun C: HGpd => Equiv A C) A idEquiv = (B; e)) eq_refl B e.
+
+Definition hgpdFamilyEquivInd {I: Type} (H: I -> HGpd)
+  (P: forall K: I -> HGpd, (forall i, Equiv (H i) (K i)) -> Type)
+  (h: P H (fun _ => idEquiv)) (K: I -> HGpd)
+  (e: forall i, Equiv (H i) (K i)): P K e.
+Proof.
+  assert (q: (fun i => existT (fun C: HGpd => Equiv (H i) C) (H i) idEquiv)
+    = (fun i => (K i; e i))).
+  { apply functional_extensionality_dep. intro i. now apply hgpdEquivContr. }
+  pose (r := f_equal (fun z: forall i, {C: HGpd &T Equiv (H i) C} =>
+    existT (fun L: I -> HGpd => forall i, Equiv (H i) (L i))
+      (fun i => (z i).1) (fun i => (z i).2)) q).
+  now exact (@eq_rect {L: I -> HGpd &T forall i, Equiv (H i) (L i)}
+    (H; fun _ => idEquiv) (fun z => P z.1 z.2) h (K; e) r).
+Defined.

@@ -14,7 +14,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT RewLemmas HSet LeSProp Notation Limit Univalence
-  νGpd.HGpd νGpd.HGpdEq νGpd.Layer νGpd.Lemmas νGpd.Pasting νGpd.
+  νGpd.HGpd νGpd.Layer νGpd.Lemmas νGpd.Pasting νGpd.
 From Bonak.Lib Require Import Equiv.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Equiv.Gpd Require νGpdEquiv.
