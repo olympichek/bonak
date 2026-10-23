@@ -109,5 +109,7 @@ theories/νGpd/νGpd.v
 theories/νSet/Layer.v
 theories/νSet/νDgnSet.v
 theories/νSet/νSet.v
+theories/νStrictGpd/Layer.v
+theories/νStrictGpd/νStrictGpd.v
 
 paper/depstream.v
