@@ -14,7 +14,7 @@ Set Keyed Unification.
 
 Module νDgnSetOfPresheaf (A: LayerSig).
 Import A.
-Module Export Backward := Bonak.Equiv.Dgn.PresheafOfνDgnSet.PresheafOfνDgnSet A.
+Module Export Backward := PresheafOfνDgnSet.PresheafOfνDgnSet A.
 
 Section Forward.
 Variable psh: Presentation.νSetPresentation A.arity.
@@ -248,8 +248,8 @@ Definition pshDgnApprox n: DgnPrefix n :=
    | n.+1 => (pshDgnChain n).1
    end).
 
-Definition pshDgnFrom m: νDgnSetsFrom m (pshDgnApprox m) :=
-  ofChain (T := dgnTel) pshDgnApprox (fun n =>
+Definition pshDgnFrom m: νDgnSetFrom m (pshDgnApprox m) :=
+  ofChain (T := νDgnSetTel) pshDgnApprox (fun n =>
     match n with 0 => eq_refl | n.+1 => eq_refl end) m.
 
 Definition f: νDgnSets := pshDgnFrom 0.

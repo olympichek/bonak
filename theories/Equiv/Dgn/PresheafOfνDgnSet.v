@@ -15,12 +15,12 @@ Module PresheafOfνDgnSet (A: LayerSig).
 Import A.
 
 Module Export DgnSet := νDgnSet.νDgnSet A.
-Module Export SetRoundtrip := Bonak.Equiv.PresheafRoundtrip.PresheafRoundtripOn A DgnSet.νSet.
+Module Export SetRoundtrip := Equiv.PresheafRoundtrip.PresheafRoundtripOn A DgnSet.νSet.
 Module PshOfSet := SetRoundtrip.νSetRoundtrip.PresheafOfνSet.
-Module Export PshEquiv := Bonak.Equiv.Dgn.PresheafEquiv.PresheafEquivOn A
+Module Export PshEquiv := Dgn.PresheafEquiv.PresheafEquivOn A
   PshOfSet.νSetOfPresheaf.PshEq.
 
-Definition DgnPosition n: Type := {Y: DgnPrefix n &T νDgnSetsFrom n Y}.
+Definition DgnPosition n: Type := {Y: DgnPrefix n &T νDgnSetFrom n Y}.
 
 Definition dgnPositionNext n (s: DgnPosition n): DgnPosition n.+1 :=
   (dgnExtend s.1 (this s.2); next s.2).

@@ -14,7 +14,7 @@ Set Keyed Unification.
 
 Module PresheafRoundtrip (A: LayerSig).
 Import A.
-Module Export Forward := Bonak.Equiv.Dgn.νDgnSetOfPresheaf.νDgnSetOfPresheaf A.
+Module Export Forward := νDgnSetOfPresheaf.νDgnSetOfPresheaf A.
 
 Definition positionEquiv n {s t: DgnPosition n} (e: s = t):
   Equiv (dgnPositionTotal n s) (dgnPositionTotal n t).

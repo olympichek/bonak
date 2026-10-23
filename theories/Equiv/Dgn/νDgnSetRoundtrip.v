@@ -14,7 +14,7 @@ Set Keyed Unification.
 
 Module νDgnSetRoundtrip (A: LayerSig).
 Import A.
-Module Export DgnEq := Bonak.Equiv.Dgn.νDgnSetEquiv.νDgnSetEquiv A.
+Module Export DgnEq := νDgnSetEquiv.νDgnSetEquiv A.
 
 Definition prefixFaceFuel {n} (P: (νSetAt n.+1).(prefix)) fuel (ε: arity)
   (d: νFrame P): νTotalType P :=

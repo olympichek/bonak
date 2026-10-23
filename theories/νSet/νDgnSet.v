@@ -2554,7 +2554,7 @@ Definition dgnBond {n} (Z: DgnPrefix n.+1): DgnPrefix n := (Z.1.1; Z.2.1).
 Definition dgnHead {n} (Z: DgnPrefix n.+1): dgnIncrType (dgnBond Z) :=
   (Z.1.2; Z.2.2).
 
-Definition dgnTel: Telescope := {|
+Definition νDgnSetTel: Telescope := {|
   stage := DgnPrefix;
   datum l Y := dgnIncrType Y;
   extend l Y h := dgnExtend Y h;
@@ -2565,11 +2565,11 @@ Definition dgnTel: Telescope := {|
   bondExtendHead _ _ := eq_refl;
 |}.
 
-Definition νDgnSetsFrom n (Y: DgnPrefix n): Type := Limit dgnTel n Y.
+Definition νDgnSetFrom n (Y: DgnPrefix n): Type := Limit νDgnSetTel n Y.
 
 (** The base stage is a Σ of two copies of [unit], so the construction is
     the tower over its unique inhabitant. *)
-Definition νDgnSets := νDgnSetsFrom 0 (tt; tt).
+Definition νDgnSets := νDgnSetFrom 0 (tt; tt).
 
 End νDgnSet.
 

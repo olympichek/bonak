@@ -14,7 +14,7 @@ Set Printing Projections.
 Set Keyed Unification.
 
 Module Type PshEqSig (A: LayerSig).
-Include Bonak.Equiv.PresheafEquiv.PresheafEquiv A.
+Include Equiv.PresheafEquiv.PresheafEquiv A.
 End PshEqSig.
 
 Module PresheafEquivOn (A: LayerSig) (E: PshEqSig A).
@@ -98,7 +98,7 @@ Qed.
 End PresheafEquivOn.
 
 Module PresheafEquiv (A: LayerSig).
-Module Base := Bonak.Equiv.PresheafEquiv.PresheafEquiv A.
+Module Base := Equiv.PresheafEquiv.PresheafEquiv A.
 Include PresheafEquivOn A Base.
 End PresheafEquiv.
 

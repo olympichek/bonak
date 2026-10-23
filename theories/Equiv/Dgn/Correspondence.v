@@ -12,7 +12,7 @@ Set Printing Projections.
 Set Keyed Unification.
 
 Module Correspondence (A: LayerSig).
-Module Export Roundtrip := Bonak.Equiv.Dgn.νDgnSetRoundtrip.νDgnSetRoundtrip A.
+Module Export Roundtrip := νDgnSetRoundtrip.νDgnSetRoundtrip A.
 
 Definition νDgnSetsPresheafEquiv:
   Equiv νDgnSets (νDgnSetPresentation A.arity) :=

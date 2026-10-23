@@ -13,7 +13,7 @@ Set Keyed Unification.
 
 Module νDgnSetEquiv (A: LayerSig).
 Import A.
-Module Export PshRoundtrip := Bonak.Equiv.Dgn.PresheafRoundtrip.PresheafRoundtrip A.
+Module Export PshRoundtrip := Dgn.PresheafRoundtrip.PresheafRoundtrip A.
 
 Lemma cohAboveAbovePaintingIrrel {p k} (deps: DepsReflCohsSup p k)
   (extra: DepsReflCohsSupExtension p k deps)
