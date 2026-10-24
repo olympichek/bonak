@@ -1,2 +1,4 @@
 theories/νGpd/νGpd.v
 theories/Equiv/Gpd
+theories/Strictification/Completion.v
+theories/Strictification/Strictification.v

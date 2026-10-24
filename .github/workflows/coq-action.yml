@@ -60,40 +60,45 @@ jobs:
     env:
       ROCQ_REPO: "https://github.com/olympichek/rocq.git"
       ROCQ_BRANCH: "master+bonak-patches-experimental"
-      # Rocq's stdlib lives in its own repository; this is the revision the
-      # patched branch is developed against.
-      STDLIB_REPO: "https://github.com/rocq-prover/stdlib.git"
-      STDLIB_REV: "b89635f66d5d5fe3c91a5755b389a30846411888"
+      # Maintain the compiler and stdlib together on matching branches.
+      STDLIB_REPO: "https://github.com/olympichek/rocq-stdlib.git"
+      STDLIB_BRANCH: "master+bonak-patches-experimental"
       OCAML_COMPILER: "5.3"
     steps:
       - uses: "actions/checkout@v4"
         with:
           submodules: "true"
-      - name: "Resolve the patched Rocq revision"
-        id: "rocq"
+      - name: "Resolve the experimental toolchain revisions"
+        id: "toolchain"
         run: |
-          sha=$(git ls-remote "$ROCQ_REPO" "refs/heads/$ROCQ_BRANCH" | cut -f1)
-          test -n "$sha"
-          echo "Building against $ROCQ_BRANCH at $sha"
-          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          rocq_sha=$(git ls-remote "$ROCQ_REPO" "refs/heads/$ROCQ_BRANCH" | cut -f1)
+          stdlib_sha=$(git ls-remote "$STDLIB_REPO" "refs/heads/$STDLIB_BRANCH" | cut -f1)
+          test -n "$rocq_sha"
+          test -n "$stdlib_sha"
+          echo "Rocq $ROCQ_BRANCH at $rocq_sha"
+          echo "Stdlib $STDLIB_BRANCH at $stdlib_sha"
+          echo "rocq_sha=$rocq_sha" >> "$GITHUB_OUTPUT"
+          echo "stdlib_sha=$stdlib_sha" >> "$GITHUB_OUTPUT"
       - uses: "ocaml/setup-ocaml@v3"
         with:
           ocaml-compiler: ${{ env.OCAML_COMPILER }}
           opam-pin: false
-      # The opam switch holding the patched Rocq is cached: rebuilding it from
-      # source costs about five minutes.  The key pins the exact Rocq and
-      # stdlib revisions, so moving either one invalidates the cache.
+      # Cache the opam switch by compiler and stdlib revision, so updating
+      # either source rebuilds the corresponding switch.
       - name: "Restore the opam switch"
         id: "switch"
         uses: "actions/cache@v4"
         with:
           path: "_opam"
-          key: "rocq-patched-${{ runner.os }}-ocaml-${{ env.OCAML_COMPILER }}-${{ steps.rocq.outputs.sha }}-${{ env.STDLIB_REV }}"
+          key: "rocq-patched-${{ runner.os }}-ocaml-${{ env.OCAML_COMPILER }}-${{ steps.toolchain.outputs.rocq_sha }}-${{ steps.toolchain.outputs.stdlib_sha }}"
       - name: "Build the patched Rocq"
+        env:
+          ROCQ_REV: ${{ steps.toolchain.outputs.rocq_sha }}
+          STDLIB_REV: ${{ steps.toolchain.outputs.stdlib_sha }}
         if: steps.switch.outputs.cache-hit != 'true'
         run: |
-          opam pin add -y -n rocq-runtime "git+$ROCQ_REPO#$ROCQ_BRANCH"
-          opam pin add -y -n rocq-core "git+$ROCQ_REPO#$ROCQ_BRANCH"
+          opam pin add -y -n rocq-runtime "git+$ROCQ_REPO#$ROCQ_REV"
+          opam pin add -y -n rocq-core "git+$ROCQ_REPO#$ROCQ_REV"
           opam pin add -y -n rocq-stdlib "git+$STDLIB_REPO#$STDLIB_REV"
           opam install -y -j "$(nproc)" rocq-core rocq-stdlib
       - name: "Install the remaining dependencies"
@@ -101,4 +106,6 @@ jobs:
       - name: "Build"
         run: |
           opam exec -- rocq --version
-          opam exec -- dune build
+          nproc
+          free -h
+          /usr/bin/time -v opam exec -- dune build
