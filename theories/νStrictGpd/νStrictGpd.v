@@ -181,7 +181,8 @@ Fixpoint mkCohFrameTypesAndRestrFrames {p k}:
     fun deps extraDeps restrPaintings =>
     {|
       CohFrameTypesDef := unit;
-      RestrFramesDef _ := (tt; fun _ _ _ => terminalFunctor _)
+      RestrFramesDef _ :=
+        (tt; fun _ _ _ => terminalFunctor _): mkRestrFrameTypes (mkPaintings extraDeps)
     |}
   | S p =>
     fun deps extraDeps restrPaintings =>
@@ -190,7 +191,8 @@ Fixpoint mkCohFrameTypesAndRestrFrames {p k}:
     {|
       CohFrameTypesDef := mkCohFrameTypesStep prev;
       RestrFramesDef Q :=
-        (restrFrames Q.1; fun q Hq ε => totalMap (mkRestrLayer restrPaintings Q q Hq ε))
+        (restrFrames Q.1; fun q Hq ε => totalMap (mkRestrLayer restrPaintings Q q Hq ε)):
+          mkRestrFrameTypes (mkPaintings extraDeps)
     |}
   end.
 
