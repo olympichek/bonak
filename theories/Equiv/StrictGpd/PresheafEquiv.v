@@ -45,7 +45,7 @@ Proof.
   refine (levelIsoInd P.(G0) (fun Qo eo => forall
     (Qf: forall n q (Hq: q <= n) (ε: A), Functor (Qo n.+1) (Qo n))
     (Qc: forall n q (Hq: q <= n) r (Hr: r <= q) (ε ω: A),
-      Qf n.+1 r (Hr ↕ (↑ Hq)) ω ⨟ᶠ Qf n q Hq ε ≐
+      Qf n.+1 r (Hr ↕ (↑ Hq)) ω ⨟ᶠ Qf n q Hq ε =
       Qf n.+1 q.+1 (⇑ Hq) ε ⨟ᶠ Qf n r (Hr ↕ Hq) ω),
     (forall n q (Hq: q <= n) (ε: A),
       P.(GFace) n q Hq ε ⨟ᶠ hsetGroupoidIsoFunctor (eo n) ≐

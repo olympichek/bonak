@@ -14,8 +14,7 @@ Definition pshStr {A: HSet} (P: νStrictGpdPresentation A):
   @Build_CategoryFaceStr A HSetGroupoidCat P.(G0) P.(GFace).
 
 Definition pshCoh {A: HSet} (P: νStrictGpdPresentation A): CategoryCoh (pshStr P) :=
-  fun n q Hq r Hr ε ω =>
-    functorEqPath (P.(G0) n).(hsetGroupoidUIP) (P.(GFaceCoh) n q Hq r Hr ε ω).
+  P.(GFaceCoh).
 
 Definition toFunctor {A: HSet} (P: νStrictGpdPresentation A):
   Functor (Op (νSemiShape A)) HSetGroupoidCat :=
@@ -27,11 +26,10 @@ Definition toFunctor {A: HSet} (P: νStrictGpdPresentation A):
 Definition ofFunctorCoh {A: HSet} (F: Functor (Op (νSemiShape A)) HSetGroupoidCat)
   n q (Hq: q <= n) r (Hr: r <= q) (ε ω: A):
   F.(fhom) (a := S (S n)) (b := S n) (wgen (S n) r ω) ⨟ᶠ
-    F.(fhom) (a := S n) (b := n) (wgen n q ε) ≐
+    F.(fhom) (a := S n) (b := n) (wgen n q ε) =
   F.(fhom) (a := S (S n)) (b := S n) (wgen (S n) (S q) ε) ⨟ᶠ
     F.(fhom) (a := S n) (b := n) (wgen n r ω).
 Proof.
-  apply pathFunctorEq.
   refine (eq_sym (F.(fcomp) (wgen (S n) r ω) (wgen n q ε)) • _).
   refine (f_equal (fun w => F.(fhom) (a := S (S n)) (b := n) w)
     (wgenExchange n q Hq r Hr ε ω) • _).

@@ -281,7 +281,8 @@ Proof.
     refine (feqWhiskerL _ (mkPshLayerFace _ _ _ ω) •ᶠ _).
     refine (feqSym (feqAssoc _ _ _) •ᶠ _).
     refine (feqWhiskerR
-      (feqSym (psh.(GFaceCoh) m (q + p) (⇓ Hqp) p (leR_add_l q) ε ω)) _ •ᶠ _).
+      (feqSym (pathFunctorEq
+        (psh.(GFaceCoh) m (q + p) (⇓ Hqp) p (leR_add_l q) ε ω))) _ •ᶠ _).
     refine (feqAssoc _ _ _ •ᶠ _).
     refine (feqWhiskerL _ (PC.(_pshRestrPaintings).2 q Hq (⇓ Hqp) ε) •ᶠ _).
     refine (feqSym (feqAssoc _ _ _) •ᶠ _).

@@ -28,7 +28,7 @@ Proof.
   apply spropFunext; intro Hr.
   apply functional_extensionality_dep; intro ε.
   apply functional_extensionality_dep; intro ω.
-  now apply (functorEqProp (Po n).(hsetGroupoidUIP)).
+  now apply (hsetFunctorSet (Po n.+2) (Po n)).(UIP).
 Defined.
 
 Lemma ofToFunctor {A: HSet} (P: νStrictGpdPresentation A):

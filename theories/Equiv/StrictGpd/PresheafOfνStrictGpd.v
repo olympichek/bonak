@@ -202,7 +202,7 @@ Definition g (X: νStrictGpds): νStrictGpdPresentation arity := {|
   G0 := gF0 X;
   GFace := fun n q Hq ε => gFace X n q (leR_eq_r (plus_n_O n) Hq) ε;
   GFaceCoh := fun n q Hq r Hr ε ω =>
-    pathFunctorEq (gFaceCoh X n q (leR_eq_r (plus_n_O n) Hq) r Hr ε ω);
+    gFaceCoh X n q (leR_eq_r (plus_n_O n) Hq) r Hr ε ω;
 |}.
 
 End PresheafOfνStrictGpdOn.
