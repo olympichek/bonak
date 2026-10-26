@@ -55,6 +55,8 @@ Definition qinvEquiv {A B} (f: A -> B) (g: B -> A)
   eqvIsEquiv := {| linv := g; linvEq := Hgf; rinv := g; rinvEq := Hfg |};
 |}.
 
+Arguments qinvEquiv {A B} & f g Hgf Hfg.
+
 (** The canonical inverse: the left inverse, which is also a right inverse
     up to [secEq]. *)
 
@@ -159,7 +161,7 @@ Qed.
 
 Definition sigTEquivFst {A A': Type} {B: A' -> Type} (eA: Equiv A A'):
   Equiv {a: A &T B (eA a)} {a': A' &T B a'} :=
-  qinvEquiv (A := {a: A &T B (eA a)}) (B := {a': A' &T B a'})
+  qinvEquiv
     (fun x => (eA x.1; x.2))
     (fun x => ((toIsHAE eA).(haeInv) x.1;
       rew <- [B] ((toIsHAE eA).(haeSec) x.1) in x.2))

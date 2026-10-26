@@ -18,10 +18,10 @@ Definition pshCoh {A: HSet} (P: νStrictGpdPresentation A): CategoryCoh (pshStr 
 
 Definition toFunctor {A: HSet} (P: νStrictGpdPresentation A):
   Functor (Op (νSemiShape A)) HSetGroupoidCat :=
-  Build_Functor (Op (νSemiShape A)) HSetGroupoidCat P.(G0)
-    (fun m n w => categoryApplyW m w (pshStr P))
-    (fun n => categoryApplyWId (pshStr P))
-    (fun p m n g f => eq_sym (categoryApplyWComp p m n g f (pshStr P) (pshCoh P))).
+  {| fobj := P.(G0);
+     fhom m n w := categoryApplyW m w (pshStr P);
+     fid n := categoryApplyWId (pshStr P);
+     fcomp p m n g f := eq_sym (categoryApplyWComp p m n g f (pshStr P) (pshCoh P)) |}.
 
 Definition ofFunctorCoh {A: HSet} (F: Functor (Op (νSemiShape A)) HSetGroupoidCat)
   n q (Hq: q <= n) r (Hr: r <= q) (ε ω: A):

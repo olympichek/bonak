@@ -9,8 +9,8 @@ Set Universe Polymorphism.
 Definition pairFunctor {X G H: HSetGroupoid} (F: Functor X G) (L: Functor X H):
   Functor X (total (const G H)).
 Proof.
-  refine (Build_Functor X (total (const G H)) (fun x => (F.(fobj) x; L.(fobj) x))
-    (fun x y f => (F.(fhom) f, L.(fhom) f)) _ _).
+  refine {| fobj := fun x => (F.(fobj) x; L.(fobj) x);
+    fhom := fun x y f => (F.(fhom) f, L.(fhom) f); fid := _; fcomp := _ |}.
   - intro x. cbn. now rewrite F.(fid), L.(fid).
   - intros x y z f g. cbn. now rewrite F.(fcomp), L.(fcomp).
 Defined.
@@ -32,8 +32,7 @@ Definition pairCongr {X G H: HSetGroupoid}
   {F F': Functor X G} {L L': Functor X H} (e: F ≐ F') (h: L ≐ L'):
   pairFunctor F L ≐ pairFunctor F' L'.
 Proof.
-  refine (@Build_FunctorEq X (total (const G H)) (pairFunctor F L) (pairFunctor F' L')
-    (fun x => eq_existT_nondep (e.(objEq) x) (h.(objEq) x)) _).
+  refine (Build_FunctorEq (fun x => eq_existT_nondep (e.(objEq) x) (h.(objEq) x)) _).
   intros x y f. cbn beta.
   change (castArrow (G := total (const G H))
     (eq_existT_nondep (e.(objEq) x) (h.(objEq) x))
@@ -51,15 +50,13 @@ Definition productFst {G: HSetGroupoid} (E P: Family G):
 
 Definition productSnd {G: HSetGroupoid} (E P: Family G):
   Map (familyProduct E P) P (idFunctor G) :=
-  @Build_Map G G (familyProduct E P) P (idFunctor G)
-    (fun x a => a.2) (fun x y a b f => f.2.1)
+  Build_Map (fun x a => a.2) (fun x y a b f => f.2.1)
     (fun _ _ => eq_refl) (fun _ _ _ _ _ _ _ _ => eq_refl) (fun _ _ _ _ f => f.2.2).
 
 Definition productPair {G H: HSetGroupoid} {D: Family G} {E P: Family H}
   {F: Functor G H} (m: Map D E F) (n: Map D P F): Map D (familyProduct E P) F.
 Proof.
-  refine (@Build_Map G H D (familyProduct E P) F
-    (fun x a => (m.(mobj) x a; n.(mobj) x a))
+  refine (Build_Map (fun x a => (m.(mobj) x a; n.(mobj) x a))
     (fun x y a b f => (m.(mhom) f; (n.(mhom) f; n.(mbase) f • eq_sym (m.(mbase) f)))) _ _ _).
   - intros. apply (eq_sigT_nondep_hprop (fun _ _ _ _ => UIP _)); cbn.
     + now apply m.(mid).

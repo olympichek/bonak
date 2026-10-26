@@ -36,6 +36,8 @@ Class RestrFrameTypeBlock p k := {
   FrameDef: RestrFrameTypesDef -> mkFrameTypes p.+1 k;
 }.
 
+#[local] Arguments Build_RestrFrameTypeBlock p k & _ _.
+
 (**
 For n and p<=n be given, and assuming {frame(n,0);...;frame(n,p)} and
 {painting(n,0);...;painting(n,p)}, we build the list of pairs:
@@ -84,7 +86,7 @@ Fixpoint mkRestrFrameTypesAndFrames {p k}:
   | 0 => fun frames paintings =>
     {|
       RestrFrameTypesDef := unit;
-      FrameDef _ := (tt; hunit): mkFrameTypes 1 k
+      FrameDef _ := (tt; hunit)
     |}
   | p.+1 => fun frames paintings =>
     let prev :=
@@ -94,7 +96,7 @@ Fixpoint mkRestrFrameTypesAndFrames {p k}:
       RestrFrameTypesDef := mkRestrFrameTypesStep frames prev;
       FrameDef R :=
         (frames' R.1; { d: (frames' R.1).2 &
-          mkLayer (paintings := paintings) R d }): mkFrameTypes p.+2 k
+          mkLayer (paintings := paintings) R d })
     |}
   end.
 
@@ -687,7 +689,7 @@ Example SemiSimplicial4 := Eval compute in (νSetSimplicial.νSetAt 4).(νSetSim
 Print SemiSimplicial4.
 
 Example TrivialAugmentedSemiSimplicial: AugmentedSemiSimplicial :=
-  ana (T := νSetSimplicial.νSetTel) tt (fun n X _ => hunit).
+  ana tt (fun n X _ => hunit).
 
 Example TrivialSemiSimplicial2 := Eval compute in
   (approx TrivialAugmentedSemiSimplicial 2 leR_O).

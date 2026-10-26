@@ -28,9 +28,10 @@ Definition Section {G H: HSetGroupoid} (E: Family H) (F: Functor G H) :=
 
 Definition sectionTotal {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F): Functor G (total E) :=
-  Build_Functor G (total E) (fun x => (F.(fobj) x; s.(mobj) x tt))
-    (fun x y f => s.(mhom) (a := tt) (b := tt) f)
-    (fun x => s.(mid) tt) (fun x y z f g => s.(mcomp) (a := tt) (b := tt) (c := tt) f g).
+  {| fobj := fun x => (F.(fobj) x; s.(mobj) x tt);
+     fhom := fun x y f => s.(mhom) (a := tt) (b := tt) f;
+     fid := fun x => s.(mid) tt;
+     fcomp := fun x y z f g => s.(mcomp) (a := tt) (b := tt) (c := tt) f g |}.
 
 Definition sectionProj {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F): sectionTotal s ⨟ᶠ proj E ≐ F.
@@ -41,7 +42,7 @@ Defined.
 
 Definition unitMap {G H: HSetGroupoid} (F: Functor G H):
   Map (unitFamily G) (unitFamily H) F :=
-  @Build_Map G H (unitFamily G) (unitFamily H) F (fun _ _ => tt)
+  Build_Map (fun _ _ => tt)
     (fun x y a b f => F.(fhom) f) (fun x a => F.(fid) x)
     (fun x y z a b c f g => F.(fcomp) f g)
     (fun x y a b f => eq_refl).
@@ -54,8 +55,7 @@ Definition sectionSigma {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F) {P: Family (total E)} (t: Section P (sectionTotal s)):
   Section (sigma E P) F.
 Proof.
-  refine (@Build_Map G H (unitFamily G) (sigma E P) F
-    (fun x _ => (s.(mobj) x tt; t.(mobj) x tt))
+  refine (Build_Map (fun x _ => (s.(mobj) x tt; t.(mobj) x tt))
     (fun x y a b f => t.(mhom) (a := tt) (b := tt) f)
     (fun x a => t.(mid) tt)
     (fun x y z a b c f g => t.(mcomp) (a := tt) (b := tt) (c := tt) f g) _).
@@ -75,8 +75,10 @@ Lemma sectionSigmaTotal {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
 Proof. unshelve econstructor; now intros. Defined.
 
 Definition unitSection (G: HSetGroupoid): Functor G (total (unitFamily G)) :=
-  Build_Functor G (total (unitFamily G)) (fun x => (x; tt))
-    (fun x y f => f) (fun x => eq_refl) (fun x y z f g => eq_refl).
+  {| fobj := fun x => (x; tt);
+     fhom := fun x y f => f;
+     fid := fun x => eq_refl;
+     fcomp := fun x y z f g => eq_refl |}.
 
 Lemma sectionTotalMap {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F): sectionTotal s ≐ unitSection G ⨟ᶠ totalMap s.

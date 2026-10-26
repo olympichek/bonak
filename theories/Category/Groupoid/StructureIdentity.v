@@ -19,7 +19,8 @@ Record HSetGroupoidIso {G H: HSetGroupoid} := {
 Arguments HSetGroupoidIso G H : clear implicits.
 
 Definition hsetGroupoidIsoFunctor {G H} (e: HSetGroupoidIso G H): Functor G H :=
-  Build_Functor G H e.(sgisoObj) e.(sgisoHom) e.(sgisoId) e.(sgisoComp).
+  {| fobj := e.(sgisoObj); fhom := e.(sgisoHom);
+     fid := e.(sgisoId); fcomp := e.(sgisoComp) |}.
 
 Definition idHSetGroupoidIso (G: HSetGroupoid): HSetGroupoidIso G G :=
   @Build_HSetGroupoidIso G G idEquiv (fun _ _ => idEquiv)

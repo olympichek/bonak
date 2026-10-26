@@ -34,9 +34,8 @@ Module CategoryCompletion (T: PropositionalTruncation).
 
   Definition completionUnit (C: Category): Functor C (completionCategory C).
   Proof.
-    refine (@Build_Functor C (completionCategory C)
-      (fun a => (representable C a; tr (a; @idToIso _ _ _ eq_refl)))
-      (fun a b f => yonedaArrow f) _ _).
+    refine {| fobj a := (representable C a; tr (a; @idToIso _ _ _ eq_refl));
+      fhom a b f := yonedaArrow f; fid := _; fcomp := _ |}.
     - now exact (yoneda C).(fid).
     - now exact (@fcomp _ _ (yoneda C)).
   Defined.

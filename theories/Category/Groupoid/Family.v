@@ -44,9 +44,12 @@ Definition total {G: HSetGroupoid} (E: Family G): HSetGroupoid := {|
   hsetGroupoidUIP := @sigT_UIP G E.(dobj);
 |}.
 
-Definition proj {G: HSetGroupoid} (E: Family G): Functor (total E) G :=
-  Build_Functor (total E) G (fun a => a.1) (fun a b f => E.(dbase) f)
-    (fun a => E.(dbaseId) a.2) (fun a b c f g => E.(dbaseComp) f g).
+Definition proj {G: HSetGroupoid} (E: Family G): Functor (total E) G := {|
+  fobj a := a.1;
+  fhom a b f := E.(dbase) f;
+  fid a := E.(dbaseId) a.2;
+  fcomp a b c f g := E.(dbaseComp) f g;
+|}.
 
 Definition Over {G: HSetGroupoid} (E: Family G) {x y} (f: G.(CHom) x y)
   (a: E.(dobj) x) (b: E.(dobj) y): HSet :=
@@ -118,14 +121,20 @@ Defined.
 
 (** Reassociation of total dependent sums. *)
 Definition totalAssoc {G: HSetGroupoid} (E: Family G) (P: Family (total E)):
-  Functor (total (sigma E P)) (total P) :=
-  Build_Functor (total (sigma E P)) (total P) (fun a => ((a.1; a.2.1); a.2.2))
-    (fun a b f => f) (fun a => eq_refl) (fun a b c f g => eq_refl).
+  Functor (total (sigma E P)) (total P) := {|
+  fobj a := ((a.1; a.2.1); a.2.2);
+  fhom a b f := f;
+  fid a := eq_refl;
+  fcomp a b c f g := eq_refl;
+|}.
 
 Definition totalUnassoc {G: HSetGroupoid} (E: Family G) (P: Family (total E)):
-  Functor (total P) (total (sigma E P)) :=
-  Build_Functor (total P) (total (sigma E P)) (fun a => (a.1.1; (a.1.2; a.2)))
-    (fun a b f => f) (fun a => eq_refl) (fun a b c f g => eq_refl).
+  Functor (total P) (total (sigma E P)) := {|
+  fobj a := (a.1.1; (a.1.2; a.2));
+  fhom a b f := f;
+  fid a := eq_refl;
+  fcomp a b c f g := eq_refl;
+|}.
 
 Declare Scope displayed_gpd_scope.
 Delimit Scope displayed_gpd_scope with dgpd.

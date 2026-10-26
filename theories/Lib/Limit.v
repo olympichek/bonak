@@ -201,6 +201,8 @@ Definition ofChain {T} (A: forall l, T.(stage) l)
   approxS l _ _ := HA l;
 |}.
 
+Arguments ofChain {T} & A HA n.
+
 Fixpoint mkApprox {T} (z: T.(stage) 0)
   (F: forall l (s: T.(stage) l), T.(datum) l s) l: T.(stage) l :=
   match l with
@@ -211,6 +213,8 @@ Fixpoint mkApprox {T} (z: T.(stage) 0)
 Definition ana {T} (z: T.(stage) 0)
   (F: forall l (s: T.(stage) l), T.(datum) l s): Limit T 0 z :=
   ofChain (mkApprox z F) (fun l => T.(bondExtend) l _ _) 0.
+
+Arguments ana {T} & z F.
 
 (** Extensionality
 

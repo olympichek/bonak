@@ -9,8 +9,8 @@ Set Universe Polymorphism.
 
 Definition representable (C: Category) (a: C.(CObj)): Functor (Op C) HSetCat.
 Proof.
-  refine (@Build_Functor (Op C) HSetCat (fun x => C.(CHom) x a)
-    (fun x y f h => @ccomp C y x a f h) _ _).
+  refine {| fobj x := C.(CHom) x a;
+    fhom x y f h := @ccomp C y x a f h; fid := _; fcomp := _ |}.
   - intro x. apply functional_extensionality_dep; intro h. now exact (C.(cidl) h).
   - intros x y z f g. apply functional_extensionality_dep; intro h. now exact (C.(cassoc) g f h).
 Defined.
@@ -18,15 +18,14 @@ Defined.
 Definition yonedaArrow {C: Category} {a b: C.(CObj)} (f: C.(CHom) a b):
   NatTrans (representable C a) (representable C b).
 Proof.
-  refine (@Build_NatTrans (Op C) HSetCat (representable C a) (representable C b)
-    (fun x h => h ⨟ f) _).
+  refine {| ncomp x h := h ⨟ f; nnat := _ |}.
   intros x y g. apply functional_extensionality_dep; intro h. now exact (C.(cassoc) g h f).
 Defined.
 
 Definition yoneda (C: Category): Functor C (functorCategory (Op C) HSetCat).
 Proof.
-  refine (@Build_Functor C (functorCategory (Op C) HSetCat)
-    (representable C) (fun a b f => yonedaArrow f) _ _).
+  refine {| fobj := representable C;
+    fhom a b f := yonedaArrow f; fid := _; fcomp := _ |}.
   - intro a. apply natTransEq; intro x.
     apply functional_extensionality_dep; intro h. now apply cidr.
   - intros a b c f g. apply natTransEq; intro x.

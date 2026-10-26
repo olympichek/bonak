@@ -39,8 +39,10 @@ Defined.
 
 Definition presentationFunctor (U: Groupoid) (S: HSet)
   (p: S -> U.(CObj)): Functor (presentationGroupoid U S p) U :=
-  Build_Functor (presentationGroupoid U S p) U p (fun x y f => f)
-    (fun x => eq_refl) (fun x y z f g => eq_refl).
+  {| fobj := p;
+     fhom := fun x y f => f;
+     fid := fun x => eq_refl;
+     fcomp := fun x y z f g => eq_refl |}.
 
 (** The terminal groupoid. *)
 Unset Universe Minimization ToSet.
@@ -56,8 +58,10 @@ Proof.
 Defined.
 
 Definition terminalFunctor (G: HSetGroupoid): Functor G unitGroupoid :=
-  Build_Functor G unitGroupoid (fun _ => tt) (fun _ _ _ => tt)
-    (fun _ => eq_refl) (fun _ _ _ _ _ => eq_refl).
+  {| fobj := fun _ => tt;
+     fhom := fun _ _ _ => tt;
+     fid := fun _ => eq_refl;
+     fcomp := fun _ _ _ _ _ => eq_refl |}.
 
 (** The category of groupoids with h-set objects. *)
 

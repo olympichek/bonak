@@ -21,12 +21,12 @@ Context (A: HSet).
 (** Interpreting faces along words *)
 
 Definition toFunctor (P: νSetPresentation A): Functor (Op (νSemiShape A)) HSetCat :=
-  Build_Functor (Op (νSemiShape A)) HSetCat (fun n => P.(F0) n)
-    (fun a b w => applyW a w (pshStr P))
-    (fun a => functional_extensionality_dep _ _
-       (fun x => applyW_id (pshStr P) x))
-    (fun a b c f g => functional_extensionality_dep _ _
-       (fun x => eq_sym (applyWComp a b c f g (pshStr P) P.(FaceCoh) x))).
+  {| fobj n := P.(F0) n;
+     fhom a b w := applyW a w (pshStr P);
+     fid a := functional_extensionality_dep _ _
+       (fun x => applyW_id (pshStr P) x);
+     fcomp a b c f g := functional_extensionality_dep _ _
+       (fun x => eq_sym (applyWComp a b c f g (pshStr P) P.(FaceCoh) x)) |}.
 
 (** Restricting a functor to generating cofaces *)
 

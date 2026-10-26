@@ -75,10 +75,10 @@ Module CompletionAction (T: PropositionalTruncation).
 
   Definition liftIdentitySource (G: HSetGroupoid):
     NatTrans (compFunctor (pathCompletionUnit G) (liftFunctor (idFunctor G)))
-      (compFunctor (pathCompletionUnit G) (idFunctor (completedPaths G))) :=
-    @Build_NatTrans G (completedPaths G) _ _
-      (natInv (liftUnit (idFunctor G))).(ncomp)
-      (fun a b f => (natInv (liftUnit (idFunctor G))).(nnat) f).
+      (compFunctor (pathCompletionUnit G) (idFunctor (completedPaths G))) := {|
+    ncomp := (natInv (liftUnit (idFunctor G))).(ncomp);
+    nnat a b f := (natInv (liftUnit (idFunctor G))).(nnat) f;
+  |}.
 
   Definition liftIdentity (G: HSetGroupoid):
     NatTrans (liftFunctor (idFunctor G)) (idFunctor (completedPaths G)) :=
@@ -100,10 +100,7 @@ Module CompletionAction (T: PropositionalTruncation).
   Proof.
     pose (α := whiskerLNat F (liftUnit E)).
     pose (β := whiskerRNat (liftUnit F) (liftFunctor E)).
-    refine (@Build_NatTrans G (completedPaths K)
-      (compFunctor (compFunctor F E) (pathCompletionUnit K))
-      (compFunctor (pathCompletionUnit G) (compFunctor (liftFunctor F) (liftFunctor E)))
-      (fun a => α.(ncomp) a ⨟ β.(ncomp) a) _).
+    refine {| ncomp a := α.(ncomp) a ⨟ β.(ncomp) a; nnat := _ |}.
     intros a b f.
     change ((pathCompletionUnit K).(fhom) (E.(fhom) (F.(fhom) f))
       ⨟ (α.(ncomp) b ⨟ β.(ncomp) b)

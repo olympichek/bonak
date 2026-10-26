@@ -64,7 +64,7 @@ Module GroupoidPrecomposition (T: PropositionalTruncation).
 
   Definition extendNat: NatTrans K L.
   Proof.
-    refine (@Build_NatTrans H U K L (fun y => (extendComponent y).1) _).
+    refine {| ncomp y := (extendComponent y).1; nnat := _ |}.
     intros y z k.
     refine (trRec (@UIP (U.(CHom) (K.(fobj) y) (L.(fobj) z)) _ _)
       _ (weakEssentiallySurjective _ w y)).

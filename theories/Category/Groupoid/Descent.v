@@ -182,9 +182,12 @@ Module GroupoidDescent (T: PropositionalTruncation).
       (fun t => @descentLeg z (r.1; t)) _ _ (eq_sym (H.(cassoc) r.2 f g))).
   Qed.
 
-  Definition descend: Functor H U :=
-    @Build_Functor H U descentObject (fun y z k => descentArrow k)
-      descentArrowId (fun x y z f g => descentArrowComp f g).
+  Definition descend: Functor H U := {|
+    fobj := descentObject;
+    fhom y z k := descentArrow k;
+    fid := descentArrowId;
+    fcomp x y z f g := descentArrowComp f g;
+  |}.
 
   Definition canonicalRepresentative (a: G.(CObj)): Representative (F.(fobj) a) :=
     (a; cid (F.(fobj) a)).
@@ -198,8 +201,7 @@ Module GroupoidDescent (T: PropositionalTruncation).
 
   Definition descentUnit: NatTrans E (compFunctor F descend).
   Proof.
-    refine (@Build_NatTrans G U E (compFunctor F descend)
-      (fun a => descentLeg (canonicalRepresentative a)) _).
+    refine {| ncomp a := descentLeg (canonicalRepresentative a); nnat := _ |}.
     intros a b f.
     change (E.(fhom) f ⨟ descentLeg (canonicalRepresentative b)
       = descentLeg (canonicalRepresentative a) ⨟ descentArrow (F.(fhom) f)).

@@ -3163,7 +3163,7 @@ Fixpoint pshChain (l: nat): {X: (νGpdAt l).(prefix) &T PshState l X} :=
 Definition pshApprox (l: nat): (νGpdAt l).(prefix) := (pshChain l).1.
 
 Definition pshFrom (n: nat): νGpdFrom n (pshApprox n) :=
-  ofChain (T := νGpdTel) pshApprox (fun _ => eq_refl) n.
+  ofChain pshApprox (fun _ => eq_refl) n.
 
 Definition f: νGpds := pshFrom 0.
 

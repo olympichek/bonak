@@ -59,7 +59,5 @@ Proof.
   apply spropFunext; intro Hq.
   apply functional_extensionality_dep; intro ε.
   apply (functorEqPath (P.(G0) n).(hsetGroupoidUIP)).
-  now exact (@Build_FunctorEq (P.(G0) n.+1) (P.(G0) n)
-    (P.(GFace) n q Hq ε) (Qf n q Hq ε)
-    (ef n q Hq ε).(objEq) (ef n q Hq ε).(homEq)).
+  now exact (Build_FunctorEq (ef n q Hq ε).(objEq) (ef n q Hq ε).(homEq)).
 Defined.

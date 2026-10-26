@@ -36,6 +36,8 @@ Class RestrFrameTypeBlock p k := {
   FrameDef: RestrFrameTypesDef -> mkFrameTypes p.+1 k;
 }.
 
+#[local] Arguments Build_RestrFrameTypeBlock p k & _ _.
+
 (**
 For n and p<=n be given, and assuming {frame(n,0);...;frame(n,p)} and
 {painting(n,0);...;painting(n,p)}, we build the list of pairs:
@@ -89,7 +91,7 @@ Fixpoint mkRestrFrameTypesAndFrames {p k}:
   | 0 => fun frames paintings =>
     {|
       RestrFrameTypesDef := unit;
-      FrameDef _ := (tt; gunit): mkFrameTypes 1 k
+      FrameDef _ := (tt; gunit)
     |}
   | p.+1 => fun frames paintings =>
     let prev :=
@@ -99,7 +101,7 @@ Fixpoint mkRestrFrameTypesAndFrames {p k}:
       RestrFrameTypesDef := mkRestrFrameTypesStep frames prev;
       FrameDef R :=
         (frames' R.1; { d: (frames' R.1).2 &
-          mkLayer R.2 (painting := paintings.2) d }): mkFrameTypes p.+2 k
+          mkLayer R.2 (painting := paintings.2) d })
     |}
   end.
 

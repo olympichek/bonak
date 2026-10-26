@@ -84,8 +84,8 @@ Qed.
 
 Definition toDgnFunctor (P: νDgnSetPresentation A): Functor (Op (νShape A)) HSetCat.
 Proof.
-  refine (Build_Functor (Op (νShape A)) HSetCat P.1.(F0)
-    (fun a b s => applyShape P.2 s) _ _).
+  refine {| fobj := P.1.(F0);
+            fhom a b s := applyShape P.2 s |}.
   - intro n. apply functional_extensionality_dep; intro x. apply applyShapeId.
   - intros a b c f g. apply functional_extensionality_dep; intro x. apply applyShapeComp.
 Defined.

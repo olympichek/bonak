@@ -51,6 +51,7 @@ Record Functor (C D: Category) := {
     fhom (f ⨟ g) = fhom f ⨟ fhom g;
 }.
 
+Arguments Build_Functor C D & _ _ _ _.
 Arguments fobj {C D} _ _.
 Arguments fhom {C D} _ {a b} _.
 Arguments fid {C D} _ _.
@@ -67,10 +68,12 @@ Definition compFunctor {C D E} (F: Functor C D) (G: Functor D E):
 
 Infix "⨟ᶠ" := compFunctor (at level 40, left associativity).
 
-Definition opFunctor {C D: Category} (F: Functor C D): Functor (Op C) (Op D) :=
-  Build_Functor (Op C) (Op D) F.(fobj)
-    (fun a b f => F.(fhom) f) (fun a => F.(fid) a)
-    (fun a b c f g => F.(fcomp) g f).
+Definition opFunctor {C D: Category} (F: Functor C D): Functor (Op C) (Op D) := {|
+  fobj := F.(fobj);
+  fhom a b f := F.(fhom) f;
+  fid a := F.(fid) a;
+  fcomp a b c f g := F.(fcomp) g f;
+|}.
 
 (** The identity functor *)
 
@@ -93,6 +96,7 @@ Record NatTrans {C D: Category} (F G: Functor C D) := {
     F.(fhom) f ⨟ ncomp b = ncomp a ⨟ G.(fhom) f;
 }.
 
+Arguments Build_NatTrans C D F G & _ _.
 Arguments ncomp {C D F G} _ _.
 Arguments nnat {C D F G} _ {a b} _.
 
@@ -152,10 +156,10 @@ Definition compNatTrans {C D: Category} {F G H: Functor C D}
 
 Definition whiskerLNat {C D E: Category} (F: Functor C D)
   {G H: Functor D E} (α: NatTrans G H):
-  NatTrans (compFunctor F G) (compFunctor F H) :=
-  Build_NatTrans _ _ (compFunctor F G) (compFunctor F H)
-    (fun a => α.(ncomp) (F.(fobj) a))
-    (fun a b f => α.(nnat) (F.(fhom) f)).
+  NatTrans (compFunctor F G) (compFunctor F H) := {|
+  ncomp a := α.(ncomp) (F.(fobj) a);
+  nnat a b f := α.(nnat) (F.(fhom) f);
+|}.
 
 Lemma whiskerRNatural {C D E: Category} {F G: Functor C D} (α: NatTrans F G)
   (H: Functor D E) {a b} (f: C.(CHom) a b):
@@ -166,10 +170,10 @@ Proof.
 Qed.
 
 Definition whiskerRNat {C D E: Category} {F G: Functor C D} (α: NatTrans F G)
-  (H: Functor D E): NatTrans (compFunctor F H) (compFunctor G H) :=
-  Build_NatTrans _ _ (compFunctor F H) (compFunctor G H)
-    (fun a => H.(fhom) (α.(ncomp) a))
-    (fun a b f => whiskerRNatural α H f).
+  (H: Functor D E): NatTrans (compFunctor F H) (compFunctor G H) := {|
+  ncomp a := H.(fhom) (α.(ncomp) a);
+  nnat a b f := whiskerRNatural α H f;
+|}.
 
 
 (** Functors and natural transformations form a category. The canonical
@@ -189,14 +193,14 @@ Defined.
 Definition functorUnitL {C D: Category} (F: Functor C D):
   NatTrans (compFunctor (idFunctor C) F) F.
 Proof.
-  refine (Build_NatTrans C D (compFunctor (idFunctor C) F) F (fun x => cid (F.(fobj) x)) _).
+  refine {| ncomp x := cid (F.(fobj) x) |}.
   intros x y f. exact (D.(cidr) _ • eq_sym (D.(cidl) _)).
 Defined.
 
 Definition functorUnitR {C D: Category} (F: Functor C D):
   NatTrans (compFunctor F (idFunctor D)) F.
 Proof.
-  refine (Build_NatTrans C D (compFunctor F (idFunctor D)) F (fun x => cid (F.(fobj) x)) _).
+  refine {| ncomp x := cid (F.(fobj) x) |}.
   intros x y f. exact (D.(cidr) _ • eq_sym (D.(cidl) _)).
 Defined.
 
@@ -204,8 +208,7 @@ Definition functorAssoc {C D E K: Category}
   (F: Functor C D) (G: Functor D E) (H: Functor E K):
   NatTrans (compFunctor (compFunctor F G) H) (compFunctor F (compFunctor G H)).
 Proof.
-  refine (Build_NatTrans C K (compFunctor (compFunctor F G) H)
-    (compFunctor F (compFunctor G H)) (fun x => cid (H.(fobj) (G.(fobj) (F.(fobj) x)))) _).
+  refine {| ncomp x := cid (H.(fobj) (G.(fobj) (F.(fobj) x))) |}.
   intros x y f. exact (K.(cidr) _ • eq_sym (K.(cidl) _)).
 Defined.
 

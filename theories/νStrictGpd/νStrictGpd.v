@@ -34,6 +34,8 @@ Class RestrFrameTypeBlock p k := {
   FrameDef: RestrFrameTypesDef -> mkFrameTypes p.+1 k;
 }.
 
+#[local] Arguments Build_RestrFrameTypeBlock p k & _ _.
+
 Generalizable Variables p k frames.
 
 Definition mkRestrFrameTypesStep `(frames: mkFrameTypes p.+1 k)
@@ -52,7 +54,7 @@ Fixpoint mkRestrFrameTypesAndFrames {p k}:
   | 0 => fun frames paintings =>
     {|
       RestrFrameTypesDef := unit;
-      FrameDef _ := (tt; unitGroupoid): mkFrameTypes 1 k
+      FrameDef _ := (tt; unitGroupoid)
     |}
   | p.+1 => fun frames paintings =>
     let prev :=
@@ -61,7 +63,7 @@ Fixpoint mkRestrFrameTypesAndFrames {p k}:
     {|
       RestrFrameTypesDef := mkRestrFrameTypesStep frames prev;
       FrameDef R :=
-        (frames' R.1; total (mkLayer (paintings := paintings) R)): mkFrameTypes p.+2 k
+        (frames' R.1; total (mkLayer (paintings := paintings) R))
     |}
   end.
 

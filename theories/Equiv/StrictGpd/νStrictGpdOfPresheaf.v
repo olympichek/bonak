@@ -580,7 +580,7 @@ Definition pshTwRp (m: nat): PshTowerRestrPaintings (pshTw m) :=
     reflexivity. *)
 
 Definition pshFrom (n: nat): νStrictGpdFrom n (pshApprox n) :=
-  ofChain (T := νStrictGpdTel) pshApprox (fun _ => eq_refl) n.
+  ofChain pshApprox (fun _ => eq_refl) n.
 
 Definition f: νStrictGpds := pshFrom 0.
 

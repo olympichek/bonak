@@ -36,19 +36,24 @@ Definition graphPoint {C B: HSetGroupoid} (p: Functor C B) (c: C):
 
 Definition graphSection {G H: HSetGroupoid} (F: Functor G H):
   Section (graphFiber F) F :=
-  @Build_Map G H (unitFamily G) (graphFiber F) F
+  Build_Map
     (fun x _ => graphPoint F x) (fun x y a b f => f)
     (fun x a => eq_refl) (fun x y z a b c f g => eq_refl)
     (fun x y a b f => eq_refl).
 
-Definition graphUnit {C B: HSetGroupoid} (p: Functor C B): Functor C (total (graphFiber p)) :=
-  Build_Functor C (total (graphFiber p))
-    (fun c => (p.(fobj) c; graphPoint p c)) (fun x y f => f)
-    (fun _ => eq_refl) (fun _ _ _ _ _ => eq_refl).
+Definition graphUnit {C B: HSetGroupoid} (p: Functor C B): Functor C (total (graphFiber p)) := {|
+  fobj c := (p.(fobj) c; graphPoint p c);
+  fhom x y f := f;
+  fid _ := eq_refl;
+  fcomp _ _ _ _ _ := eq_refl;
+|}.
 
-Definition graphTotal {C B: HSetGroupoid} (p: Functor C B): Functor (total (graphFiber p)) C :=
-  Build_Functor (total (graphFiber p)) C (fun a => a.2.1) (fun x y f => f)
-    (fun _ => eq_refl) (fun _ _ _ _ _ => eq_refl).
+Definition graphTotal {C B: HSetGroupoid} (p: Functor C B): Functor (total (graphFiber p)) C := {|
+  fobj a := a.2.1;
+  fhom x y f := f;
+  fid _ := eq_refl;
+  fcomp _ _ _ _ _ := eq_refl;
+|}.
 
 Definition graphUnitProj {C B: HSetGroupoid} (p: Functor C B):
   graphUnit p ⨟ᶠ proj (graphFiber p) ≐ p.

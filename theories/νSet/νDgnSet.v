@@ -105,6 +105,8 @@ Class CohReflRestrFrameBelowInfTypeBlock {p k} (deps: DepsRestr p k) := {
   ReflFramesBelowDef: CohReflRestrFrameBelowInfTypesDef -> mkReflFrameBelowTypes deps;
 }.
 
+#[local] Arguments Build_CohReflRestrFrameBelowInfTypeBlock {p k} deps & _ _.
+
 #[local]
 Instance toDepsReflBelow {p k}
   (depsCohs: DepsCohs p k)
@@ -152,7 +154,7 @@ Fixpoint mkCohReflRestrFrameBelowInfTypesAndReflFramesBelow {p k}:
         let reflFrame0: forall i (Hi: i <= k),
           FramePrev (mkDepsRestr deps) -> FrameBase (mkDepsRestr deps) :=
           fun _ _ d => d in
-        ((tt; reflFrame0): mkReflFrameBelowTypes (mkDepsRestr deps))
+        (tt; reflFrame0)
     |}
   | S p =>
     fun deps reflFramesBelow reflPaintingsBelow =>
@@ -165,7 +167,7 @@ Fixpoint mkCohReflRestrFrameBelowInfTypesAndReflFramesBelow {p k}:
         let prevFrames := prev.(ReflFramesBelowDef) Q.1 in
         let reflFrame i (Hi: i <= k) d := (prevFrames.2 i.+1 (⇑ Hi) d.1;
           mkReflLayerBelow deps reflFramesBelow reflPaintingsBelow prev Q i Hi d.1 d.2) in
-        (prevFrames; reflFrame): mkReflFrameBelowTypes (mkDepsRestr deps)
+        (prevFrames; reflFrame)
     |}
   end.
 
@@ -446,6 +448,8 @@ Class CohReflRestrFrameAboveSupTypeBlock {p k} (deps: DepsRestr p k) := {
   ReflFramesAboveSDef: CohReflRestrFrameAboveSupTypesDef -> mkReflFrameAboveTypesS deps;
 }.
 
+#[local] Arguments Build_CohReflRestrFrameAboveSupTypeBlock {p k} deps & _ _.
+
 Definition mkCohReflRestrFrameAboveSupType {p k} (deps: DepsReflCohsInf p.+1 k)
   (prev: CohReflRestrFrameAboveSupTypeBlock (mkDepsRestr (CohsOfReflCohsInf deps.(1))))
   (Q: prev.(CohReflRestrFrameAboveSupTypesDef)): Type :=
@@ -490,7 +494,7 @@ Fixpoint mkCohReflRestrFrameAboveSupTypesAndReflFramesAbove {p k}:
       ReflFramesAboveSDef _ :=
         let reflFrame0: mkReflFrameAboveTypeS (mkDepsRestr (CohsOfReflCohsInf deps)) :=
           fun i Hi d c => match Hi with end in
-        ((tt; reflFrame0): mkReflFrameAboveTypesS (mkDepsRestr (CohsOfReflCohsInf deps)))
+        (tt; reflFrame0)
     |}
   | p'.+1 => fun deps reflPaintingsAbove =>
     let prev := mkCohReflRestrFrameAboveSupTypesAndReflFramesAbove deps.(1) reflPaintingsAbove.1 in
@@ -502,8 +506,7 @@ Fixpoint mkCohReflRestrFrameAboveSupTypesAndReflFramesAbove {p k}:
         let reflFrame i (Hi: i.+1 <= p'.+1) d c :=
           (reflFramesAbove.2 i Hi d.1 (d.2; c);
            mkReflLayerAbove deps reflPaintingsAbove prev Q i (⇓ Hi) d.1 (d.2; c)) in
-        (prevReflFrames; reflFrame):
-          mkReflFrameAboveTypesS (mkDepsRestr (CohsOfReflCohsInf deps))
+        (prevReflFrames; reflFrame)
     |}
   end.
 
@@ -1750,6 +1753,7 @@ Inductive DepsReflCohs2Extension p: forall k (deps: DepsReflCohs2 p k), Type :=
   DepsReflCohs2Extension p.+1 k deps -> DepsReflCohs2Extension p k.+1 deps.(1)%depsreflcohs2.
 
 Arguments TopReflCoh2Dep {p deps}.
+#[local] Arguments TopReflCoh2Dep {p deps} & L cohL.
 Arguments AddReflCoh2Dep {p k}.
 
 Declare Scope extra_depsreflcohs2_scope.
@@ -2417,17 +2421,17 @@ Instance mkDgnData {p} (C: νSetData p)
   @Build_DgnData p.+1 (mkνSetData p C E) E'
     base
     (fun E'' L' cohL' => mkCohReflRestrPaintingsBelowInf (deps2 E'')
-      (TopReflCoh2Dep (deps := deps2 E'') L' cohL'.2))
+      (TopReflCoh2Dep L' cohL'.2))
     (fun E'' L' cohL' => mkCohReflRestrPaintingsBelowSup (deps2 E'')
-      (TopReflCoh2Dep (deps := deps2 E'') L' cohL'.2))
+      (TopReflCoh2Dep L' cohL'.2))
     (fun E'' L' cohL' => mkCohReflRestrPaintingsAboveSup (deps2 E'')
-      (TopReflCoh2Dep (deps := deps2 E'') L' cohL'.2))
+      (TopReflCoh2Dep L' cohL'.2))
     (fun E'' L' cohL' => mkCohReflBelowBelowPaintings (deps2 E'')
-      (TopReflCoh2Dep (deps := deps2 E'') L' cohL'.2))
+      (TopReflCoh2Dep L' cohL'.2))
     (fun E'' L' cohL' => mkCohReflAboveBelowPaintings (deps2 E'')
-      (TopReflCoh2Dep (deps := deps2 E'') L' cohL'.2))
+      (TopReflCoh2Dep L' cohL'.2))
     (fun E'' L' cohL' => mkCohReflAboveAbovePaintings (deps2 E'')
-      (TopReflCoh2Dep (deps := deps2 E'') L' cohL'.2)).
+      (TopReflCoh2Dep L' cohL'.2)).
 
 (** The degeneracy structure over a [νSet] truncated at dimension [p].
 
@@ -2460,13 +2464,14 @@ Definition mkDgnStepType p {C: νSet p} {D: νDgnSet p C}
     dgnCohLFromData
       (C.(data) X.1) X.2 E (D.(dgnStepData) X.1 R.1 X.2 R.2) dgnL }.
 
+#[local] Arguments Build_νSetData p & _ _ _ _ _ _.
+
 #[local]
 Definition mkνSetData0: νSetData 0 :=
   {|
-    frames := (tt: mkFrameTypes 0 0);
-    paintings := (tt: mkPaintingTypes 0 0 (tt: mkFrameTypes 0 0));
-    restrFrames :=
-      (tt: mkRestrFrameTypes (tt: mkPaintingTypes 0 0 (tt: mkFrameTypes 0 0)));
+    frames := tt;
+    paintings := tt;
+    restrFrames := tt;
     restrPaintings := fun _ => tt;
     cohFrames := fun _ => tt;
     cohPaintings := fun _ _ => tt;

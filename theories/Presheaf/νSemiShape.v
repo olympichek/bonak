@@ -239,8 +239,10 @@ Defined.
     the indices of the deleted positions. *)
 
 Definition νSemiShapeShift: Functor (Op νSemiShape) (Op νSemiShape) :=
-  Build_Functor (Op νSemiShape) (Op νSemiShape) (fun n => S n) (fun a b w => wkeep w)
-    (fun a => eq_refl) (fun a b c f g => eq_sym (wcomp_keep_keep f g)).
+  {| fobj n := S n;
+     fhom a b w := wkeep w;
+     fid a := eq_refl;
+     fcomp a b c f g := eq_sym (wcomp_keep_keep f g) |}.
 
 Lemma wskipKeep {k l} (ε: A) (w: Word l k):
   wcomp (wkeep w) (wgen l l ε) = wskip ε w.

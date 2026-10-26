@@ -249,7 +249,7 @@ Definition pshDgnApprox n: DgnPrefix n :=
    end).
 
 Definition pshDgnFrom m: νDgnSetFrom m (pshDgnApprox m) :=
-  ofChain (T := νDgnSetTel) pshDgnApprox (fun n =>
+  ofChain pshDgnApprox (fun n =>
     match n with 0 => eq_refl | n.+1 => eq_refl end) m.
 
 Definition f: νDgnSets := pshDgnFrom 0.

@@ -44,8 +44,7 @@ Defined.
 Definition graphFamilyMap {G: HSetGroupoid} (E: Family G):
   Map (graphFiber (proj E)) E (idFunctor G).
 Proof.
-  refine (@Build_Map G G (graphFiber (proj E)) E (idFunctor G)
-    (fun x a => graphFamilyObj E a)
+  refine (Build_Map (fun x a => graphFamilyObj E a)
     (fun x y a b => graphFamilyHom E a b) _ _ _).
   - intros x [[y a] p]. cbn in p. now destruct p.
   - intros x y z [[x' a] p] [[y' b] q] [[z' c] r] f g.

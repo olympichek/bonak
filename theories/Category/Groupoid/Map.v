@@ -19,11 +19,15 @@ Record Map {G H: HSetGroupoid} {E: Family G} {P: Family H} {F: Functor G H} := {
     P.(dbase) (mhom f) = F.(fhom) (E.(dbase) f);
 }.
 Arguments Map {G H} E P F.
+Arguments Build_Map {G H E P F} & _ _ _ _ _.
 
 Definition totalMap {G H: HSetGroupoid} {E: Family G} {P: Family H}
-  {F: Functor G H} (m: Map E P F): Functor (total E) (total P) :=
-  Build_Functor (total E) (total P) (fun a => (F.(fobj) a.1; m.(mobj) a.1 a.2))
-    (fun a b => m.(mhom)) (fun a => m.(mid) a.2) (fun a b c => m.(mcomp)).
+  {F: Functor G H} (m: Map E P F): Functor (total E) (total P) := {|
+  fobj a := (F.(fobj) a.1; m.(mobj) a.1 a.2);
+  fhom a b := m.(mhom);
+  fid a := m.(mid) a.2;
+  fcomp a b c := m.(mcomp);
+|}.
 
 (** Equality of displayed maps over a specified equality of base functors. *)
 Record MapEq {G H: HSetGroupoid} {E: Family G} {P: Family H}
@@ -40,7 +44,7 @@ Arguments MapEq {G H E P F L} e m n.
 Definition totalMapEq {G H: HSetGroupoid} {E: Family G} {P: Family H}
   {F L: Functor G H} (e: F ≐ L) {m: Map E P F} {n: Map E P L}
   (h: MapEq e m n): totalMap m ≐ totalMap n :=
-  @Build_FunctorEq (total E) (total P) (totalMap m) (totalMap n)
+  Build_FunctorEq
     (fun a => (= e.(objEq) a.1; h.(mapObjEq) a.1 a.2))
     (fun a b f => h.(mapHomEq) a.1 b.1 a.2 b.2 f).
 
@@ -64,7 +68,7 @@ Definition compMap {G H K: HSetGroupoid} {E: Family G} {P: Family H} {Q: Family 
   {F: Functor G H} {L: Functor H K} (m: Map E P F) (n: Map P Q L):
   Map E Q (F ⨟ᶠ L).
 Proof.
-  refine (@Build_Map G K E Q (F ⨟ᶠ L)
+  refine (Build_Map
     (fun x a => n.(mobj) (F.(fobj) x) (m.(mobj) x a))
     (fun x y a b f => n.(mhom) (m.(mhom) f)) _ _ _).
   - intros x a. now exact (f_equal n.(mhom) (m.(mid) a) • n.(mid) (m.(mobj) x a)).
@@ -74,13 +78,13 @@ Proof.
 Defined.
 
 Definition idMap {G: HSetGroupoid} (E: Family G): Map E E (idFunctor G) :=
-  @Build_Map G G E E (idFunctor G) (fun _ a => a) (fun _ _ _ _ f => f)
+  Build_Map (fun _ a => a) (fun _ _ _ _ f => f)
     (fun _ _ => eq_refl) (fun _ _ _ _ _ _ _ _ => eq_refl) (fun _ _ _ _ _ => eq_refl).
 
 Definition precomposeMapId {G H: HSetGroupoid} {E P: Family G} {Q: Family H}
   {F: Functor G H} (m: Map E P (idFunctor G)) (n: Map P Q F): Map E Q F.
 Proof.
-  refine (@Build_Map G H E Q F (fun x a => n.(mobj) x (m.(mobj) x a))
+  refine (Build_Map (fun x a => n.(mobj) x (m.(mobj) x a))
     (fun x y a b f => n.(mhom) (m.(mhom) f)) _ _ _).
   - intros. now rewrite m.(mid), n.(mid).
   - intros. now rewrite m.(mcomp), n.(mcomp).
@@ -118,7 +122,7 @@ Proof. now destruct p, q. Defined.
 Definition castBase {G H: HSetGroupoid} {E: Family G} {P: Family H}
   {F L: Functor G H} (e: F ≐ L) (m: Map E P F): Map E P L.
 Proof.
-  refine (@Build_Map G H E P L
+  refine (Build_Map
     (fun x a => rew [fun y => P.(dobj) y] e.(objEq) x in m.(mobj) x a)
     (fun x y a b f => castHom P (e.(objEq) x) (e.(objEq) y) (m.(mhom) f)) _ _ _).
   - intros x a. cbn beta. rewrite m.(mid). now apply castHomId.
@@ -135,7 +139,7 @@ Proof. now destruct p, q. Defined.
 Definition castBaseTotal {G H: HSetGroupoid} {E: Family G} {P: Family H}
   {F L: Functor G H} (e: F ≐ L) (m: Map E P F): totalMap (castBase e m) ≐ totalMap m.
 Proof.
-  refine (@Build_FunctorEq (total E) (total P) (totalMap (castBase e m)) (totalMap m)
+  refine (Build_FunctorEq
     (fun a => eq_existT_rew (e.(objEq) a.1) (m.(mobj) a.1 a.2)) _).
   intros a b f. now apply (castTotalHom P).
 Defined.
@@ -144,7 +148,7 @@ Definition pull {G H K: HSetGroupoid} {E: Family H} {P: Family K}
   {R: Functor H K} (m: Map E P R) (F: Functor G H):
   Map (reindex E F) P (F ⨟ᶠ R).
 Proof.
-  refine (@Build_Map G K (reindex E F) P (F ⨟ᶠ R)
+  refine (Build_Map
     (fun x a => m.(mobj) (F.(fobj) x) a) (fun x y a b f => m.(mhom) f.2.1)
     (fun x a => m.(mid) a) (fun x y z a b c f g => m.(mcomp) f.2.1 g.2.1) _).
   intros. cbn. now rewrite m.(mbase), f.2.2.
@@ -154,7 +158,7 @@ Definition intoPull {G H K: HSetGroupoid} {E: Family G} {P: Family K}
   (F: Functor G H) (R: Functor H K) (m: Map E P (F ⨟ᶠ R)):
   Map E (reindex P R) F.
 Proof.
-  refine (@Build_Map G H E (reindex P R) F m.(mobj)
+  refine (Build_Map m.(mobj)
     (fun x y a b f => (F.(fhom) (E.(dbase) f); (m.(mhom) f; m.(mbase) f))) _ _ _).
   - intros. apply (eq_sigT_nondep_hprop (fun _ _ _ _ => UIP _)); cbn.
     + now rewrite E.(dbaseId), F.(fid).
@@ -167,14 +171,14 @@ Defined.
 
 Definition sigmaFst {G: HSetGroupoid} (E: Family G) (P: Family (total E)):
   Map (sigma E P) E (idFunctor G) :=
-  @Build_Map G G (sigma E P) E (idFunctor G)
+  Build_Map
     (fun x a => a.1) (fun x y a b => P.(dbase))
     (fun x a => P.(dbaseId) a.2) (fun x y z a b c => P.(dbaseComp))
     (fun x y a b f => eq_refl).
 
 Definition forgetPull {G H: HSetGroupoid} (E: Family H) (F: Functor G H):
   Map (reindex E F) E F :=
-  @Build_Map G H (reindex E F) E F (fun x a => a)
+  Build_Map (fun x a => a)
     (fun x y a b f => f.2.1) (fun x a => eq_refl)
     (fun x y z a b c f g => eq_refl) (fun x y a b f => f.2.2).
 
@@ -185,7 +189,7 @@ Definition sigmaMap {G H: HSetGroupoid} {E: Family G} {P: Family H}
   {F: Functor G H} (m: Map E P F) {Q: Family (total E)} {R: Family (total P)}
   (n: Map Q R (totalMap m)): Map (sigma E Q) (sigma P R) F.
 Proof.
-  refine (@Build_Map G H (sigma E Q) (sigma P R) F
+  refine (Build_Map
     (fun x a => (m.(mobj) x a.1; n.(mobj) (x; a.1) a.2))
     (fun x y a b => n.(mhom))
     (fun x a => n.(mid) a.2) (fun x y z a b c => n.(mcomp)) _).

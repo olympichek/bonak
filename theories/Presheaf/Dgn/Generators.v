@@ -56,9 +56,10 @@ Proof.
 Qed.
 
 Definition semiShapeInclusion: Functor (νSemiShape A) (νShape A) :=
-  Build_Functor (νSemiShape A) (νShape A) (fun n => n)
-    (fun p n f => shapeFace f) (fun n => eq_refl)
-    (fun p m n f g => eq_sym (shapeFaceComp f g)).
+  {| fobj n := n;
+     fhom p n f := shapeFace f;
+     fid n := eq_refl;
+     fcomp p m n f g := eq_sym (shapeFaceComp f g) |}.
 
 Definition semiShapeOpInclusion: Functor (Op (νSemiShape A)) (Op (νShape A)) :=
   opFunctor semiShapeInclusion.
@@ -134,9 +135,10 @@ Proof.
 Qed.
 
 Definition shapeShift: Functor (Op (νShape A)) (Op (νShape A)) :=
-  Build_Functor (Op (νShape A)) (Op (νShape A)) S
-    (fun p n f => shapeKeep f) (fun n => eq_refl)
-    (fun p m n f g => eq_sym (shapeCompKeep g f)).
+  {| fobj := S;
+     fhom p n f := shapeKeep f;
+     fid n := eq_refl;
+     fcomp p m n f g := eq_sym (shapeCompKeep g f) |}.
 
 Lemma shapeMaskSkip {p k} (d: Word hunit k p):
   shapeMask (A := A) (wskip (A := hunit) tt d)

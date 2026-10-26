@@ -93,11 +93,12 @@ Unset Keyed Unification.
 
 (** Composition of pseudofunctors. *)
 Local Definition psHomFunctor {S T: Bicategory} (F: Pseudofunctor S T) (a b: S.(BObj)):
-  Functor (S.(BHom) a b) (T.(BHom) (F.(psObj) a) (F.(psObj) b)) :=
-  @Build_Functor _ _ (fun f => (psfData F).(psHom) f)
-    (fun f g α => (psfData F).(psCell) α)
-    (fun f => (psCellId _ F.(psStr).(psLaws)) a b f)
-    (fun f g h α β => (psCellComp _ F.(psStr).(psLaws)) a b f g h α β).
+  Functor (S.(BHom) a b) (T.(BHom) (F.(psObj) a) (F.(psObj) b)) := {|
+  fobj f := (psfData F).(psHom) f;
+  fhom f g α := (psfData F).(psCell) α;
+  fid f := (psCellId _ F.(psStr).(psLaws)) a b f;
+  fcomp f g h α β := (psCellComp _ F.(psStr).(psLaws)) a b f g h α β;
+|}.
 
 Definition composePsfData {S T U: Bicategory} (F: Pseudofunctor S T) (G: Pseudofunctor T U):
   PsfData S U (fun a => G.(psObj) (F.(psObj) a)) :=

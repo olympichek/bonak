@@ -72,9 +72,12 @@ Definition classGpd (G: UnivalentGroupoid): HGpd := gobj G.
 (** The 2-functor from 1-types to groupoids *)
 
 Definition pathFunctor {A B: HGpd} (f: A -> B):
-  Functor (pathCat A) (pathCat B) :=
-  Build_Functor (pathCat A) (pathCat B) f (fun x y p => f_equal f p)
-    (fun x => eq_refl) (fun x y z p q => eq_trans_map_distr f p q).
+  Functor (pathCat A) (pathCat B) := {|
+  fobj := f;
+  fhom x y p := f_equal f p;
+  fid x := eq_refl;
+  fcomp x y z p q := eq_trans_map_distr f p q;
+|}.
 
 (** The identity and composition paths of [pathFunctor] act trivially on
     object maps. Transport along them leaves components of natural
@@ -113,9 +116,10 @@ Proof.
 Qed.
 
 Definition pathNat {A B: HGpd} (f g: A -> B) (α: forall x: A, f x = g x):
-  NatTrans (pathFunctor f) (pathFunctor g) :=
-  Build_NatTrans _ _ (pathFunctor f) (pathFunctor g) α
-    (fun x y p => homotopyNat f g α p).
+  NatTrans (pathFunctor f) (pathFunctor g) := {|
+  ncomp := α;
+  nnat x y p := homotopyNat f g α p;
+|}.
 
 Local Lemma loopConcatRefl {X: Type} {x: X} (p q: x = x):
   p = eq_refl -> q = eq_refl -> p • q = eq_refl.

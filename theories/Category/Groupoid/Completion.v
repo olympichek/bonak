@@ -70,9 +70,12 @@ End GroupoidCompletion.
 Unset Universe Minimization ToSet.
 
 (** Univalence identifies a groupoid with the paths in its object 1-type. *)
-Definition groupoidToPaths (U: UnivalentGroupoid): Functor U (pathGpd (gobj U)) :=
-  @Build_Functor U (pathGpd (gobj U)) (fun a => a)
-    (fun a b f => homToId f) (homToIdId) (fun a b c f g => homToIdComp f g).
+Definition groupoidToPaths (U: UnivalentGroupoid): Functor U (pathGpd (gobj U)) := {|
+  fobj a := a;
+  fhom a b f := homToId f;
+  fid := homToIdId;
+  fcomp a b c f g := homToIdComp f g;
+|}.
 
 Definition groupoidToPathsFullyFaithful (U: UnivalentGroupoid):
   FullyFaithful (groupoidToPaths U).

@@ -603,7 +603,7 @@ Proof.
   pose (s := fullCohsChainSig dcTop).
   apply (frameEqDescend F L Hfaces s.2.2).
   apply (frameEqStep s.2.2 F L (Hfaces _ _ _ s.2.2)).
-  refine (@Build_FunctorEq _ unitGroupoid _ _ (fun x => hunit_ext _ _) _).
+  refine (Build_FunctorEq (fun x => hunit_ext _ _) _).
   intros x y f. now apply hunit_ext.
 Defined.
 

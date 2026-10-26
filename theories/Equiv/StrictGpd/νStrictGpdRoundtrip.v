@@ -280,7 +280,7 @@ Lemma frt0:
   transportGroupoidFunctor (descTotal DescZ) ⨟ᶠ proj (this X).
 Proof.
   apply (functorEqPath unitGroupoid.(hsetGroupoidUIP)).
-  refine (@Build_FunctorEq _ unitGroupoid _ _ (fun _ => hunit_ext _ _) _).
+  refine (Build_FunctorEq (fun _ => hunit_ext _ _) _).
   intros x y f. now apply hunit_ext.
 Defined.
 

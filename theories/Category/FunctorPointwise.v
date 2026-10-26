@@ -42,15 +42,16 @@ Record FunctorEq {G H: Category} {F L: Functor G H}: Prop := {
     castArrow (objEq x) (objEq y) (F.(fhom) f) = L.(fhom) f;
 }.
 Arguments FunctorEq {G H} F L.
+Arguments Build_FunctorEq {G H F L} & _ _.
 Infix "≐" := FunctorEq (at level 70, no associativity).
 
 Definition feqRefl {G H: Category} (F: Functor G H): F ≐ F :=
-  @Build_FunctorEq G H F F (fun _ => eq_refl) (fun _ _ _ => eq_refl).
+  Build_FunctorEq (fun _ => eq_refl) (fun _ _ _ => eq_refl).
 
 Definition feqTrans {G H: Category} {F L R: Functor G H}
   (e: F ≐ L) (h: L ≐ R): F ≐ R.
 Proof.
-  refine (@Build_FunctorEq G H F R (fun x => e.(objEq) x • h.(objEq) x) _).
+  refine (Build_FunctorEq (fun x => e.(objEq) x • h.(objEq) x) _).
   intros x y f. cbn beta.
   rewrite (castArrowTrans (G := H) (e.(objEq) x) (h.(objEq) x)
     (e.(objEq) y) (h.(objEq) y)), (e.(homEq) x y f).
@@ -61,19 +62,19 @@ Infix "•ᶠ" := feqTrans (at level 65, left associativity).
 
 Definition feqSym {G H: Category} {F L: Functor G H} (e: F ≐ L): L ≐ F.
 Proof.
-  refine (@Build_FunctorEq G H L F (fun x => eq_sym (e.(objEq) x)) _).
+  refine (Build_FunctorEq (fun x => eq_sym (e.(objEq) x)) _).
   intros x y f. cbn beta. rewrite <- (e.(homEq) x y f). now apply (castArrowCancel (G := H)).
 Defined.
 
 Definition feqWhiskerL {G H K: Category} (F: Functor G H)
   {L R: Functor H K} (e: L ≐ R): F ⨟ᶠ L ≐ F ⨟ᶠ R :=
-  @Build_FunctorEq G K (F ⨟ᶠ L) (F ⨟ᶠ R)
+  Build_FunctorEq
     (fun x => e.(objEq) (F.(fobj) x)) (fun x y f => e.(homEq) _ _ (F.(fhom) f)).
 
 Definition feqWhiskerR {G H K: Category} {F L: Functor G H}
   (e: F ≐ L) (R: Functor H K): F ⨟ᶠ R ≐ L ⨟ᶠ R.
 Proof.
-  refine (@Build_FunctorEq G K (F ⨟ᶠ R) (L ⨟ᶠ R)
+  refine (Build_FunctorEq
     (fun x => f_equal R.(fobj) (e.(objEq) x)) _).
   intros x y f. cbn. rewrite <- (mapCastArrow R). now rewrite (e.(homEq) x y f).
 Defined.
@@ -100,7 +101,7 @@ Definition cancelObservation {G H K: Category} (O: Functor H K)
   (mi: forall x y (f g: H.(CHom) x y), O.(fhom) f = O.(fhom) g -> f = g)
   (F L: Functor G H) (h: F ⨟ᶠ O ≐ L ⨟ᶠ O): F ≐ L.
 Proof.
-  refine (@Build_FunctorEq G H F L (fun x => oi _ _ (h.(objEq) x)) _).
+  refine (Build_FunctorEq (fun x => oi _ _ (h.(objEq) x)) _).
   intros x y f. apply mi. rewrite (mapCastArrow O).
   rewrite (objectUIP _ _ (f_equal O.(fobj) (oi _ _ (h.(objEq) x))) (h.(objEq) x)).
   rewrite (objectUIP _ _ (f_equal O.(fobj) (oi _ _ (h.(objEq) y))) (h.(objEq) y)).
