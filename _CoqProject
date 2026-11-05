@@ -138,6 +138,9 @@ theories/Presheaf/WordCoherence.v
 theories/Presheaf/νSemiShape.v
 theories/Reedy/Correspondence.v
 theories/Reedy/Extension.v
+theories/Reedy/Gpd/Correspondence.v
+theories/Reedy/Gpd/Extension.v
+theories/Reedy/Gpd/Reedy.v
 theories/Reedy/MatchingSystem.v
 theories/Reedy/Reedy.v
 theories/Reedy/StrictGpd/Correspondence.v
