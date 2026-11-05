@@ -19,8 +19,10 @@
     and needs no dependent inversion. *)
 
 Set Warnings "-notation-overridden".
+From Stdlib Require Import Arith.PeanoNat.
 From Bonak Require Import HSet Notation LeSProp NatLemmas.
-From Bonak.Category Require Import Category.
+From Bonak.Lib Require Import FinitePrefix Equiv.
+From Bonak.Category Require Import Category Full.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -272,3 +274,55 @@ Arguments wcomp_keep_keep {A m n p} g f.
 Arguments wordSet {A} n m.
 
 Arguments wskipKeep {A k l} ε w.
+
+(** The ν-semi-shape category is direct: morphisms cannot lower the rank, and
+    every endomorphism is the identity. *)
+Lemma wordBound {A: HSet} {k l: nat} (w: Word A k l): Nat.le k l.
+Proof.
+  revert k w; induction l as [|l IH]; intros k w.
+  - destruct k as [|k].
+    + now apply Nat.le_refl.
+    + now destruct w.
+  - destruct w as [[ε w]|w].
+    + now exact (Nat.le_trans _ _ _ (IH _ w) (Nat.le_succ_diag_r l)).
+    + destruct k as [|k].
+      * now destruct w.
+      * now apply le_n_S, IH.
+Defined.
+
+Lemma noWordAbove {A: HSet} {k l: nat}
+  (h: Nat.lt l k) (w: Word A k l): False.
+Proof.
+  now exact (Nat.lt_irrefl l (Nat.lt_le_trans _ _ _ h (wordBound w))).
+Defined.
+
+Lemma wordEndId {A: HSet} (n: nat) (w: Word A n n): w = wid n.
+Proof.
+  revert w; induction n as [|n IH]; intro w.
+  - now destruct w.
+  - destruct w as [[ε w]|w].
+    + exfalso. now exact (Nat.nle_succ_diag_l n (wordBound w)).
+    + cbn. now rewrite (IH w).
+Defined.
+
+(** Closes a goal with a word in the context whose target lies strictly below
+    its source rank. *)
+Ltac wordAboveAbsurd :=
+  exfalso; match goal with
+  | j: Index _, f: _ |- _ => now exact (noWordAbove (rankLt j) f)
+  end.
+
+(** The full category on all objects of the opposite category is that category.
+    The two sides differ in the universe of objects, so this is an equivalence
+    rather than a conversion. *)
+Polymorphic Definition fullShapeFunctorEquiv (A: HSet) (D: Category):
+  Equiv (Functor (fullCategory@{Set _ _} (Op (νSemiShape A)) (fun n: nat => n)) D)
+    (Functor (Op (νSemiShape A)) D).
+Proof.
+  refine (qinvEquiv
+    (fun F => {| fobj := F.(fobj); fhom i j f := F.(fhom) f;
+      fid := F.(fid); fcomp i j k f g := F.(fcomp) f g |})
+    (fun F => {| fobj := F.(fobj); fhom i j f := F.(fhom) f;
+      fid := F.(fid); fcomp i j k f g := F.(fcomp) f g |}) _ _);
+    now intros.
+Defined.

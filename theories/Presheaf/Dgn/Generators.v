@@ -48,6 +48,15 @@ Proof.
   unfold shapeSandwich, shapeMask; cbn. rewrite wcompIdl. reflexivity.
 Qed.
 
+(** Moving a face past a coordinate selection gives its normalized shape. *)
+Lemma shapeCross {m k l} (f: Word A k m) (d: Word hunit l m):
+  shapeComp (shapeFace f) (shapeMask d) = cross f d.
+Proof.
+  unfold shapeComp, shapeFace, shapeMask; cbn.
+  destruct (cross f d) as [j [r g]].
+  unfold shapeSandwich; cbn. rewrite 2 wcompIdl. now reflexivity.
+Qed.
+
 Lemma shapeFactor {p n k} (r: Word hunit k p) (f: Word A k n):
   shapeComp (shapeMask r) (shapeFace f) = (k; (r, f)).
 Proof.

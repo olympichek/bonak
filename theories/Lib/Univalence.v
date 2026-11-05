@@ -158,3 +158,44 @@ Polymorphic Definition hsetFamilyEquivInd4 {I: Type} {J: I -> Type}
       (fun i j k l => e (i; (j; (k; l))))) h
     (fun z => R z.1 z.2.1 z.2.2.1 z.2.2.2)
     (fun z => e z.1 z.2.1 z.2.2.1 z.2.2.2).
+
+(** H-set families correspond to maps of their total spaces. *)
+
+Polymorphic Definition hsetTotalMap (B: HSet) (E: B -> HSet): {T: HSet &T T -> B} :=
+  (hsigT E; fun x => x.1).
+
+Polymorphic Definition hsetFiberFamily (B: HSet) (m: {T: HSet &T T -> B}): B -> HSet :=
+  fun b => hsigT (A := m.1) (fun t => hEq b (m.2 t)).
+
+(** An equivalence over the base identifies the corresponding maps. *)
+Polymorphic Lemma hsetMapEq {B T U: HSet} (e: Equiv T U) (f: T -> B) (g: U -> B)
+  (h: forall t, g (e t) = f t):
+  ((T; f): {V: HSet &T V -> B}) = (U; g).
+Proof.
+  revert g h.
+  refine (hsetEquivInd T
+    (fun U e => forall g: U -> B, (forall t, g (e t) = f t) ->
+      ((T; f): {V: HSet &T V -> B}) = (U; g)) _ U e).
+  intros g h. apply f_equal.
+  apply functional_extensionality. intro t. now symmetry; apply h.
+Defined.
+
+Polymorphic Lemma hsetFiberTotal (B: HSet) (E: B -> HSet):
+  hsetFiberFamily B (hsetTotalMap B E) = E.
+Proof.
+  apply functional_extensionality. intro b.
+  now exact (@hsetEq (hsetFiberFamily B (hsetTotalMap B E) b) (E b)
+    (baseContract E b)).
+Defined.
+
+Polymorphic Lemma hsetTotalFiber (B: HSet) (m: {T: HSet &T T -> B}):
+  hsetTotalMap B (hsetFiberFamily B m) = m.
+Proof.
+  destruct m as [T f].
+  apply (@hsetMapEq B (hsigT (hsetFiberFamily B (T; f))) T (fillerEquiv f)).
+  intros [b [t p]]. now symmetry; exact p.
+Defined.
+
+Polymorphic Definition hsetFamilyMapEquiv (B: HSet):
+  Equiv (B -> HSet) {T: HSet &T T -> B} :=
+  qinvEquiv (hsetTotalMap B) (hsetFiberFamily B) (hsetFiberTotal B) (hsetTotalFiber B).

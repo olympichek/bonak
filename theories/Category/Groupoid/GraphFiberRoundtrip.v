@@ -106,3 +106,37 @@ Proof.
   apply (functorEqPath (total E).(hsetGroupoidUIP)).
   unshelve econstructor; now intros.
 Defined.
+
+(** Displayed groupoids classify functors with a fixed codomain. *)
+
+Local Definition groupoidFunctorPairEq {B C D: HSetGroupoid}
+  (e: HSetGroupoidIso C D) (p: Functor C B) (q: Functor D B)
+  (h: hsetGroupoidIsoFunctor e ⨟ᶠ q = p):
+  ((C; p): {G: HSetGroupoid &T Functor G B}) = (D; q).
+Proof.
+  revert p q h.
+  refine (hsetGroupoidIsoInd C (fun D e => forall p q,
+    hsetGroupoidIsoFunctor e ⨟ᶠ q = p ->
+    ((C; p): {G: HSetGroupoid &T Functor G B}) = (D; q)) _ D e).
+  intros p q h. change (idFunctor C ⨟ᶠ q = p) in h.
+  rewrite functorIdL in h. now destruct h.
+Defined.
+
+Definition graphFiberTotal {B C: HSetGroupoid} (p: Functor C B):
+  ((total (graphFiber p); proj (graphFiber p)):
+    {G: HSetGroupoid &T Functor G B}) = (C; p).
+Proof.
+  symmetry. apply (groupoidFunctorPairEq (graphUnitIso p)).
+  apply (functorEqPath B.(hsetGroupoidUIP)). now apply graphUnitProj.
+Defined.
+
+Definition graphFiberProj {B: HSetGroupoid} (E: Family B):
+  graphFiber (proj E) = E := familyEq (graphFamilyIso E).
+
+Definition familyEquivFunctor (B: HSetGroupoid):
+  Equiv (Family B) {G: HSetGroupoid &T Functor G B}.
+Proof.
+  refine (qinvEquiv (fun E => (total E; proj E))
+    (fun p => graphFiber p.2) graphFiberProj _).
+  intros [C p]. now apply graphFiberTotal.
+Defined.

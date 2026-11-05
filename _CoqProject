@@ -42,6 +42,7 @@ theories/Category/Groupoid/SetBased.v
 theories/Category/Groupoid/StructureIdentity.v
 theories/Category/Groupoid/WeakEquivalence.v
 theories/Category/HSetCat.v
+theories/Category/SequentialFunctor.v
 theories/Category/UnivalenceFacts.v
 theories/Category/WeakEquivalence.v
 theories/Category/Yoneda.v
@@ -96,6 +97,7 @@ theories/Lib/BoolLemmas.v
 theories/Lib/CohShapes.v
 theories/Lib/Contractible.v
 theories/Lib/Equiv.v
+theories/Lib/FinitePrefix.v
 theories/Lib/Funext.v
 theories/Lib/HGpd.v
 theories/Lib/HSet.v
@@ -104,6 +106,7 @@ theories/Lib/Limit.v
 theories/Lib/NatLemmas.v
 theories/Lib/Notation.v
 theories/Lib/RewLemmas.v
+theories/Lib/SequentialLimit.v
 theories/Lib/SigT.v
 theories/Lib/Truncation.v
 theories/Lib/Univalence.v

@@ -1,10 +1,10 @@
-(** This file defines HGpd and provides unit and sigT on HGpd. *)
+(** This file defines HGpd and provides unit, sigT and pi on HGpd. *)
 
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT HSet.
-From Bonak.Lib Require Import Notation RewLemmas Equiv Univalence.
+From Bonak.Lib Require Import Notation RewLemmas Equiv Univalence Funext.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 
 Set Primitive Projections.
@@ -106,6 +106,27 @@ Definition hgpdOfHSet (A: HSet): HGpd := {|
 Definition gpaths {A: HGpd} (x y: A): HGpd :=
   hgpdOfHSet (hpaths x y).
 
+
+(** Pointwise paths form an h-set and classify paths between sections. *)
+Definition gpiT_GUIP {I: Type} (B: I -> HGpd) (f g: forall i, B i)
+  (p q: f = g) (r s: p = q): r = s.
+Proof.
+  eapply (retract_UIP
+    (B := hpiT (fun i => hpaths (f i) (g i)))
+    (@happly I (fun i => B i) f g)
+    (functional_extensionality_dep_good f g)).
+  now apply funextHapply.
+Defined.
+
+Definition gpiT {I: Type} (B: I -> HGpd): HGpd := {|
+  GDom := forall i, B i;
+  GUIP := gpiT_GUIP B;
+|}.
+
+Notation "'gforall' x .. y , P" :=
+  (gpiT (fun x => .. (gpiT (fun y => P%type)) ..))
+  (at level 10, x binder, y binder, P at level 200,
+  format "'[  ' '[  ' 'gforall'  x  ..  y ']' ,  '/' P ']'"): type_scope.
 
 (** [sigT] seen as a type constructor on [HGpd] *)
 
@@ -228,3 +249,44 @@ Proof.
   now exact (@eq_rect {L: I -> HGpd &T forall i, Equiv (H i) (L i)}
     (H; fun _ => idEquiv) (fun z => P z.1 z.2) h (K; e) r).
 Defined.
+
+(** Families of 1-types correspond to maps of their total spaces. *)
+
+Definition hgpdTotalMap (B: HGpd) (E: B -> HGpd): {T: HGpd &T T -> B} :=
+  (gsigT E; fun x => x.1).
+
+Definition hgpdFiberFamily (B: HGpd) (m: {T: HGpd &T T -> B}): B -> HGpd :=
+  fun b => {t: m.1 & gpaths b (m.2 t)}.
+
+(** An equivalence over the base identifies the corresponding maps. *)
+Lemma hgpdMapEq {B T U: HGpd} (e: Equiv T U) (f: T -> B) (g: U -> B)
+  (h: forall t, g (e t) = f t):
+  ((T; f): {V: HGpd &T V -> B}) = (U; g).
+Proof.
+  revert g h.
+  refine (hgpdEquivInd T
+    (fun U e => forall g: U -> B, (forall t, g (e t) = f t) ->
+      ((T; f): {V: HGpd &T V -> B}) = (U; g)) _ U e).
+  intros g h. apply f_equal.
+  apply functional_extensionality. intro t. now symmetry; apply h.
+Defined.
+
+Lemma hgpdFiberTotal (B: HGpd) (E: B -> HGpd):
+  hgpdFiberFamily B (hgpdTotalMap B E) = E.
+Proof.
+  apply functional_extensionality. intro b.
+  now exact (@hgpdEq (hgpdFiberFamily B (hgpdTotalMap B E) b) (E b)
+    (basePairEquiv (fun b => E b) b)).
+Defined.
+
+Lemma hgpdTotalFiber (B: HGpd) (m: {T: HGpd &T T -> B}):
+  hgpdTotalMap B (hgpdFiberFamily B m) = m.
+Proof.
+  destruct m as [T f].
+  apply (@hgpdMapEq B (gsigT (hgpdFiberFamily B (T; f))) T (fillerEquiv f)).
+  intros [b [t p]]. now symmetry; exact p.
+Defined.
+
+Definition hgpdFamilyMapEquiv (B: HGpd):
+  Equiv (B -> HGpd) {T: HGpd &T T -> B} :=
+  qinvEquiv (hgpdTotalMap B) (hgpdFiberFamily B) (hgpdFiberTotal B) (hgpdTotalFiber B).

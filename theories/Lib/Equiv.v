@@ -16,6 +16,7 @@
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
+From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak Require Import SigT HSet Notation RewLemmas.
 From Bonak.Lib Require Import Contractible.
 
@@ -385,4 +386,42 @@ Proof.
     now exact (f_equal (fun q: (a; r) = (a; r) => projT1_eq q)
       (contrUIP c (eq_sym (c.2 (a; r)) • c.2 (a; r)) eq_refl)).
   - intro s. now exact (projT2_eq (h b s)).
+Defined.
+
+(** Pointwise equivalences induce an equivalence of dependent products. *)
+
+Definition piEquiv {I: Type} {X Y: I -> Type}
+  (e: forall i, Equiv (X i) (Y i)):
+  Equiv (forall i, X i) (forall i, Y i).
+Proof.
+  refine (qinvEquiv (fun x i => e i (x i))
+    (fun y i => invEq (e i) (y i)) _ _).
+  - intro x. apply functional_extensionality_dep; intro i.
+    now apply retEq.
+  - intro y. apply functional_extensionality_dep; intro i.
+    now apply secEq.
+Defined.
+
+(** A dependent family of pairs is a pair of dependent families. *)
+
+Definition sigTPiEquiv {I: Type} {X: I -> Type}
+  {P: forall i, X i -> Type}:
+  Equiv {x: forall i, X i &T forall i, P i (x i)}
+    (forall i, {x: X i &T P i x}) :=
+  qinvEquiv (fun z i => (z.1 i; z.2 i))
+    (fun z => (fun i => (z i).1; fun i => (z i).2))
+    (fun _ => eq_refl) (fun _ => eq_refl).
+
+(** A path between dependent pairs consists of a path in the base and
+    a path in the fibre after transport. *)
+
+Definition sigTPathEquiv {X: Type} {P: X -> Type}
+  (u v: {x: X &T P x}):
+  Equiv (u = v) {p: u.1 = v.1 &T rew [P] p in u.2 = v.2}.
+Proof.
+  refine (qinvEquiv (fun p => (projT1_eq p; projT2_eq p))
+    (fun p => eq_sigT_uncurried u v p) _ _).
+  - intro p. now destruct p, u.
+  - destruct u as [x a], v as [y b]; intros [p q]; cbn in p, q.
+    now destruct q, p.
 Defined.
