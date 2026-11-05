@@ -137,6 +137,10 @@ theories/Presheaf/WordAction.v
 theories/Presheaf/WordCoherence.v
 theories/Presheaf/νSemiShape.v
 theories/Reedy/Correspondence.v
+theories/Reedy/Dgn/Correspondence.v
+theories/Reedy/Dgn/Extension.v
+theories/Reedy/Dgn/Reedy.v
+theories/Reedy/Dgn/ShapeAction.v
 theories/Reedy/Extension.v
 theories/Reedy/Gpd/Correspondence.v
 theories/Reedy/Gpd/Extension.v
