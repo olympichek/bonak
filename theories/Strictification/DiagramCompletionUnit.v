@@ -3,7 +3,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Truncation Notation Funext RewLemmas Equiv.
 From Bonak.Category Require Import Category Groupoid.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Groupoid Require Import WeakEquivalence SetBased.
 From Bonak.Strictification Require Import DiagramEvaluation DiagramDescent.
 From Bonak.Category.Groupoid Require Import CompletionPseudofunctor.

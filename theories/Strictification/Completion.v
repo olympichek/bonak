@@ -3,7 +3,7 @@
     paths and their coherence. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation LeSProp Truncation.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Presheaf Require Import νSemiShape CategoryAction.
 From Bonak.Presheaf.StrictGpd Require Import Presentation Functor.
 From Bonak.Strictification Require Export DiagramCompletion.

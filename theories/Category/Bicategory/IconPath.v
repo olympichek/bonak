@@ -17,7 +17,7 @@ Set Universe Polymorphism.
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import RewLemmas.
 From Bonak Require Import HSet Notation Funext.
-From Bonak Require Import νGpd.HGpd.
+From Bonak Require Import HGpd.
 From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import Bicategory.
 From Stdlib Require Import Logic.FunctionalExtensionality.

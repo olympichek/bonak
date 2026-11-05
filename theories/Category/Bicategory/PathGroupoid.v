@@ -16,7 +16,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import HSet Notation RewLemmas.
-From Bonak Require Import νGpd.HGpd.
+From Bonak Require Import HGpd.
 From Bonak.Lib Require Import Equiv Univalence Funext.
 From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import Bicategory BicategoryEq.

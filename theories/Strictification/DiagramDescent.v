@@ -2,7 +2,7 @@
     The comparison transformations are determined on represented objects. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Funext RewLemmas Truncation.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Strictification Require Import DiagramEvaluation.
 From Bonak.Category.Groupoid Require Import CompletionUniqueness Precomposition SetBased WeakEquivalence.
 From Bonak.Category.Bicategory Require Import PathDiagram PathGroupoid Pseudonatural

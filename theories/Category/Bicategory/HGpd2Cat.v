@@ -1,7 +1,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas.
 From Stdlib Require Import Logic.FunctionalExtensionality.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Bicategory Require Export Bicategory.
 Set Primitive Projections.
 Set Printing Projections.

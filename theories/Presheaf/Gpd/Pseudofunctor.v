@@ -5,7 +5,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import RewLemmas.
 From Bonak Require Import HSet Notation LeSProp Funext.
-From Bonak Require Import νGpd.HGpd νGpd.Pasting.
+From Bonak Require Import HGpd νGpd.Pasting.
 From Bonak.Presheaf.Gpd Require Export Presentation.
 
 From Bonak.Category Require Import Category.

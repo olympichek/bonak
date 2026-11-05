@@ -15,7 +15,7 @@
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT RewLemmas HSet LeSProp NatLemmas Notation νGpd.HGpd
+From Bonak Require Import SigT RewLemmas HSet LeSProp NatLemmas Notation HGpd
   νGpd.Layer νGpd.Lemmas νGpd.Pasting νGpd Presheaf.Gpd.Presentation.
 From Bonak.Equiv.Gpd Require Import Face νGpdOfPresheaf PresheafOfνGpd νGpdEquiv.
 From Bonak.Lib Require Import Equiv.

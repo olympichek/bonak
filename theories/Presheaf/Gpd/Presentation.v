@@ -7,7 +7,7 @@
     [HGpd] are h-sets, any two proofs of this hexagon agree by [GUIP]. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import HSet Notation LeSProp CohShapes νGpd.HGpd.
+From Bonak Require Import HSet Notation LeSProp CohShapes HGpd.
 
 From Bonak.Presheaf Require Import FaceStructure.
 

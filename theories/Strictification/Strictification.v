@@ -4,7 +4,7 @@
     correspondences transfer this result. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet SigT Equiv Notation NatLemmas Truncation.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category Require Import Category.
 From Bonak.Presheaf Require Import νSemiShape.
 From Bonak.Strictification Require Import ChartDiagram Completion DiagramCompletionUnit.

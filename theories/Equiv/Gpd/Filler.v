@@ -5,7 +5,7 @@
     laws remain transparent so that they compute at identity paths. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT RewLemmas HSet Notation νGpd.HGpd.
+From Bonak Require Import SigT RewLemmas HSet Notation HGpd.
 From Bonak.Lib Require Import Equiv.
 From Bonak.Equiv.Gpd Require Import PathAlgebra.
 Import Logic.EqNotations.

@@ -1,6 +1,6 @@
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT RewLemmas HSet Notation LeSProp Limit CohShapes.
-From Bonak Require Import νGpd.HGpd νGpd.Layer νGpd.Lemmas.
+From Bonak Require Import HGpd νGpd.Layer νGpd.Lemmas.
 
 Set Primitive Projections.
 Set Printing Projections.

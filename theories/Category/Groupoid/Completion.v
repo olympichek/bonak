@@ -3,7 +3,7 @@ From Bonak.Lib Require Import SigT HSet Notation Equiv Truncation.
 From Bonak.Category Require Import Category Groupoid HSetCat UnivalenceFacts FunctorUnivalence
   Yoneda Completion.
 From Bonak.Category.Groupoid Require Import WeakEquivalence.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Bicategory Require Import PathGroupoid.
 Set Primitive Projections.
 Set Universe Polymorphism.

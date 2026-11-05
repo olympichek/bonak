@@ -2,7 +2,7 @@
     components are equivalences determines an equality of diagrams. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import Funext Equiv RewLemmas Notation HSet.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Bicategory Require Import HGpd2Cat Pseudonatural.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 Set Primitive Projections.

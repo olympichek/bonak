@@ -1,7 +1,7 @@
 (** Path composition, dependent-pair paths, and transport identities. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT RewLemmas HSet Notation νGpd.HGpd νGpd.Lemmas νGpd.Pasting.
+From Bonak Require Import SigT RewLemmas HSet Notation HGpd νGpd.Lemmas νGpd.Pasting.
 From Bonak.Lib Require Import Equiv.
 Import Logic.EqNotations.
 

@@ -21,7 +21,7 @@ From Bonak.Lib Require Import CohShapes.
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT RewLemmas HSet LeSProp Notation Limit νGpd.HGpd
+From Bonak Require Import SigT RewLemmas HSet LeSProp Notation Limit HGpd
   νGpd.Layer νGpd.Lemmas νGpd.
 From Bonak.Lib Require Import Equiv.
 From Bonak.Equiv.Gpd Require Import PathAlgebra.

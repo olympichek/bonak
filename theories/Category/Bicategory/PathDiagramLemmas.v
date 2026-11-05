@@ -3,7 +3,7 @@
 Set Universe Polymorphism.
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas Funext.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Bicategory Require Export PathDiagram.
 From Bonak.Category.Bicategory Require Import HGpd2Cat Pseudofunctor
   LocallyDiscretePseudofunctor LocallyDiscrete.

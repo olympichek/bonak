@@ -1,7 +1,7 @@
 (** Prefix coherence and generated B-side exchange for the backward round trip. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT RewLemmas HSet LeSProp NatLemmas Notation νGpd.HGpd
+From Bonak Require Import SigT RewLemmas HSet LeSProp NatLemmas Notation HGpd
   νGpd.Layer νGpd.Lemmas νGpd Presheaf.Gpd.Presentation.
 From Bonak.Equiv.Gpd Require Import Face νGpdOfPresheaf PresheafOfνGpd νGpdEquiv.
 From Bonak.Equiv.Gpd.νGpdRoundtrip Require Import Exchange.

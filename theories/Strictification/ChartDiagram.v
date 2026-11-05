@@ -2,7 +2,7 @@
     representatives under all arrows of the indexing category. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet SigT Notation RewLemmas Equiv Truncation.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category Require Import Category FunctorAlgebra.
 From Bonak.Category.Groupoid Require Import SetBased WeakEquivalence.
 From Bonak.Strictification Require Import DiagramEvaluation.

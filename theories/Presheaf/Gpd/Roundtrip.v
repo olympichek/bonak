@@ -2,7 +2,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation LeSProp Equiv.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 
 From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import Bicategory IconPath LocallyDiscrete Pseudofunctor

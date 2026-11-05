@@ -4,7 +4,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT HSet Notation.
-From Bonak Require Import νGpd.HGpd.
+From Bonak Require Import HGpd.
 From Bonak.Lib Require Import Equiv Contractible.
 From Bonak.Category Require Export Category.
 From Stdlib Require Import Logic.FunctionalExtensionality.

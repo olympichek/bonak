@@ -10,7 +10,7 @@
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT HSet LeSProp Notation νGpd.HGpd νGpd.Layer νGpd Presheaf.Gpd.Presentation.
+From Bonak Require Import SigT HSet LeSProp Notation HGpd νGpd.Layer νGpd Presheaf.Gpd.Presentation.
 From Bonak.Equiv.Gpd Require Import Face.
 
 From Bonak Require Import Limit.

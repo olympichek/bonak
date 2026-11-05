@@ -4,7 +4,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Truncation.
 From Bonak.Category Require Import Category Groupoid.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Groupoid Require Import SetBased.
 From Bonak.Category.Bicategory Require Import Groupoids.
 From Bonak.Category.Groupoid Require Import CompletionPseudofunctor.

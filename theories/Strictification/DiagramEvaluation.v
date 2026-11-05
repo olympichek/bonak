@@ -3,7 +3,7 @@
     paths and composition comparisons of the target diagram. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Groupoid Require Import SetBased.
 From Bonak.Category.Bicategory Require Import PathDiagram PathGroupoid.
 Set Primitive Projections.

@@ -4,7 +4,7 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Truncation.
 From Bonak.Category Require Import Groupoid.
 From Bonak.Category.Groupoid Require Import SetBased.
-From Bonak.νGpd Require Import HGpd.
+From Bonak.Lib Require Import HGpd.
 From Bonak.Category Require Export FullyFaithful.
 Set Primitive Projections.
 Set Universe Polymorphism.

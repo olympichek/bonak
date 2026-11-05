@@ -97,6 +97,7 @@ theories/Lib/CohShapes.v
 theories/Lib/Contractible.v
 theories/Lib/Equiv.v
 theories/Lib/Funext.v
+theories/Lib/HGpd.v
 theories/Lib/HSet.v
 theories/Lib/LeSProp.v
 theories/Lib/Limit.v
@@ -139,7 +140,6 @@ theories/Strictification/DiagramCompletionUnit.v
 theories/Strictification/DiagramDescent.v
 theories/Strictification/DiagramEvaluation.v
 theories/Strictification/Strictification.v
-theories/νGpd/HGpd.v
 theories/νGpd/Layer.v
 theories/νGpd/Lemmas.v
 theories/νGpd/Pasting.v
