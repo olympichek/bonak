@@ -7,6 +7,7 @@ From Bonak.Lib Require Import HSet SigT Equiv Funext RewLemmas Notation Sequenti
 Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
+Unset Universe Minimization ToSet.
 
 (** The ranks below [n]. [Some] retains an earlier rank; [None] adds the
     highest rank. Reedy theory calls the rank of an object its degree. *)
