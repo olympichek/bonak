@@ -419,70 +419,6 @@ Proof.
   now reflexivity.
 Defined.
 
-(** Extend a permutahedral cell along a path in its source. A supplied
-    naturality prism moves its upper hexagon from [z1] to [z0]. The vertical
-    boundaries are normalized using [f_equal zS e • pIs] and
-    [f_equal zQ e • pIq]. *)
-Definition layer_cube_nat
-  {X2 X1 X0 TU T: Type}
-  {uf0: TU -> X1} {rf0: T -> X0} {fA fB fC: TU -> T}
-  {rfq rfs rfr: X1 -> X0}
-  {gq: forall dd, rfq (uf0 dd) = rf0 (fA dd)}
-  {gs: forall dd, rfs (uf0 dd) = rf0 (fB dd)}
-  {gr: forall dd, rfr (uf0 dd) = rf0 (fC dd)}
-  {rur rus ruq1 rur1: X2 -> X1}
-  {KA2: forall z, rfq (rus z) = rfs (ruq1 z)}
-  {KA4: forall z, rfq (rur z) = rfr (ruq1 z)}
-  {KA6: forall z, rfr (rus z) = rfs (rur1 z)}
-  {Z: Type} (zS zR zQ: Z -> X2)
-  (K1: forall z, rur (zS z) = rus (zR z))
-  (K3: forall z, ruq1 (zR z) = rur1 (zQ z))
-  (K5: forall z, ruq1 (zS z) = rus (zQ z))
-  (HHA: forall z, hexagonal_coherence rfq rfs rfr
-    (K1 z) (K3 z) (K5 z) (KA2 (zR z)) (KA4 (zS z)) (KA6 (zQ z)))
-  {z0 z1: Z} (e: z0 = z1)
-  (u0 u1 u2 u3 u4 u5: TU)
-  (eU1: u0 = u1) (eU2: u2 = u3) (eU3: u4 = u5)
-  (e2: fA u1 = fB u2) (e4: fA u0 = fC u4) (e6: fC u5 = fB u3)
-  (zs2 zr2 zq2: X2)
-  (pIs: zS z1 = zs2) (pIr: zR z1 = zr2) (pIq: zQ z1 = zq2)
-  (pV0: rur zs2 = uf0 u0) (pV1: rus zr2 = uf0 u1)
-  (pV2: ruq1 zr2 = uf0 u2) (pV3: rur1 zq2 = uf0 u3)
-  (pV4: ruq1 zs2 = uf0 u4) (pV5: rus zq2 = uf0 u5)
-  (HH1: hexagonal_coherence rur uf0 rus pIs eU1 pIr pV0 (K1 z1) pV1)
-  (HH3: hexagonal_coherence ruq1 uf0 rur1 pIr eU2 pIq pV2 (K3 z1) pV3)
-  (HH5: hexagonal_coherence ruq1 uf0 rus pIs eU3 pIq pV4 (K5 z1) pV5)
-  (κ: hexagonal_coherence fA fB fC eU1 eU2 eU3 e2 e4 e6)
-  (HH2: hexagonal_coherence rfq rf0 rfs pV1 e2 pV2 (gq u1) (KA2 zr2) (gs u2))
-  (HH4: hexagonal_coherence rfq rf0 rfr pV0 e4 pV4 (gq u0) (KA4 zs2) (gr u4))
-  (HH6: hexagonal_coherence rfr rf0 rfs pV5 e6 pV3 (gr u5) (KA6 zq2) (gs u3))
-  (P: permutahedral_coherence u0 u1 u2 u3 u4 u5
-    eU1 eU2 eU3 e2 e4 e6 (zS z1) zs2 (zR z1) zr2 (zQ z1) zq2 pIs pIr pIq
-    pV0 pV1 pV2 pV3 pV4 pV5 (K1 z1) (K3 z1) (K5 z1) HH1 HH3 HH5 κ HH2 HH4 HH6 (HHA z1))
-  (S1: square_coherence
-    (fun z => rur (zS z)) (fun z => rus (zR z)) rfq rfq
-    (fun z => f_equal rfq (K1 z)) e)
-  (S2: square_coherence
-    (fun z => rus (zR z)) (fun z => ruq1 (zR z)) rfq rfs
-    (fun z => KA2 (zR z)) e)
-  (S3: square_coherence
-    (fun z => ruq1 (zR z)) (fun z => rur1 (zQ z)) rfs rfs
-    (fun z => f_equal rfs (K3 z)) e)
-  (T1: square_coherence
-    (fun z => rur (zS z)) (fun z => ruq1 (zS z)) rfq rfr
-    (fun z => KA4 (zS z)) e)
-  (T2: square_coherence
-    (fun z => ruq1 (zS z)) (fun z => rus (zQ z)) rfr rfr
-    (fun z => f_equal rfr (K5 z)) e)
-  (T3: square_coherence
-    (fun z => rus (zQ z)) (fun z => rur1 (zQ z)) rfr rfs
-    (fun z => KA6 (zQ z)) e)
-  (N: hexagonal_prism_coherence (HHA z0) (HHA z1) S1 S2 S3 T1 T2 T3) :=
-  square_cube_change_sides
-    (layer_cube_nat_side zS rur rfq e pIs pV0 (gq u0))
-    (layer_cube_nat_side zQ rur1 rfs e pIq pV3 (gs u3))
-    (square_cube_stack N P).
-
 (** Compatibility of source extension, mapping and square pasting. *)
 Lemma layer_square_nat_source {Z V W W' X B: Type}
   (u: Z -> V) (L: V -> W) (R: V -> W') (f: W -> X) (g: W' -> X) (d: B -> X)
@@ -2027,6 +1963,120 @@ Lemma square_change_sides_route_left {X: Type} {x0 x1 x2 x3 y0 y1 y2 y3: X}
   square_change_sides M0 (square_compose (square_compose S1 S2) S3) M3.
 Proof. now rewrite 2 square_change_sides_compose. Defined.
 
+(** Extend a permutahedral cell along a path [e] in its source. The
+    result is the permutahedral boundary at [z0]: each source path is
+    prefixed with the image of [e], and each source hexagon is extended
+    along [e] by [layer_square_nat]. The upper hexagon moves along its
+    canonical naturality prism. *)
+Definition layer_cube_nat
+  {X2 X1 X0 TU T: Type}
+  {uf0: TU -> X1} {rf0: T -> X0} {fA fB fC: TU -> T}
+  {rfq rfs rfr: X1 -> X0}
+  {gq: forall dd, rfq (uf0 dd) = rf0 (fA dd)}
+  {gs: forall dd, rfs (uf0 dd) = rf0 (fB dd)}
+  {gr: forall dd, rfr (uf0 dd) = rf0 (fC dd)}
+  {rur rus ruq1 rur1: X2 -> X1}
+  {KA2: forall z, rfq (rus z) = rfs (ruq1 z)}
+  {KA4: forall z, rfq (rur z) = rfr (ruq1 z)}
+  {KA6: forall z, rfr (rus z) = rfs (rur1 z)}
+  {Z: Type} (zS zR zQ: Z -> X2)
+  (K1: forall z, rur (zS z) = rus (zR z))
+  (K3: forall z, ruq1 (zR z) = rur1 (zQ z))
+  (K5: forall z, ruq1 (zS z) = rus (zQ z))
+  (HHA: forall z, hexagonal_coherence rfq rfs rfr
+    (K1 z) (K3 z) (K5 z) (KA2 (zR z)) (KA4 (zS z)) (KA6 (zQ z)))
+  {z0 z1: Z} (e: z0 = z1)
+  {u0 u1 u2 u3 u4 u5: TU}
+  {eU1: u0 = u1} {eU2: u2 = u3} {eU3: u4 = u5}
+  {e2: fA u1 = fB u2} {e4: fA u0 = fC u4} {e6: fC u5 = fB u3}
+  {zs2 zr2 zq2: X2}
+  {pIs: zS z1 = zs2} {pIr: zR z1 = zr2} {pIq: zQ z1 = zq2}
+  {pV0: rur zs2 = uf0 u0} {pV1: rus zr2 = uf0 u1}
+  {pV2: ruq1 zr2 = uf0 u2} {pV3: rur1 zq2 = uf0 u3}
+  {pV4: ruq1 zs2 = uf0 u4} {pV5: rus zq2 = uf0 u5}
+  {HH1: hexagonal_coherence rur uf0 rus pIs eU1 pIr pV0 (K1 z1) pV1}
+  {HH3: hexagonal_coherence ruq1 uf0 rur1 pIr eU2 pIq pV2 (K3 z1) pV3}
+  {HH5: hexagonal_coherence ruq1 uf0 rus pIs eU3 pIq pV4 (K5 z1) pV5}
+  {κ: hexagonal_coherence fA fB fC eU1 eU2 eU3 e2 e4 e6}
+  {HH2: hexagonal_coherence rfq rf0 rfs pV1 e2 pV2 (gq u1) (KA2 zr2) (gs u2)}
+  {HH4: hexagonal_coherence rfq rf0 rfr pV0 e4 pV4 (gq u0) (KA4 zs2) (gr u4)}
+  {HH6: hexagonal_coherence rfr rf0 rfs pV5 e6 pV3 (gr u5) (KA6 zq2) (gs u3)}
+  (P: permutahedral_coherence u0 u1 u2 u3 u4 u5
+    eU1 eU2 eU3 e2 e4 e6 (zS z1) zs2 (zR z1) zr2 (zQ z1) zq2 pIs pIr pIq
+    pV0 pV1 pV2 pV3 pV4 pV5 (K1 z1) (K3 z1) (K5 z1) HH1 HH3 HH5 κ HH2 HH4 HH6 (HHA z1)):
+  permutahedral_coherence u0 u1 u2 u3 u4 u5 eU1 eU2 eU3 e2 e4 e6
+    (zS z0) zs2 (zR z0) zr2 (zQ z0) zq2
+    (f_equal zS e • pIs) (f_equal zR e • pIr) (f_equal zQ e • pIq)
+    pV0 pV1 pV2 pV3 pV4 pV5 (K1 z0) (K3 z0) (K5 z0)
+    (layer_square_nat zS zR rur rus uf0 K1 e pIs pIr eU1 pV0 pV1 HH1
+      (square_coherence_fill zS zR rur rus K1 e))
+    (layer_square_nat zR zQ ruq1 rur1 uf0 K3 e pIr pIq eU2 pV2 pV3 HH3
+      (square_coherence_fill zR zQ ruq1 rur1 K3 e))
+    (layer_square_nat zS zQ ruq1 rus uf0 K5 e pIs pIq eU3 pV4 pV5 HH5
+      (square_coherence_fill zS zQ ruq1 rus K5 e))
+    κ HH2 HH4 HH6 (HHA z0) :=
+  square_cube_change_faces
+    (eq_trans
+      (path_map2 (fun H K => square_compose_map rf0 H K)
+        (path_map2 (fun H K => square_compose_map rf0 H K)
+          (layer_square_map_source zS zR rur rus uf0 K1 rfq fA rf0 gq e pIs pIr
+            eU1 pV0 pV1 HH1)
+          (layer_square_nat_source zR rus ruq1 rfq rfs rf0 KA2 e pIr pV1 pV2 e2
+            (gq u1) (gs u2) HH2))
+        (layer_square_map_source zR zQ ruq1 rur1 uf0 K3 rfs fB rf0 gs e pIr pIq
+          eU2 pV2 pV3 HH3))
+      (square_nat_route_left rf0
+        (layer_cube_nat_side zS rur rfq e pIs pV0 (gq u0))
+        (layer_cube_nat_side zR rus rfq e pIr pV1 (gq u1))
+        (layer_cube_nat_side zR ruq1 rfs e pIr pV2 (gs u2))
+        (layer_cube_nat_side zQ rur1 rfs e pIq pV3 (gs u3))
+        (square_coherence_fill (fun z => rur (zS z)) (fun z => rus (zR z)) rfq
+          rfq (fun z => f_equal rfq (K1 z)) e)
+        (square_coherence_fill (fun z => rus (zR z)) (fun z => ruq1 (zR z)) rfq
+          rfs (fun z => KA2 (zR z)) e)
+        (square_coherence_fill (fun z => ruq1 (zR z)) (fun z => rur1 (zQ z)) rfs
+          rfs (fun z => f_equal rfs (K3 z)) e)
+        (square_stack (square_map rfq HH1)
+          (eq_sym (square_coherence_fill uf0 fA rfq rf0 gq eU1)))
+        (layer_square_nat rus ruq1 rfq rfs rf0 KA2 pIr pV1 pV2 e2 (gq u1)
+          (gs u2) HH2 (square_coherence_fill rus ruq1 rfq rfs KA2 pIr))
+        (square_stack (square_map rfs HH3)
+          (eq_sym (square_coherence_fill uf0 fB rfs rf0 gs eU2)))))
+    (square_cube_change_sides (layer_cube_nat_side zS rur rfq e pIs pV0 (gq u0))
+      (layer_cube_nat_side zQ rur1 rfs e pIq pV3 (gs u3))
+      (square_cube_stack
+        (hexagonal_prism_coherence_nat_fill rfq rfs rfr (fun z => rur (zS z))
+          (fun z => rus (zR z)) (fun z => ruq1 (zR z)) (fun z => rur1 (zQ z))
+          (fun z => ruq1 (zS z)) (fun z => rus (zQ z)) K1 K3 K5
+          (fun z => KA2 (zR z)) (fun z => KA4 (zS z)) (fun z => KA6 (zQ z)) HHA
+          e)
+        P))
+    (eq_trans
+      (path_map2 (fun H K => square_compose_map rf0 H K)
+        (layer_square_nat_source zS rur ruq1 rfq rfr rf0 KA4 e pIs pV0 pV4 e4
+          (gq u0) (gr u4) HH4)
+        (path_map2 (fun H K => square_compose_map rf0 H K)
+          (layer_square_map_source zS zQ ruq1 rus uf0 K5 rfr fC rf0 gr e pIs pIq
+            eU3 pV4 pV5 HH5)
+          (layer_square_nat_source zQ rus rur1 rfr rfs rf0 KA6 e pIq pV5 pV3 e6
+            (gr u5) (gs u3) HH6)))
+      (square_nat_route rf0 (layer_cube_nat_side zS rur rfq e pIs pV0 (gq u0))
+        (layer_cube_nat_side zS ruq1 rfr e pIs pV4 (gr u4))
+        (layer_cube_nat_side zQ rus rfr e pIq pV5 (gr u5))
+        (layer_cube_nat_side zQ rur1 rfs e pIq pV3 (gs u3))
+        (square_coherence_fill (fun z => rur (zS z)) (fun z => ruq1 (zS z)) rfq
+          rfr (fun z => KA4 (zS z)) e)
+        (square_coherence_fill (fun z => ruq1 (zS z)) (fun z => rus (zQ z)) rfr
+          rfr (fun z => f_equal rfr (K5 z)) e)
+        (square_coherence_fill (fun z => rus (zQ z)) (fun z => rur1 (zQ z)) rfr
+          rfs (fun z => KA6 (zQ z)) e)
+        (layer_square_nat rur ruq1 rfq rfr rf0 KA4 pIs pV0 pV4 e4 (gq u0)
+          (gr u4) HH4 (square_coherence_fill rur ruq1 rfq rfr KA4 pIs))
+        (square_stack (square_map rfr HH5)
+          (eq_sym (square_coherence_fill uf0 fC rfr rf0 gr eU3)))
+        (layer_square_nat rus rur1 rfr rfs rf0 KA6 pIq pV5 pV3 e6 (gr u5)
+          (gs u3) HH6 (square_coherence_fill rus rur1 rfr rfs KA6 pIq)))).
+
 (** Cubes expressing compatibility of square operations with supplied
     edge squares. Shared boundary data is inferred from the inputs. *)
 Definition square_compose_cube {X Y: Type} (r: Y -> X)
@@ -2664,6 +2714,244 @@ Proof.
         X0 X1 X2 X3 X4 X5 F1 F2 F3 hp1 hp2 hp3 hh1 hh2 hh3 HH e he).
   - now exact CC.
 Defined.
+
+Section LayerCubeNatDep.
+
+Local Arguments square_stack_dep
+  {X} P {x0 x1 y0 y1 z0 z1 a c d p q r s H K u0 u1 v0 v1 w0 w1 ha hc hd hp hq hr hs} HH KK.
+
+Local Arguments square_map_dep
+  {X Y P Q} f F {x0 x1 y0 y1 a b p q H u0 u1 v0 v1 ha hb hp hq} HH.
+
+Local Arguments square_compose_map_coherence_dep
+  {X Y} f P Q F {x0 x1 x2 y0 y1 y2 a b c d p q r H K u0 u1 u2 v0 v1 v2 ha hb hc hd hp hq hr} HH
+    KK.
+
+Context {X2 X1 X0 TU T: Type}
+  {S2: X2 -> Type} {S1: X1 -> Type} {S0: X0 -> Type}
+  {PU: TU -> Type} {PT: T -> Type}
+  {uf0: TU -> X1} {rf0: T -> X0} {fA fB fC: TU -> T}
+  {rfq rfs rfr: X1 -> X0}
+  {gq: forall dd, rfq (uf0 dd) = rf0 (fA dd)}
+  {gs: forall dd, rfs (uf0 dd) = rf0 (fB dd)}
+  {gr: forall dd, rfr (uf0 dd) = rf0 (fC dd)}
+  {rur rus ruq1 rur1: X2 -> X1}
+  {KA2: forall z, rfq (rus z) = rfs (ruq1 z)}
+  {KA4: forall z, rfq (rur z) = rfr (ruq1 z)}
+  {KA6: forall z, rfr (rus z) = rfs (rur1 z)}
+  {Z: Type} {PZ: Z -> Type} (zS zR zQ: Z -> X2)
+  (K1: forall z, rur (zS z) = rus (zR z))
+  (K3: forall z, ruq1 (zR z) = rur1 (zQ z))
+  (K5: forall z, ruq1 (zS z) = rus (zQ z))
+  (HHA: forall z, hexagonal_coherence rfq rfs rfr
+    (K1 z) (K3 z) (K5 z) (KA2 (zR z)) (KA4 (zS z)) (KA6 (zQ z)))
+  {z0 z1: Z} (e: z0 = z1)
+  {u0 u1 u2 u3 u4 u5: TU}
+  {eU1: u0 = u1} {eU2: u2 = u3} {eU3: u4 = u5}
+  {e2: fA u1 = fB u2} {e4: fA u0 = fC u4} {e6: fC u5 = fB u3}
+  {zs2 zr2 zq2: X2}
+  {pIs: zS z1 = zs2} {pIr: zR z1 = zr2} {pIq: zQ z1 = zq2}
+  {pV0: rur zs2 = uf0 u0} {pV1: rus zr2 = uf0 u1}
+  {pV2: ruq1 zr2 = uf0 u2} {pV3: rur1 zq2 = uf0 u3}
+  {pV4: ruq1 zs2 = uf0 u4} {pV5: rus zq2 = uf0 u5}
+  {HH1: hexagonal_coherence rur uf0 rus pIs eU1 pIr pV0 (K1 z1) pV1}
+  {HH3: hexagonal_coherence ruq1 uf0 rur1 pIr eU2 pIq pV2 (K3 z1) pV3}
+  {HH5: hexagonal_coherence ruq1 uf0 rus pIs eU3 pIq pV4 (K5 z1) pV5}
+  {κ: hexagonal_coherence fA fB fC eU1 eU2 eU3 e2 e4 e6}
+  {HH2: hexagonal_coherence rfq rf0 rfs pV1 e2 pV2 (gq u1) (KA2 zr2) (gs u2)}
+  {HH4: hexagonal_coherence rfq rf0 rfr pV0 e4 pV4 (gq u0) (KA4 zs2) (gr u4)}
+  {HH6: hexagonal_coherence rfr rf0 rfs pV5 e6 pV3 (gr u5) (KA6 zq2) (gs u3)}
+  (P: permutahedral_coherence u0 u1 u2 u3 u4 u5
+    eU1 eU2 eU3 e2 e4 e6 (zS z1) zs2 (zR z1) zr2 (zQ z1) zq2 pIs pIr pIq
+    pV0 pV1 pV2 pV3 pV4 pV5 (K1 z1) (K3 z1) (K5 z1) HH1 HH3 HH5 κ HH2 HH4 HH6 (HHA z1))
+  (U: forall u, PU u -> S1 (uf0 u)) (F0: forall t, PT t -> S0 (rf0 t))
+  (FA: forall u, PU u -> PT (fA u)) (FB: forall u, PU u -> PT (fB u))
+  (FC: forall u, PU u -> PT (fC u))
+  (Fq: forall x, S1 x -> S0 (rfq x)) (Fs: forall x, S1 x -> S0 (rfs x))
+  (Fr: forall x, S1 x -> S0 (rfr x))
+  (Rr: forall z, S2 z -> S1 (rur z)) (Rs: forall z, S2 z -> S1 (rus z))
+  (Rq1: forall z, S2 z -> S1 (ruq1 z)) (Rr1: forall z, S2 z -> S1 (rur1 z))
+  (Hgq: forall u a, rew [S0] gq u in Fq (uf0 u) (U u a) = F0 (fA u) (FA u a))
+  (Hgs: forall u a, rew [S0] gs u in Fs (uf0 u) (U u a) = F0 (fB u) (FB u a))
+  (Hgr: forall u a, rew [S0] gr u in Fr (uf0 u) (U u a) = F0 (fC u) (FC u a))
+  (HKA2: forall z a, rew [S0] KA2 z in Fq (rus z) (Rs z a) = Fs (ruq1 z) (Rq1 z a))
+  (HKA4: forall z a, rew [S0] KA4 z in Fq (rur z) (Rr z a) = Fr (ruq1 z) (Rq1 z a))
+  (HKA6: forall z a, rew [S0] KA6 z in Fr (rus z) (Rs z a) = Fs (rur1 z) (Rr1 z a))
+  (ZS: forall z, PZ z -> S2 (zS z)) (ZR: forall z, PZ z -> S2 (zR z))
+  (ZQ: forall z, PZ z -> S2 (zQ z))
+  (HK1: forall z a, rew [S1] K1 z in Rr (zS z) (ZS z a) = Rs (zR z) (ZR z a))
+  (HK3: forall z a, rew [S1] K3 z in Rq1 (zR z) (ZR z a) = Rr1 (zQ z) (ZQ z a))
+  (HK5: forall z a, rew [S1] K5 z in Rq1 (zS z) (ZS z a) = Rs (zQ z) (ZQ z a))
+  (DHHA: forall z a, hexagonal_coherence_dep Fq Fs Fr (HHA z) (HK1 z a) (HK3 z a)
+    (HK5 z a) (HKA2 (zR z) (ZR z a)) (HKA4 (zS z) (ZS z a)) (HKA6 (zQ z) (ZQ z a)))
+  {b0: PZ z0} {b1: PZ z1} (he: rew [PZ] e in b0 = b1)
+  {a0: PU u0} {a1: PU u1} {a2: PU u2} {a3: PU u3} {a4: PU u4} {a5: PU u5}
+  {aS2: S2 zs2} {aR2: S2 zr2} {aQ2: S2 zq2}
+  {heU1: rew [PU] eU1 in a0 = a1} {heU2: rew [PU] eU2 in a2 = a3}
+  {heU3: rew [PU] eU3 in a4 = a5}
+  {he2: rew [PT] e2 in FA u1 a1 = FB u2 a2}
+  {he4: rew [PT] e4 in FA u0 a0 = FC u4 a4}
+  {he6: rew [PT] e6 in FC u5 a5 = FB u3 a3}
+  {hpIs: rew [S2] pIs in ZS z1 b1 = aS2} {hpIr: rew [S2] pIr in ZR z1 b1 = aR2}
+  {hpIq: rew [S2] pIq in ZQ z1 b1 = aQ2}
+  {hpV0: rew [S1] pV0 in Rr zs2 aS2 = U u0 a0}
+  {hpV1: rew [S1] pV1 in Rs zr2 aR2 = U u1 a1}
+  {hpV2: rew [S1] pV2 in Rq1 zr2 aR2 = U u2 a2}
+  {hpV3: rew [S1] pV3 in Rr1 zq2 aQ2 = U u3 a3}
+  {hpV4: rew [S1] pV4 in Rq1 zs2 aS2 = U u4 a4}
+  {hpV5: rew [S1] pV5 in Rs zq2 aQ2 = U u5 a5}
+  {DHH1: hexagonal_coherence_dep Rr U Rs HH1 hpIs heU1 hpIr hpV0 (HK1 z1 b1) hpV1}
+  {DHH3: hexagonal_coherence_dep Rq1 U Rr1 HH3 hpIr heU2 hpIq hpV2 (HK3 z1 b1) hpV3}
+  {DHH5: hexagonal_coherence_dep Rq1 U Rs HH5 hpIs heU3 hpIq hpV4 (HK5 z1 b1) hpV5}
+  {Dκ: hexagonal_coherence_dep FA FB FC κ heU1 heU2 heU3 he2 he4 he6}
+  {DHH2: hexagonal_coherence_dep Fq F0 Fs HH2 hpV1 he2 hpV2
+    (Hgq u1 a1) (HKA2 zr2 aR2) (Hgs u2 a2)}
+  {DHH4: hexagonal_coherence_dep Fq F0 Fr HH4 hpV0 he4 hpV4
+    (Hgq u0 a0) (HKA4 zs2 aS2) (Hgr u4 a4)}
+  {DHH6: hexagonal_coherence_dep Fr F0 Fs HH6 hpV5 he6 hpV3
+    (Hgr u5 a5) (HKA6 zq2 aQ2) (Hgs u3 a3)}
+  (DP: permutahedral_coherence_dep P U F0 FA FB FC Fq Fs Fr Rr Rs Rq1 Rr1 Hgq Hgs Hgr
+    HKA2 HKA4 HKA6 heU1 heU2 heU3 he2 he4 he6 hpIs hpIr hpIq hpV0 hpV1 hpV2 hpV3 hpV4 hpV5
+    (HK1 z1 b1) (HK3 z1 b1) (HK5 z1 b1) DHH1 DHH3 DHH5 Dκ DHH2 DHH4 DHH6 (DHHA z1 b1)).
+
+(** The dependent form of [layer_cube_nat]: a dependent permutahedral cell
+    over the stored cell extends along a dependent path over [e]. *)
+Lemma layer_cube_nat_coherence_dep:
+  permutahedral_coherence_dep (layer_cube_nat zS zR zQ K1 K3 K5 HHA e P)
+    U F0 FA FB FC Fq Fs Fr Rr Rs Rq1 Rr1 Hgq Hgs Hgr HKA2 HKA4 HKA6
+    heU1 heU2 heU3 he2 he4 he6
+    (sigT_map_eq ZS he ⊙ hpIs) (sigT_map_eq ZR he ⊙ hpIr) (sigT_map_eq ZQ he ⊙ hpIq)
+    hpV0 hpV1 hpV2 hpV3 hpV4 hpV5 (HK1 z0 b0) (HK3 z0 b0) (HK5 z0 b0)
+    (layer_square_nat_coherence_dep zS zR rur rus uf0 ZS ZR Rr Rs U K1 HK1
+      e pIs pIr eU1 pV0 pV1 HH1 he hpIs hpIr heU1 hpV0 hpV1 DHH1)
+    (layer_square_nat_coherence_dep zR zQ ruq1 rur1 uf0 ZR ZQ Rq1 Rr1 U K3 HK3
+      e pIr pIq eU2 pV2 pV3 HH3 he hpIr hpIq heU2 hpV2 hpV3 DHH3)
+    (layer_square_nat_coherence_dep zS zQ ruq1 rus uf0 ZS ZQ Rq1 Rs U K5 HK5
+      e pIs pIq eU3 pV4 pV5 HH5 he hpIs hpIq heU3 hpV4 hpV5 DHH5)
+    Dκ DHH2 DHH4 DHH6 (DHHA z0 b0).
+Proof.
+  refine (square_cube_change_faces_coherence_dep S0
+    (path_map2_dep (fun H K => square_compose_map rf0 H K)
+      (fun H K h k => square_compose_map_coherence_dep rf0 S0 PT F0 (H := H) (K := K) h k)
+      (path_map2 (fun H K => square_compose_map rf0 H K)
+        (layer_square_map_source zS zR rur rus uf0 K1 rfq fA rf0 gq e pIs pIr
+          eU1 pV0 pV1 HH1)
+        (layer_square_nat_source zR rus ruq1 rfq rfs rf0 KA2 e pIr pV1 pV2 e2
+          (gq u1) (gs u2) HH2))
+      (layer_square_map_source zR zQ ruq1 rur1 uf0 K3 rfs fB rf0 gs e pIr pIq
+        eU2 pV2 pV3 HH3)
+      (path_map2_dep (fun H K => square_compose_map rf0 H K)
+        (fun H K h k => square_compose_map_coherence_dep rf0 S0 PT F0 (H := H) (K := K) h k)
+        (layer_square_map_source zS zR rur rus uf0 K1 rfq fA rf0 gq e pIs pIr
+          eU1 pV0 pV1 HH1)
+        (layer_square_nat_source zR rus ruq1 rfq rfs rf0 KA2 e pIr pV1 pV2 e2
+          (gq u1) (gs u2) HH2)
+        (layer_square_map_source_coherence_dep zS zR rur rus uf0 ZS ZR Rr Rs U
+          K1 HK1 rfq fA rf0 Fq FA F0 gq Hgq e pIs pIr eU1 pV0 pV1 HH1
+          he hpIs hpIr heU1 hpV0 hpV1 DHH1)
+        (layer_square_nat_source_coherence_dep zR rus ruq1 rfq rfs rf0 ZR Rs Rq1
+          Fq Fs F0 KA2 HKA2 e pIr pV1 pV2 e2 (gq u1) (gs u2) HH2
+          he hpIr hpV1 hpV2 he2 (Hgq u1 a1) (Hgs u2 a2) DHH2))
+      (layer_square_map_source_coherence_dep zR zQ ruq1 rur1 uf0 ZR ZQ Rq1 Rr1 U
+        K3 HK3 rfs fB rf0 Fs FB F0 gs Hgs e pIr pIq eU2 pV2 pV3 HH3
+        he hpIr hpIq heU2 hpV2 hpV3 DHH3) ⊙
+    square_nat_route_left_coherence_dep rf0 S0 PT F0
+      (layer_cube_nat_side_coherence_dep zS rur rfq ZS Rr Fq e pIs pV0 (gq u0)
+        he hpIs hpV0 (Hgq u0 a0))
+      (layer_cube_nat_side_coherence_dep zR rus rfq ZR Rs Fq e pIr pV1 (gq u1)
+        he hpIr hpV1 (Hgq u1 a1))
+      (layer_cube_nat_side_coherence_dep zR ruq1 rfs ZR Rq1 Fs e pIr pV2 (gs u2)
+        he hpIr hpV2 (Hgs u2 a2))
+      (layer_cube_nat_side_coherence_dep zQ rur1 rfs ZQ Rr1 Fs e pIq pV3 (gs u3)
+        he hpIq hpV3 (Hgs u3 a3))
+      (square_coherence_dep_fill (fun z => rur (zS z)) (fun z => rus (zR z))
+        rfq rfq (fun z a => Rr (zS z) (ZS z a)) (fun z a => Rs (zR z) (ZR z a))
+        Fq Fq (fun z => f_equal rfq (K1 z)) (fun z a => sigT_map_eq Fq (HK1 z a))
+        e he)
+      (square_coherence_dep_fill (fun z => rus (zR z)) (fun z => ruq1 (zR z))
+        rfq rfs (fun z a => Rs (zR z) (ZR z a)) (fun z a => Rq1 (zR z) (ZR z a))
+        Fq Fs (fun z => KA2 (zR z)) (fun z a => HKA2 (zR z) (ZR z a)) e he)
+      (square_coherence_dep_fill (fun z => ruq1 (zR z)) (fun z => rur1 (zQ z))
+        rfs rfs (fun z a => Rq1 (zR z) (ZR z a)) (fun z a => Rr1 (zQ z) (ZQ z a))
+        Fs Fs (fun z => f_equal rfs (K3 z)) (fun z a => sigT_map_eq Fs (HK3 z a))
+        e he)
+      (square_stack_dep _ (square_map_dep rfq Fq DHH1)
+        (square_coherence_dep_reverse_fill uf0 fA rfq rf0 U FA Fq F0 gq Hgq eU1
+          heU1))
+      (layer_square_nat_coherence_dep rus ruq1 rfq rfs rf0 Rs Rq1 Fq Fs F0 KA2
+        HKA2 pIr pV1 pV2 e2 (gq u1) (gs u2) HH2 hpIr hpV1 hpV2 he2 (Hgq u1 a1)
+        (Hgs u2 a2) DHH2)
+      (square_stack_dep _ (square_map_dep rfs Fs DHH3)
+        (square_coherence_dep_reverse_fill uf0 fB rfs rf0 U FB Fs F0 gs Hgs eU2
+          heU2)))
+    (square_cube_nat_prism_coherence_dep rfq rfs rfr (fun z => rur (zS z))
+      (fun z => rus (zR z)) (fun z => ruq1 (zR z)) (fun z => rur1 (zQ z))
+      (fun z => ruq1 (zS z)) (fun z => rus (zQ z)) K1 K3 K5
+      (fun z => KA2 (zR z)) (fun z => KA4 (zS z)) (fun z => KA6 (zQ z)) HHA
+      (fun z a => Rr (zS z) (ZS z a)) (fun z a => Rs (zR z) (ZR z a))
+      (fun z a => Rq1 (zR z) (ZR z a)) (fun z a => Rr1 (zQ z) (ZQ z a))
+      (fun z a => Rq1 (zS z) (ZS z a)) (fun z a => Rs (zQ z) (ZQ z a))
+      Fq Fs Fr HK1 HK3 HK5 (fun z a => HKA2 (zR z) (ZR z a))
+      (fun z a => HKA4 (zS z) (ZS z a)) (fun z a => HKA6 (zQ z) (ZQ z a))
+      DHHA e he P DP
+      (layer_cube_nat_side_coherence_dep zS rur rfq ZS Rr Fq e pIs pV0 (gq u0)
+        he hpIs hpV0 (Hgq u0 a0))
+      (layer_cube_nat_side_coherence_dep zQ rur1 rfs ZQ Rr1 Fs e pIq pV3 (gs u3)
+        he hpIq hpV3 (Hgs u3 a3)))
+    (path_map2_dep (fun H K => square_compose_map rf0 H K)
+      (fun H K h k => square_compose_map_coherence_dep rf0 S0 PT F0 (H := H) (K := K) h k)
+      (layer_square_nat_source zS rur ruq1 rfq rfr rf0 KA4 e pIs pV0 pV4 e4
+        (gq u0) (gr u4) HH4)
+      (path_map2 (fun H K => square_compose_map rf0 H K)
+        (layer_square_map_source zS zQ ruq1 rus uf0 K5 rfr fC rf0 gr e pIs pIq
+          eU3 pV4 pV5 HH5)
+        (layer_square_nat_source zQ rus rur1 rfr rfs rf0 KA6 e pIq pV5 pV3 e6
+          (gr u5) (gs u3) HH6))
+      (layer_square_nat_source_coherence_dep zS rur ruq1 rfq rfr rf0 ZS Rr Rq1
+        Fq Fr F0 KA4 HKA4 e pIs pV0 pV4 e4 (gq u0) (gr u4) HH4
+        he hpIs hpV0 hpV4 he4 (Hgq u0 a0) (Hgr u4 a4) DHH4)
+      (path_map2_dep (fun H K => square_compose_map rf0 H K)
+        (fun H K h k => square_compose_map_coherence_dep rf0 S0 PT F0 (H := H) (K := K) h k)
+        (layer_square_map_source zS zQ ruq1 rus uf0 K5 rfr fC rf0 gr e pIs pIq
+          eU3 pV4 pV5 HH5)
+        (layer_square_nat_source zQ rus rur1 rfr rfs rf0 KA6 e pIq pV5 pV3 e6
+          (gr u5) (gs u3) HH6)
+        (layer_square_map_source_coherence_dep zS zQ ruq1 rus uf0 ZS ZQ Rq1 Rs U
+          K5 HK5 rfr fC rf0 Fr FC F0 gr Hgr e pIs pIq eU3 pV4 pV5 HH5
+          he hpIs hpIq heU3 hpV4 hpV5 DHH5)
+        (layer_square_nat_source_coherence_dep zQ rus rur1 rfr rfs rf0 ZQ Rs Rr1
+          Fr Fs F0 KA6 HKA6 e pIq pV5 pV3 e6 (gr u5) (gs u3) HH6
+          he hpIq hpV5 hpV3 he6 (Hgr u5 a5) (Hgs u3 a3) DHH6)) ⊙
+    square_nat_route_coherence_dep rf0 S0 PT F0
+      (layer_cube_nat_side_coherence_dep zS rur rfq ZS Rr Fq e pIs pV0 (gq u0)
+        he hpIs hpV0 (Hgq u0 a0))
+      (layer_cube_nat_side_coherence_dep zS ruq1 rfr ZS Rq1 Fr e pIs pV4 (gr u4)
+        he hpIs hpV4 (Hgr u4 a4))
+      (layer_cube_nat_side_coherence_dep zQ rus rfr ZQ Rs Fr e pIq pV5 (gr u5)
+        he hpIq hpV5 (Hgr u5 a5))
+      (layer_cube_nat_side_coherence_dep zQ rur1 rfs ZQ Rr1 Fs e pIq pV3 (gs u3)
+        he hpIq hpV3 (Hgs u3 a3))
+      (square_coherence_dep_fill (fun z => rur (zS z)) (fun z => ruq1 (zS z))
+        rfq rfr (fun z a => Rr (zS z) (ZS z a)) (fun z a => Rq1 (zS z) (ZS z a))
+        Fq Fr (fun z => KA4 (zS z)) (fun z a => HKA4 (zS z) (ZS z a)) e he)
+      (square_coherence_dep_fill (fun z => ruq1 (zS z)) (fun z => rus (zQ z))
+        rfr rfr (fun z a => Rq1 (zS z) (ZS z a)) (fun z a => Rs (zQ z) (ZQ z a))
+        Fr Fr (fun z => f_equal rfr (K5 z)) (fun z a => sigT_map_eq Fr (HK5 z a))
+        e he)
+      (square_coherence_dep_fill (fun z => rus (zQ z)) (fun z => rur1 (zQ z))
+        rfr rfs (fun z a => Rs (zQ z) (ZQ z a)) (fun z a => Rr1 (zQ z) (ZQ z a))
+        Fr Fs (fun z => KA6 (zQ z)) (fun z a => HKA6 (zQ z) (ZQ z a)) e he)
+      (layer_square_nat_coherence_dep rur ruq1 rfq rfr rf0 Rr Rq1 Fq Fr F0 KA4
+        HKA4 pIs pV0 pV4 e4 (gq u0) (gr u4) HH4 hpIs hpV0 hpV4 he4 (Hgq u0 a0)
+        (Hgr u4 a4) DHH4)
+      (square_stack_dep _ (square_map_dep rfr Fr DHH5)
+        (square_coherence_dep_reverse_fill uf0 fC rfr rf0 U FC Fr F0 gr Hgr eU3
+          heU3))
+      (layer_square_nat_coherence_dep rus rur1 rfr rfs rf0 Rs Rr1 Fr Fs F0 KA6
+        HKA6 pIq pV5 pV3 e6 (gr u5) (gs u3) HH6 hpIq hpV5 hpV3 he6 (Hgr u5 a5)
+        (Hgs u3 a3) DHH6))).
+Defined.
+End LayerCubeNatDep.
 
 Lemma square_cube_map_along_coherence_dep
   {T X U Y: Type} {PT: T -> Type} {PX: X -> Type} {PU: U -> Type} {PY: Y -> Type}

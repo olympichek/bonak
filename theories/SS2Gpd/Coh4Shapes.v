@@ -1,4 +1,4 @@
-(** The P5 coherence and its thirty three-dimensional facets. *)
+(** The P5 coherence, a sweep of the last operation across the P4 boundary. *)
 
 From Bonak.Lib Require Import Notation RewLemmas Coh2Shapes.
 From Bonak.SSGpd Require Import Pasting Coh3Shapes.
@@ -780,39 +780,10 @@ Context (kBCDE_A: forall x: X4,
     (hBDE_AC (dC_1_1_U (x))) (hBCE_AD (dD_1_1_U (x))) (hCDE_AB (dB_1_1_U (x)))
     (hBCD_AE (dE_1_1_U (x)))).
 
-(** The ten permutahedral faces use the supplied P4 coherences. The twenty
-    prism faces use the canonical map and naturality fillers. *)
 Context (x: X5).
 
-Definition facet_BCDE_A :=
-  kBCDE_A (dA_0_0_U (x)).
-
-Definition facet_A_BCDE :=
-  square_cube_map dA_4_0_L (kBCDE_nil x).
-
-Definition facet_ACDE_B :=
-  kACDE_B (dB_0_0_U (x)).
-
-Definition facet_B_ACDE :=
-  square_cube_map dB_4_1_L (kACDE_nil x).
-
-Definition facet_ABDE_C :=
-  kABDE_C (dC_0_0_U (x)).
-
-Definition facet_C_ABDE :=
-  square_cube_map dC_4_2_L (kABDE_nil x).
-
-Definition facet_ABCE_D :=
-  kABCE_D (dD_0_0_U (x)).
-
-Definition facet_D_ABCE :=
-  square_cube_map dD_4_3_L (kABCE_nil x).
-
-Definition facet_ABCD_E :=
-  kABCD_E (dE_0_0_U (x)).
-
-Definition facet_E_ABCD :=
-  square_cube_map dE_4_4_U (kABCD_nil x).
+(** The hexagonal prisms over the six square faces of P4 use the canonical
+    naturality and map fillers. *)
 
 Definition facet_CDE_AB :=
   hexagonal_prism_coherence_nat_fill (dC_4_2_L) (dE_4_4_U) (dD_4_3_L)
@@ -853,19 +824,6 @@ Definition facet_AD_BCE :=
     (dA_3_0_L) (dA_4_0_L) (dD_4_3_L) (cAD_BCE) (cCE_nil (x)) (cBC_nil (x)) (cBE_nil (x))
     (cBE_C (dC_0_0_U (x))) (cBC_E (dE_0_0_U (x))) (cCE_B (dB_0_0_U (x))) (hBCE_nil (x)).
 
-Definition facet_BCD_AE :=
-  hexagonal_prism_coherence_nat_fill (dB_4_1_L) (dD_4_3_L) (dC_4_2_L)
-    (fun z => dC_3_1_L (dD_2_1_L (z))) (fun z => dD_3_2_L (dC_2_1_L (z)))
-    (fun z => dB_3_1_L (dC_2_1_L (z))) (fun z => dC_3_2_L (dB_2_1_L (z)))
-    (fun z => dB_3_1_L (dD_2_1_L (z))) (fun z => dD_3_2_L (dB_2_1_L (z))) (cCD_AE)
-    (cBC_AE) (cBD_AE) (fun z => cBD_ACE (dC_2_1_L (z))) (fun z => cBC_ADE (dD_2_1_L (z)))
-    (fun z => cCD_ABE (dB_2_1_L (z))) (hBCD_AE) (cAE_nil (x)).
-
-Definition facet_AE_BCD :=
-  hexagonal_prism_coherence_map_fill (dB_2_0_U) (dD_2_2_U) (dC_2_1_U) (dE_3_3_U)
-    (dA_3_0_U) (dA_4_0_L) (dE_4_4_U) (cAE_BCD) (cCD_nil (x)) (cBC_nil (x)) (cBD_nil (x))
-    (cBD_C (dC_0_0_U (x))) (cBC_D (dD_0_0_U (x))) (cCD_B (dB_0_0_U (x))) (hBCD_nil (x)).
-
 Definition facet_ADE_BC :=
   hexagonal_prism_coherence_nat_fill (dA_4_0_L) (dE_4_4_U) (dD_4_3_L)
     (fun z => dD_3_2_L (dE_2_2_U (z))) (fun z => dE_3_3_U (dD_2_2_U (z)))
@@ -892,19 +850,6 @@ Definition facet_BD_ACE :=
     (dB_3_1_L) (dB_4_1_L) (dD_4_3_L) (cBD_ACE) (cCE_nil (x)) (cAC_nil (x)) (cAE_nil (x))
     (cAE_C (dC_0_0_U (x))) (cAC_E (dE_0_0_U (x))) (cCE_A (dA_0_0_U (x))) (hACE_nil (x)).
 
-Definition facet_ACD_BE :=
-  hexagonal_prism_coherence_nat_fill (dA_4_0_L) (dD_4_3_L) (dC_4_2_L)
-    (fun z => dC_3_1_L (dD_2_1_L (z))) (fun z => dD_3_2_L (dC_2_1_L (z)))
-    (fun z => dA_3_0_L (dC_2_1_L (z))) (fun z => dC_3_2_L (dA_2_0_L (z)))
-    (fun z => dA_3_0_L (dD_2_1_L (z))) (fun z => dD_3_2_L (dA_2_0_L (z))) (cCD_BE)
-    (cAC_BE) (cAD_BE) (fun z => cAD_BCE (dC_2_1_L (z))) (fun z => cAC_BDE (dD_2_1_L (z)))
-    (fun z => cCD_ABE (dA_2_0_L (z))) (hACD_BE) (cBE_nil (x)).
-
-Definition facet_BE_ACD :=
-  hexagonal_prism_coherence_map_fill (dA_2_0_U) (dD_2_2_U) (dC_2_1_U) (dE_3_3_U)
-    (dB_3_1_U) (dB_4_1_L) (dE_4_4_U) (cBE_ACD) (cCD_nil (x)) (cAC_nil (x)) (cAD_nil (x))
-    (cAD_C (dC_0_0_U (x))) (cAC_D (dD_0_0_U (x))) (cCD_A (dA_0_0_U (x))) (hACD_nil (x)).
-
 Definition facet_ABE_CD :=
   hexagonal_prism_coherence_nat_fill (dA_4_0_L) (dE_4_4_U) (dB_4_1_L)
     (fun z => dB_3_0_L (dE_2_2_U (z))) (fun z => dE_3_3_U (dB_2_0_U (z)))
@@ -917,32 +862,6 @@ Definition facet_CD_ABE :=
   hexagonal_prism_coherence_map_fill (dA_2_0_L) (dE_2_2_U) (dB_2_1_L) (dD_3_2_L)
     (dC_3_2_L) (dC_4_2_L) (dD_4_3_L) (cCD_ABE) (cBE_nil (x)) (cAB_nil (x)) (cAE_nil (x))
     (cAE_B (dB_0_0_U (x))) (cAB_E (dE_0_0_U (x))) (cBE_A (dA_0_0_U (x))) (hABE_nil (x)).
-
-Definition facet_ABD_CE :=
-  hexagonal_prism_coherence_nat_fill (dA_4_0_L) (dD_4_3_L) (dB_4_1_L)
-    (fun z => dB_3_0_L (dD_2_1_L (z))) (fun z => dD_3_2_L (dB_2_0_L (z)))
-    (fun z => dA_3_0_L (dB_2_0_L (z))) (fun z => dB_3_1_L (dA_2_0_L (z)))
-    (fun z => dA_3_0_L (dD_2_1_L (z))) (fun z => dD_3_2_L (dA_2_0_L (z))) (cBD_CE)
-    (cAB_CE) (cAD_CE) (fun z => cAD_BCE (dB_2_0_L (z))) (fun z => cAB_CDE (dD_2_1_L (z)))
-    (fun z => cBD_ACE (dA_2_0_L (z))) (hABD_CE) (cCE_nil (x)).
-
-Definition facet_CE_ABD :=
-  hexagonal_prism_coherence_map_fill (dA_2_0_U) (dD_2_2_U) (dB_2_1_U) (dE_3_3_U)
-    (dC_3_2_U) (dC_4_2_L) (dE_4_4_U) (cCE_ABD) (cBD_nil (x)) (cAB_nil (x)) (cAD_nil (x))
-    (cAD_B (dB_0_0_U (x))) (cAB_D (dD_0_0_U (x))) (cBD_A (dA_0_0_U (x))) (hABD_nil (x)).
-
-Definition facet_ABC_DE :=
-  hexagonal_prism_coherence_nat_fill (dA_4_0_L) (dC_4_2_L) (dB_4_1_L)
-    (fun z => dB_3_0_L (dC_2_0_L (z))) (fun z => dC_3_1_L (dB_2_0_L (z)))
-    (fun z => dA_3_0_L (dB_2_0_L (z))) (fun z => dB_3_1_L (dA_2_0_L (z)))
-    (fun z => dA_3_0_L (dC_2_0_L (z))) (fun z => dC_3_1_L (dA_2_0_L (z))) (cBC_DE)
-    (cAB_DE) (cAC_DE) (fun z => cAC_BDE (dB_2_0_L (z))) (fun z => cAB_CDE (dC_2_0_L (z)))
-    (fun z => cBC_ADE (dA_2_0_L (z))) (hABC_DE) (cDE_nil (x)).
-
-Definition facet_DE_ABC :=
-  hexagonal_prism_coherence_map_fill (dA_2_0_U) (dC_2_2_U) (dB_2_1_U) (dE_3_3_U)
-    (dD_3_3_U) (dD_4_3_L) (dE_4_4_U) (cDE_ABC) (cBC_nil (x)) (cAB_nil (x)) (cAC_nil (x))
-    (cAC_B (dB_0_0_U (x))) (cAB_C (dC_0_0_U (x))) (cBC_A (dA_0_0_U (x))) (hABC_nil (x)).
 
 (** Whole-route views of the four outer map-prism facets. *)
 Local Definition facet_AE_BCD_route :=
@@ -1152,33 +1071,6 @@ Local Definition v_DCBA:
     • (cCE_AB (dB_1_1_U (dA_0_0_U x)))))
   • (cDE_ABC (dC_2_2_U (dB_1_1_U (dA_0_0_U x)))).
 
-Local Definition n_ABCD_1:
-  v_ABCD • f_equal dE_4_4_U (cAB_CD (dC_1_0_U (dD_0_0_U x)))
-  = (cAB_CDE (dC_2_0_L (dD_1_0_L (dE_0_0_U x)))) • v_BACD :=
-  layer_square_nat dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L dE_4_4_U cAB_CDE
-    ((f_equal dC_2_0_L (cDE_nil x)) • (cCE_D (dD_0_0_U x)))
-    (cBE_CD (dC_1_0_U (dD_0_0_U x))) (cAE_CD (dC_1_0_U (dD_0_0_U x)))
-    (cAB_CD (dC_1_0_U (dD_0_0_U x)))
-    (cAE_BCD (dB_2_0_U (dC_1_0_U (dD_0_0_U x))))
-    (cBE_ACD (dA_2_0_U (dC_1_0_U (dD_0_0_U x))))
-    (hABE_CD (dC_1_0_U (dD_0_0_U x)))
-    (square_coherence_fill dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L cAB_CDE
-      ((f_equal dC_2_0_L (cDE_nil x)) • (cCE_D (dD_0_0_U x)))).
-
-Local Definition n_ABCD_2:
-  v_ABCD • f_equal dE_4_4_U (f_equal dA_3_0_U (cBC_D (dD_0_0_U x)))
-  = (f_equal dA_4_0_L (cBC_DE (dD_1_0_L (dE_0_0_U x)))) • v_ACBD :=
-  square_stack
-    (square_map dA_4_0_L
-      (layer_square_nat dC_2_0_L dB_2_0_L dB_3_0_L dC_3_1_L dE_3_3_U cBC_DE (cDE_nil x)
-        (cCE_D (dD_0_0_U x)) (cBE_D (dD_0_0_U x)) (cBC_D (dD_0_0_U x))
-        (cBE_CD (dC_1_0_U (dD_0_0_U x))) (cCE_BD (dB_1_0_U (dD_0_0_U x)))
-        (hBCE_D (dD_0_0_U x))
-        (square_coherence_fill dC_2_0_L dB_2_0_L dB_3_0_L dC_3_1_L cBC_DE (cDE_nil x))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dA_3_0_U dA_4_0_L dE_4_4_U cAE_BCD
-        (cBC_D (dD_0_0_U x)))).
-
 Local Definition n_ABCD_3:
   v_ABCD • f_equal dE_4_4_U (f_equal dA_3_0_U (f_equal dB_2_0_U (cCD_nil x)))
   = (f_equal dA_4_0_L (f_equal dB_3_0_L (cCD_E (dE_0_0_U x)))) • v_ABDC :=
@@ -1190,19 +1082,6 @@ Local Definition n_ABCD_3:
     (eq_sym
       (square_coherence_fill dE_3_3_U dA_3_0_U dA_4_0_L dE_4_4_U cAE_BCD
         (f_equal dB_2_0_U (cCD_nil x)))).
-
-Local Definition n_ABDC_1:
-  v_ABDC • f_equal dE_4_4_U (cAB_CD (dD_1_1_U (dC_0_0_U x)))
-  = (cAB_CDE (dD_2_1_L (dC_1_0_L (dE_0_0_U x)))) • v_BADC :=
-  layer_square_nat dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L dE_4_4_U cAB_CDE
-    ((f_equal dD_2_1_L (cCE_nil x)) • (cDE_C (dC_0_0_U x)))
-    (cBE_CD (dD_1_1_U (dC_0_0_U x))) (cAE_CD (dD_1_1_U (dC_0_0_U x)))
-    (cAB_CD (dD_1_1_U (dC_0_0_U x)))
-    (cAE_BCD (dB_2_0_U (dD_1_1_U (dC_0_0_U x))))
-    (cBE_ACD (dA_2_0_U (dD_1_1_U (dC_0_0_U x))))
-    (hABE_CD (dD_1_1_U (dC_0_0_U x)))
-    (square_coherence_fill dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L cAB_CDE
-      ((f_equal dD_2_1_L (cCE_nil x)) • (cDE_C (dC_0_0_U x)))).
 
 Local Definition n_ABDC_2:
   v_ABDC • f_equal dE_4_4_U (f_equal dA_3_0_U (cBD_C (dC_0_0_U x)))
@@ -1218,19 +1097,6 @@ Local Definition n_ABDC_2:
       (square_coherence_fill dE_3_3_U dA_3_0_U dA_4_0_L dE_4_4_U cAE_BCD
         (cBD_C (dC_0_0_U x)))).
 
-Local Definition n_ACBD_1:
-  v_ACBD • f_equal dE_4_4_U (cAC_BD (dB_1_0_U (dD_0_0_U x)))
-  = (cAC_BDE (dB_2_0_L (dD_1_0_L (dE_0_0_U x)))) • v_CABD :=
-  layer_square_nat dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L dE_4_4_U cAC_BDE
-    ((f_equal dB_2_0_L (cDE_nil x)) • (cBE_D (dD_0_0_U x)))
-    (cCE_BD (dB_1_0_U (dD_0_0_U x))) (cAE_BD (dB_1_0_U (dD_0_0_U x)))
-    (cAC_BD (dB_1_0_U (dD_0_0_U x)))
-    (cAE_BCD (dC_2_1_U (dB_1_0_U (dD_0_0_U x))))
-    (cCE_ABD (dA_2_0_U (dB_1_0_U (dD_0_0_U x))))
-    (hACE_BD (dB_1_0_U (dD_0_0_U x)))
-    (square_coherence_fill dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L cAC_BDE
-      ((f_equal dB_2_0_L (cDE_nil x)) • (cBE_D (dD_0_0_U x)))).
-
 Local Definition n_ACBD_3:
   v_ACBD • f_equal dE_4_4_U (f_equal dA_3_0_U (f_equal dC_2_1_U (cBD_nil x)))
   = (f_equal dA_4_0_L (f_equal dC_3_1_L (cBD_E (dE_0_0_U x)))) • v_ACDB :=
@@ -1242,19 +1108,6 @@ Local Definition n_ACBD_3:
     (eq_sym
       (square_coherence_fill dE_3_3_U dA_3_0_U dA_4_0_L dE_4_4_U cAE_BCD
         (f_equal dC_2_1_U (cBD_nil x)))).
-
-Local Definition n_ACDB_1:
-  v_ACDB • f_equal dE_4_4_U (cAC_BD (dD_1_1_U (dB_0_0_U x)))
-  = (cAC_BDE (dD_2_1_L (dB_1_0_L (dE_0_0_U x)))) • v_CADB :=
-  layer_square_nat dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L dE_4_4_U cAC_BDE
-    ((f_equal dD_2_1_L (cBE_nil x)) • (cDE_B (dB_0_0_U x)))
-    (cCE_BD (dD_1_1_U (dB_0_0_U x))) (cAE_BD (dD_1_1_U (dB_0_0_U x)))
-    (cAC_BD (dD_1_1_U (dB_0_0_U x)))
-    (cAE_BCD (dC_2_1_U (dD_1_1_U (dB_0_0_U x))))
-    (cCE_ABD (dA_2_0_U (dD_1_1_U (dB_0_0_U x))))
-    (hACE_BD (dD_1_1_U (dB_0_0_U x)))
-    (square_coherence_fill dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L cAC_BDE
-      ((f_equal dD_2_1_L (cBE_nil x)) • (cDE_B (dB_0_0_U x)))).
 
 Local Definition n_ACDB_2:
   v_ACDB • f_equal dE_4_4_U (f_equal dA_3_0_U (cCD_B (dB_0_0_U x)))
@@ -1283,18 +1136,6 @@ Local Definition n_ADBC_1:
     (square_coherence_fill dD_3_2_L dA_3_0_L dA_4_0_L dD_4_3_L cAD_BCE
       ((f_equal dB_2_0_L (cCE_nil x)) • (cBE_C (dC_0_0_U x)))).
 
-Local Definition n_ADBC_3:
-  v_ADBC • f_equal dE_4_4_U (f_equal dA_3_0_U (f_equal dD_2_2_U (cBC_nil x)))
-  = (f_equal dA_4_0_L (f_equal dD_3_2_L (cBC_E (dE_0_0_U x)))) • v_ADCB :=
-  square_stack
-    (square_map dA_4_0_L
-      (square_stack (square_map dD_3_2_L (hBCE_nil x))
-        (eq_sym
-          (square_coherence_fill dE_2_2_U dD_2_2_U dD_3_2_L dE_3_3_U cDE_BC (cBC_nil x)))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dA_3_0_U dA_4_0_L dE_4_4_U cAE_BCD
-        (f_equal dD_2_2_U (cBC_nil x)))).
-
 Local Definition n_ADCB_1:
   v_ADCB • f_equal dE_4_4_U (cAD_BC (dC_1_1_U (dB_0_0_U x)))
   = (cAD_BCE (dC_2_1_L (dB_1_0_L (dE_0_0_U x)))) • v_DACB :=
@@ -1307,20 +1148,6 @@ Local Definition n_ADCB_1:
     (hADE_BC (dC_1_1_U (dB_0_0_U x)))
     (square_coherence_fill dD_3_2_L dA_3_0_L dA_4_0_L dD_4_3_L cAD_BCE
       ((f_equal dC_2_1_L (cBE_nil x)) • (cCE_B (dB_0_0_U x)))).
-
-Local Definition n_BACD_2:
-  v_BACD • f_equal dE_4_4_U (f_equal dB_3_1_U (cAC_D (dD_0_0_U x)))
-  = (f_equal dB_4_1_L (cAC_DE (dD_1_0_L (dE_0_0_U x)))) • v_BCAD :=
-  square_stack
-    (square_map dB_4_1_L
-      (layer_square_nat dC_2_0_L dA_2_0_L dA_3_0_L dC_3_1_L dE_3_3_U cAC_DE (cDE_nil x)
-        (cCE_D (dD_0_0_U x)) (cAE_D (dD_0_0_U x)) (cAC_D (dD_0_0_U x))
-        (cAE_CD (dC_1_0_U (dD_0_0_U x))) (cCE_AD (dA_1_0_U (dD_0_0_U x)))
-        (hACE_D (dD_0_0_U x))
-        (square_coherence_fill dC_2_0_L dA_2_0_L dA_3_0_L dC_3_1_L cAC_DE (cDE_nil x))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dB_3_1_U dB_4_1_L dE_4_4_U cBE_ACD
-        (cAC_D (dD_0_0_U x)))).
 
 Local Definition n_BACD_3:
   v_BACD • f_equal dE_4_4_U (f_equal dB_3_1_U (f_equal dA_2_0_U (cCD_nil x)))
@@ -1348,19 +1175,6 @@ Local Definition n_BADC_2:
       (square_coherence_fill dE_3_3_U dB_3_1_U dB_4_1_L dE_4_4_U cBE_ACD
         (cAD_C (dC_0_0_U x)))).
 
-Local Definition n_BCAD_1:
-  v_BCAD • f_equal dE_4_4_U (cBC_AD (dA_1_0_U (dD_0_0_U x)))
-  = (cBC_ADE (dA_2_0_L (dD_1_0_L (dE_0_0_U x)))) • v_CBAD :=
-  layer_square_nat dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L dE_4_4_U cBC_ADE
-    ((f_equal dA_2_0_L (cDE_nil x)) • (cAE_D (dD_0_0_U x)))
-    (cCE_AD (dA_1_0_U (dD_0_0_U x))) (cBE_AD (dA_1_0_U (dD_0_0_U x)))
-    (cBC_AD (dA_1_0_U (dD_0_0_U x)))
-    (cBE_ACD (dC_2_1_U (dA_1_0_U (dD_0_0_U x))))
-    (cCE_ABD (dB_2_1_U (dA_1_0_U (dD_0_0_U x))))
-    (hBCE_AD (dA_1_0_U (dD_0_0_U x)))
-    (square_coherence_fill dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L cBC_ADE
-      ((f_equal dA_2_0_L (cDE_nil x)) • (cAE_D (dD_0_0_U x)))).
-
 Local Definition n_BCAD_3:
   v_BCAD • f_equal dE_4_4_U (f_equal dB_3_1_U (f_equal dC_2_1_U (cAD_nil x)))
   = (f_equal dB_4_1_L (f_equal dC_3_1_L (cAD_E (dE_0_0_U x)))) • v_BCDA :=
@@ -1372,19 +1186,6 @@ Local Definition n_BCAD_3:
     (eq_sym
       (square_coherence_fill dE_3_3_U dB_3_1_U dB_4_1_L dE_4_4_U cBE_ACD
         (f_equal dC_2_1_U (cAD_nil x)))).
-
-Local Definition n_BCDA_1:
-  v_BCDA • f_equal dE_4_4_U (cBC_AD (dD_1_1_U (dA_0_0_U x)))
-  = (cBC_ADE (dD_2_1_L (dA_1_0_L (dE_0_0_U x)))) • v_CBDA :=
-  layer_square_nat dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L dE_4_4_U cBC_ADE
-    ((f_equal dD_2_1_L (cAE_nil x)) • (cDE_A (dA_0_0_U x)))
-    (cCE_AD (dD_1_1_U (dA_0_0_U x))) (cBE_AD (dD_1_1_U (dA_0_0_U x)))
-    (cBC_AD (dD_1_1_U (dA_0_0_U x)))
-    (cBE_ACD (dC_2_1_U (dD_1_1_U (dA_0_0_U x))))
-    (cCE_ABD (dB_2_1_U (dD_1_1_U (dA_0_0_U x))))
-    (hBCE_AD (dD_1_1_U (dA_0_0_U x)))
-    (square_coherence_fill dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L cBC_ADE
-      ((f_equal dD_2_1_L (cAE_nil x)) • (cDE_A (dA_0_0_U x)))).
 
 Local Definition n_BCDA_2:
   v_BCDA • f_equal dE_4_4_U (f_equal dB_3_1_U (cCD_A (dA_0_0_U x)))
@@ -1413,18 +1214,6 @@ Local Definition n_BDAC_1:
     (square_coherence_fill dD_3_2_L dB_3_1_L dB_4_1_L dD_4_3_L cBD_ACE
       ((f_equal dA_2_0_L (cCE_nil x)) • (cAE_C (dC_0_0_U x)))).
 
-Local Definition n_BDAC_3:
-  v_BDAC • f_equal dE_4_4_U (f_equal dB_3_1_U (f_equal dD_2_2_U (cAC_nil x)))
-  = (f_equal dB_4_1_L (f_equal dD_3_2_L (cAC_E (dE_0_0_U x)))) • v_BDCA :=
-  square_stack
-    (square_map dB_4_1_L
-      (square_stack (square_map dD_3_2_L (hACE_nil x))
-        (eq_sym
-          (square_coherence_fill dE_2_2_U dD_2_2_U dD_3_2_L dE_3_3_U cDE_AC (cAC_nil x)))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dB_3_1_U dB_4_1_L dE_4_4_U cBE_ACD
-        (f_equal dD_2_2_U (cAC_nil x)))).
-
 Local Definition n_BDCA_1:
   v_BDCA • f_equal dE_4_4_U (cBD_AC (dC_1_1_U (dA_0_0_U x)))
   = (cBD_ACE (dC_2_1_L (dA_1_0_L (dE_0_0_U x)))) • v_DBCA :=
@@ -1437,20 +1226,6 @@ Local Definition n_BDCA_1:
     (hBDE_AC (dC_1_1_U (dA_0_0_U x)))
     (square_coherence_fill dD_3_2_L dB_3_1_L dB_4_1_L dD_4_3_L cBD_ACE
       ((f_equal dC_2_1_L (cAE_nil x)) • (cCE_A (dA_0_0_U x)))).
-
-Local Definition n_CABD_2:
-  v_CABD • f_equal dE_4_4_U (f_equal dC_3_2_U (cAB_D (dD_0_0_U x)))
-  = (f_equal dC_4_2_L (cAB_DE (dD_1_0_L (dE_0_0_U x)))) • v_CBAD :=
-  square_stack
-    (square_map dC_4_2_L
-      (layer_square_nat dB_2_0_L dA_2_0_L dA_3_0_L dB_3_1_L dE_3_3_U cAB_DE (cDE_nil x)
-        (cBE_D (dD_0_0_U x)) (cAE_D (dD_0_0_U x)) (cAB_D (dD_0_0_U x))
-        (cAE_BD (dB_1_0_U (dD_0_0_U x))) (cBE_AD (dA_1_0_U (dD_0_0_U x)))
-        (hABE_D (dD_0_0_U x))
-        (square_coherence_fill dB_2_0_L dA_2_0_L dA_3_0_L dB_3_1_L cAB_DE (cDE_nil x))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dC_3_2_U dC_4_2_L dE_4_4_U cCE_ABD
-        (cAB_D (dD_0_0_U x)))).
 
 Local Definition n_CABD_3:
   v_CABD • f_equal dE_4_4_U (f_equal dC_3_2_U (f_equal dA_2_0_U (cBD_nil x)))
@@ -1517,18 +1292,6 @@ Local Definition n_CDAB_1:
     (square_coherence_fill dD_3_2_L dC_3_2_L dC_4_2_L dD_4_3_L cCD_ABE
       ((f_equal dA_2_0_L (cBE_nil x)) • (cAE_B (dB_0_0_U x)))).
 
-Local Definition n_CDAB_3:
-  v_CDAB • f_equal dE_4_4_U (f_equal dC_3_2_U (f_equal dD_2_2_U (cAB_nil x)))
-  = (f_equal dC_4_2_L (f_equal dD_3_2_L (cAB_E (dE_0_0_U x)))) • v_CDBA :=
-  square_stack
-    (square_map dC_4_2_L
-      (square_stack (square_map dD_3_2_L (hABE_nil x))
-        (eq_sym
-          (square_coherence_fill dE_2_2_U dD_2_2_U dD_3_2_L dE_3_3_U cDE_AB (cAB_nil x)))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dC_3_2_U dC_4_2_L dE_4_4_U cCE_ABD
-        (f_equal dD_2_2_U (cAB_nil x)))).
-
 Local Definition n_CDBA_1:
   v_CDBA • f_equal dE_4_4_U (cCD_AB (dB_1_1_U (dA_0_0_U x)))
   = (cCD_ABE (dB_2_1_L (dA_1_0_L (dE_0_0_U x)))) • v_DCBA :=
@@ -1542,774 +1305,24 @@ Local Definition n_CDBA_1:
     (square_coherence_fill dD_3_2_L dC_3_2_L dC_4_2_L dD_4_3_L cCD_ABE
       ((f_equal dB_2_1_L (cAE_nil x)) • (cBE_A (dA_0_0_U x)))).
 
-Local Definition n_DABC_2:
-  v_DABC • f_equal dE_4_4_U (f_equal dD_3_3_U (cAB_C (dC_0_0_U x)))
-  = (f_equal dD_4_3_L (cAB_CE (dC_1_0_L (dE_0_0_U x)))) • v_DBAC :=
-  square_stack
-    (square_map dD_4_3_L
-      (layer_square_nat dB_2_0_L dA_2_0_L dA_3_0_L dB_3_1_L dE_3_3_U cAB_CE (cCE_nil x)
-        (cBE_C (dC_0_0_U x)) (cAE_C (dC_0_0_U x)) (cAB_C (dC_0_0_U x))
-        (cAE_BC (dB_1_0_U (dC_0_0_U x))) (cBE_AC (dA_1_0_U (dC_0_0_U x)))
-        (hABE_C (dC_0_0_U x))
-        (square_coherence_fill dB_2_0_L dA_2_0_L dA_3_0_L dB_3_1_L cAB_CE (cCE_nil x))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dD_3_3_U dD_4_3_L dE_4_4_U cDE_ABC
-        (cAB_C (dC_0_0_U x)))).
+(** The four hexagons with a source operation extend their
+    permutahedral facet along the comparison of the source operation
+    with [E]. *)
+Local Definition hcube_BCD_A :=
+  layer_cube_nat dD_2_1_L dC_2_1_L dB_2_1_L cCD_AE cBC_AE cBD_AE hBCD_AE
+    (cAE_nil x) (kBCDE_A (dA_0_0_U x)).
 
-Local Definition n_DABC_3:
-  v_DABC • f_equal dE_4_4_U (f_equal dD_3_3_U (f_equal dA_2_0_U (cBC_nil x)))
-  = (f_equal dD_4_3_L (f_equal dA_3_0_L (cBC_E (dE_0_0_U x)))) • v_DACB :=
-  square_stack
-    (square_map dD_4_3_L
-      (square_stack (square_map dA_3_0_L (hBCE_nil x))
-        (eq_sym
-          (square_coherence_fill dE_2_2_U dA_2_0_U dA_3_0_L dE_3_3_U cAE_BC (cBC_nil x)))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dD_3_3_U dD_4_3_L dE_4_4_U cDE_ABC
-        (f_equal dA_2_0_U (cBC_nil x)))).
+Local Definition hcube_ACD_B :=
+  layer_cube_nat dD_2_1_L dC_2_1_L dA_2_0_L cCD_BE cAC_BE cAD_BE hACD_BE
+    (cBE_nil x) (kACDE_B (dB_0_0_U x)).
 
-Local Definition n_DACB_2:
-  v_DACB • f_equal dE_4_4_U (f_equal dD_3_3_U (cAC_B (dB_0_0_U x)))
-  = (f_equal dD_4_3_L (cAC_BE (dB_1_0_L (dE_0_0_U x)))) • v_DCAB :=
-  square_stack
-    (square_map dD_4_3_L
-      (layer_square_nat dC_2_1_L dA_2_0_L dA_3_0_L dC_3_2_L dE_3_3_U cAC_BE (cBE_nil x)
-        (cCE_B (dB_0_0_U x)) (cAE_B (dB_0_0_U x)) (cAC_B (dB_0_0_U x))
-        (cAE_BC (dC_1_1_U (dB_0_0_U x))) (cCE_AB (dA_1_0_U (dB_0_0_U x)))
-        (hACE_B (dB_0_0_U x))
-        (square_coherence_fill dC_2_1_L dA_2_0_L dA_3_0_L dC_3_2_L cAC_BE (cBE_nil x))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dD_3_3_U dD_4_3_L dE_4_4_U cDE_ABC
-        (cAC_B (dB_0_0_U x)))).
+Local Definition hcube_ABD_C :=
+  layer_cube_nat dD_2_1_L dB_2_0_L dA_2_0_L cBD_CE cAB_CE cAD_CE hABD_CE
+    (cCE_nil x) (kABDE_C (dC_0_0_U x)).
 
-Local Definition n_DBAC_3:
-  v_DBAC • f_equal dE_4_4_U (f_equal dD_3_3_U (f_equal dB_2_1_U (cAC_nil x)))
-  = (f_equal dD_4_3_L (f_equal dB_3_1_L (cAC_E (dE_0_0_U x)))) • v_DBCA :=
-  square_stack
-    (square_map dD_4_3_L
-      (square_stack (square_map dB_3_1_L (hACE_nil x))
-        (eq_sym
-          (square_coherence_fill dE_2_2_U dB_2_1_U dB_3_1_L dE_3_3_U cBE_AC (cAC_nil x)))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dD_3_3_U dD_4_3_L dE_4_4_U cDE_ABC
-        (f_equal dB_2_1_U (cAC_nil x)))).
-
-Local Definition n_DBCA_2:
-  v_DBCA • f_equal dE_4_4_U (f_equal dD_3_3_U (cBC_A (dA_0_0_U x)))
-  = (f_equal dD_4_3_L (cBC_AE (dA_1_0_L (dE_0_0_U x)))) • v_DCBA :=
-  square_stack
-    (square_map dD_4_3_L
-      (layer_square_nat dC_2_1_L dB_2_1_L dB_3_1_L dC_3_2_L dE_3_3_U cBC_AE (cAE_nil x)
-        (cCE_A (dA_0_0_U x)) (cBE_A (dA_0_0_U x)) (cBC_A (dA_0_0_U x))
-        (cBE_AC (dC_1_1_U (dA_0_0_U x))) (cCE_AB (dB_1_1_U (dA_0_0_U x)))
-        (hBCE_A (dA_0_0_U x))
-        (square_coherence_fill dC_2_1_L dB_2_1_L dB_3_1_L dC_3_2_L cBC_AE (cAE_nil x))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dD_3_3_U dD_4_3_L dE_4_4_U cDE_ABC
-        (cBC_A (dA_0_0_U x)))).
-
-Local Definition n_DCAB_3:
-  v_DCAB • f_equal dE_4_4_U (f_equal dD_3_3_U (f_equal dC_2_2_U (cAB_nil x)))
-  = (f_equal dD_4_3_L (f_equal dC_3_2_L (cAB_E (dE_0_0_U x)))) • v_DCBA :=
-  square_stack
-    (square_map dD_4_3_L
-      (square_stack (square_map dC_3_2_L (hABE_nil x))
-        (eq_sym
-          (square_coherence_fill dE_2_2_U dC_2_2_U dC_3_2_L dE_3_3_U cCE_AB (cAB_nil x)))))
-    (eq_sym
-      (square_coherence_fill dE_3_3_U dD_3_3_U dD_4_3_L dE_4_4_U cDE_ABC
-        (f_equal dC_2_2_U (cAB_nil x)))).
-
-(** The four hexagons with a source operation use the naturality
-    prism filler through [layer_cube_nat]. Normalize their side squares
-    to the same vertical paths as the adjacent-swap squares above. *)
-Local Definition raw_nat_BCD_A :=
-  @layer_cube_nat Y2 Y1 Y0 X2 X1 dE_3_3_U dE_4_4_U dB_3_1_U dD_3_3_U dC_3_2_U dB_4_1_L
-    dD_4_3_L dC_4_2_L cBE_ACD cDE_ABC cCE_ABD dC_3_1_L dD_3_2_L dB_3_1_L dC_3_2_L cBD_ACE
-    cBC_ADE cCD_ABE Y3 dD_2_1_L dC_2_1_L dB_2_1_L cCD_AE cBC_AE cBD_AE hBCD_AE
-    (dA_1_0_L (dE_0_0_U x)) (dE_1_1_U (dA_0_0_U x)) (cAE_nil x)
-    (dC_2_1_U (dD_1_1_U (dA_0_0_U x))) (dD_2_2_U (dC_1_1_U (dA_0_0_U x)))
-    (dB_2_1_U (dC_1_1_U (dA_0_0_U x))) (dC_2_2_U (dB_1_1_U (dA_0_0_U x)))
-    (dB_2_1_U (dD_1_1_U (dA_0_0_U x))) (dD_2_2_U (dB_1_1_U (dA_0_0_U x)))
-    (cCD_A (dA_0_0_U x)) (cBC_A (dA_0_0_U x)) (cBD_A (dA_0_0_U x))
-    (cBD_AC (dC_1_1_U (dA_0_0_U x))) (cBC_AD (dD_1_1_U (dA_0_0_U x)))
-    (cCD_AB (dB_1_1_U (dA_0_0_U x))) (dE_2_2_U (dD_1_1_U (dA_0_0_U x)))
-    (dE_2_2_U (dC_1_1_U (dA_0_0_U x))) (dE_2_2_U (dB_1_1_U (dA_0_0_U x)))
-    (cDE_A (dA_0_0_U x)) (cCE_A (dA_0_0_U x)) (cBE_A (dA_0_0_U x))
-    (cCE_AD (dD_1_1_U (dA_0_0_U x))) (cDE_AC (dC_1_1_U (dA_0_0_U x)))
-    (cBE_AC (dC_1_1_U (dA_0_0_U x))) (cCE_AB (dB_1_1_U (dA_0_0_U x)))
-    (cBE_AD (dD_1_1_U (dA_0_0_U x))) (cDE_AB (dB_1_1_U (dA_0_0_U x)))
-    (hCDE_A (dA_0_0_U x)) (hBCE_A (dA_0_0_U x)) (hBDE_A (dA_0_0_U x))
-    (hBCD_A (dA_0_0_U x)) (hBDE_AC (dC_1_1_U (dA_0_0_U x)))
-    (hBCE_AD (dD_1_1_U (dA_0_0_U x))) (hCDE_AB (dB_1_1_U (dA_0_0_U x)))
-    (kBCDE_A (dA_0_0_U x))
-    (square_coherence_fill (fun z => dC_3_1_L (dD_2_1_L z))
-      (fun z => dD_3_2_L (dC_2_1_L z)) dB_4_1_L dB_4_1_L
-      (fun z => f_equal dB_4_1_L (cCD_AE z)) (cAE_nil x))
-    (square_coherence_fill (fun z => dD_3_2_L (dC_2_1_L z))
-      (fun z => dB_3_1_L (dC_2_1_L z)) dB_4_1_L dD_4_3_L (fun z => cBD_ACE (dC_2_1_L z))
-      (cAE_nil x))
-    (square_coherence_fill (fun z => dB_3_1_L (dC_2_1_L z))
-      (fun z => dC_3_2_L (dB_2_1_L z)) dD_4_3_L dD_4_3_L
-      (fun z => f_equal dD_4_3_L (cBC_AE z)) (cAE_nil x))
-    (square_coherence_fill (fun z => dC_3_1_L (dD_2_1_L z))
-      (fun z => dB_3_1_L (dD_2_1_L z)) dB_4_1_L dC_4_2_L (fun z => cBC_ADE (dD_2_1_L z))
-      (cAE_nil x))
-    (square_coherence_fill (fun z => dB_3_1_L (dD_2_1_L z))
-      (fun z => dD_3_2_L (dB_2_1_L z)) dC_4_2_L dC_4_2_L
-      (fun z => f_equal dC_4_2_L (cBD_AE z)) (cAE_nil x))
-    (square_coherence_fill (fun z => dD_3_2_L (dB_2_1_L z))
-      (fun z => dC_3_2_L (dB_2_1_L z)) dC_4_2_L dD_4_3_L (fun z => cCD_ABE (dB_2_1_L z))
-      (cAE_nil x))
-    facet_BCD_AE.
-
-Local Definition hcube_BCD_A:
-  square_cube
-    (square_compose_map dE_4_4_U (square_compose_map dE_4_4_U n_BCDA_2 n_BDCA_1) n_DBCA_2)
-    (square_compose_map dE_4_4_U n_BCDA_1 (square_compose_map dE_4_4_U n_CBDA_2 n_CDBA_1))
-    (f_equal (fun e => f_equal dE_4_4_U e) (hBCD_A (dA_0_0_U x)))
-    (hBCD_AE (dA_1_0_L (dE_0_0_U x))) :=
-  square_cube_change_faces
-    (eq_trans
-      (path_map2
-        (fun H K => square_compose_map dE_4_4_U H K)
-        (path_map2
-          (fun H K => square_compose_map dE_4_4_U H K)
-          (layer_square_map_source dD_2_1_L dC_2_1_L dC_3_1_L dD_3_2_L dE_3_3_U cCD_AE
-            dB_4_1_L dB_3_1_U dE_4_4_U cBE_ACD (cAE_nil x) (cDE_A (dA_0_0_U x))
-            (cCE_A (dA_0_0_U x)) (cCD_A (dA_0_0_U x)) (cCE_AD (dD_1_1_U (dA_0_0_U x)))
-            (cDE_AC (dC_1_1_U (dA_0_0_U x))) (hCDE_A (dA_0_0_U x)))
-          (layer_square_nat_source dC_2_1_L dD_3_2_L dB_3_1_L dB_4_1_L dD_4_3_L dE_4_4_U
-            cBD_ACE (cAE_nil x) (cCE_A (dA_0_0_U x)) (cDE_AC (dC_1_1_U (dA_0_0_U x)))
-            (cBE_AC (dC_1_1_U (dA_0_0_U x))) (cBD_AC (dC_1_1_U (dA_0_0_U x)))
-            (cBE_ACD (dD_2_2_U (dC_1_1_U (dA_0_0_U x))))
-            (cDE_ABC (dB_2_1_U (dC_1_1_U (dA_0_0_U x))))
-            (hBDE_AC (dC_1_1_U (dA_0_0_U x)))))
-        (layer_square_map_source dC_2_1_L dB_2_1_L dB_3_1_L dC_3_2_L dE_3_3_U cBC_AE
-          dD_4_3_L dD_3_3_U dE_4_4_U cDE_ABC (cAE_nil x) (cCE_A (dA_0_0_U x))
-          (cBE_A (dA_0_0_U x)) (cBC_A (dA_0_0_U x)) (cBE_AC (dC_1_1_U (dA_0_0_U x)))
-          (cCE_AB (dB_1_1_U (dA_0_0_U x))) (hBCE_A (dA_0_0_U x))))
-      (square_nat_route_left dE_4_4_U
-        (layer_cube_nat_side dD_2_1_L dC_3_1_L dB_4_1_L (cAE_nil x) (cDE_A (dA_0_0_U x))
-          (cCE_AD (dD_1_1_U (dA_0_0_U x)))
-          (cBE_ACD (dC_2_1_U (dD_1_1_U (dA_0_0_U x)))))
-        (layer_cube_nat_side dC_2_1_L dD_3_2_L dB_4_1_L (cAE_nil x) (cCE_A (dA_0_0_U x))
-          (cDE_AC (dC_1_1_U (dA_0_0_U x)))
-          (cBE_ACD (dD_2_2_U (dC_1_1_U (dA_0_0_U x)))))
-        (layer_cube_nat_side dC_2_1_L dB_3_1_L dD_4_3_L (cAE_nil x) (cCE_A (dA_0_0_U x))
-          (cBE_AC (dC_1_1_U (dA_0_0_U x)))
-          (cDE_ABC (dB_2_1_U (dC_1_1_U (dA_0_0_U x)))))
-        (layer_cube_nat_side dB_2_1_L dC_3_2_L dD_4_3_L (cAE_nil x) (cBE_A (dA_0_0_U x))
-          (cCE_AB (dB_1_1_U (dA_0_0_U x)))
-          (cDE_ABC (dC_2_2_U (dB_1_1_U (dA_0_0_U x)))))
-        (square_coherence_fill (fun z => dC_3_1_L (dD_2_1_L z))
-          (fun z => dD_3_2_L (dC_2_1_L z)) dB_4_1_L dB_4_1_L
-          (fun z => f_equal dB_4_1_L (cCD_AE z)) (cAE_nil x))
-        (square_coherence_fill (fun z => dD_3_2_L (dC_2_1_L z))
-          (fun z => dB_3_1_L (dC_2_1_L z)) dB_4_1_L dD_4_3_L
-          (fun z => cBD_ACE (dC_2_1_L z)) (cAE_nil x))
-        (square_coherence_fill (fun z => dB_3_1_L (dC_2_1_L z))
-          (fun z => dC_3_2_L (dB_2_1_L z)) dD_4_3_L dD_4_3_L
-          (fun z => f_equal dD_4_3_L (cBC_AE z)) (cAE_nil x))
-        (square_stack
-          (square_map dB_4_1_L ((hCDE_A (dA_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dB_3_1_U dB_4_1_L dE_4_4_U cBE_ACD
-              (cCD_A (dA_0_0_U x)))))
-        (layer_square_nat dD_3_2_L dB_3_1_L dB_4_1_L dD_4_3_L dE_4_4_U cBD_ACE
-          (cCE_A (dA_0_0_U x)) (cDE_AC (dC_1_1_U (dA_0_0_U x)))
-          (cBE_AC (dC_1_1_U (dA_0_0_U x))) (cBD_AC (dC_1_1_U (dA_0_0_U x)))
-          (cBE_ACD (dD_2_2_U (dC_1_1_U (dA_0_0_U x))))
-          (cDE_ABC (dB_2_1_U (dC_1_1_U (dA_0_0_U x))))
-          (hBDE_AC (dC_1_1_U (dA_0_0_U x)))
-          (square_coherence_fill dD_3_2_L dB_3_1_L dB_4_1_L dD_4_3_L cBD_ACE
-            (cCE_A (dA_0_0_U x))))
-        (square_stack
-          (square_map dD_4_3_L ((hBCE_A (dA_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dD_3_3_U dD_4_3_L dE_4_4_U cDE_ABC
-              (cBC_A (dA_0_0_U x)))))))
-    raw_nat_BCD_A
-    (eq_trans
-      (path_map2
-        (fun H K => square_compose_map dE_4_4_U H K)
-        (layer_square_nat_source dD_2_1_L dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L dE_4_4_U
-          cBC_ADE (cAE_nil x) (cDE_A (dA_0_0_U x)) (cCE_AD (dD_1_1_U (dA_0_0_U x)))
-          (cBE_AD (dD_1_1_U (dA_0_0_U x))) (cBC_AD (dD_1_1_U (dA_0_0_U x)))
-          (cBE_ACD (dC_2_1_U (dD_1_1_U (dA_0_0_U x))))
-          (cCE_ABD (dB_2_1_U (dD_1_1_U (dA_0_0_U x))))
-          (hBCE_AD (dD_1_1_U (dA_0_0_U x))))
-        (path_map2
-          (fun H K => square_compose_map dE_4_4_U H K)
-          (layer_square_map_source dD_2_1_L dB_2_1_L dB_3_1_L dD_3_2_L dE_3_3_U cBD_AE
-            dC_4_2_L dC_3_2_U dE_4_4_U cCE_ABD (cAE_nil x) (cDE_A (dA_0_0_U x))
-            (cBE_A (dA_0_0_U x)) (cBD_A (dA_0_0_U x)) (cBE_AD (dD_1_1_U (dA_0_0_U x)))
-            (cDE_AB (dB_1_1_U (dA_0_0_U x))) (hBDE_A (dA_0_0_U x)))
-          (layer_square_nat_source dB_2_1_L dD_3_2_L dC_3_2_L dC_4_2_L dD_4_3_L dE_4_4_U
-            cCD_ABE (cAE_nil x) (cBE_A (dA_0_0_U x)) (cDE_AB (dB_1_1_U (dA_0_0_U x)))
-            (cCE_AB (dB_1_1_U (dA_0_0_U x))) (cCD_AB (dB_1_1_U (dA_0_0_U x)))
-            (cCE_ABD (dD_2_2_U (dB_1_1_U (dA_0_0_U x))))
-            (cDE_ABC (dC_2_2_U (dB_1_1_U (dA_0_0_U x))))
-            (hCDE_AB (dB_1_1_U (dA_0_0_U x))))))
-      (square_nat_route dE_4_4_U
-        (layer_cube_nat_side dD_2_1_L dC_3_1_L dB_4_1_L (cAE_nil x) (cDE_A (dA_0_0_U x))
-          (cCE_AD (dD_1_1_U (dA_0_0_U x)))
-          (cBE_ACD (dC_2_1_U (dD_1_1_U (dA_0_0_U x)))))
-        (layer_cube_nat_side dD_2_1_L dB_3_1_L dC_4_2_L (cAE_nil x) (cDE_A (dA_0_0_U x))
-          (cBE_AD (dD_1_1_U (dA_0_0_U x)))
-          (cCE_ABD (dB_2_1_U (dD_1_1_U (dA_0_0_U x)))))
-        (layer_cube_nat_side dB_2_1_L dD_3_2_L dC_4_2_L (cAE_nil x) (cBE_A (dA_0_0_U x))
-          (cDE_AB (dB_1_1_U (dA_0_0_U x)))
-          (cCE_ABD (dD_2_2_U (dB_1_1_U (dA_0_0_U x)))))
-        (layer_cube_nat_side dB_2_1_L dC_3_2_L dD_4_3_L (cAE_nil x) (cBE_A (dA_0_0_U x))
-          (cCE_AB (dB_1_1_U (dA_0_0_U x)))
-          (cDE_ABC (dC_2_2_U (dB_1_1_U (dA_0_0_U x)))))
-        (square_coherence_fill (fun z => dC_3_1_L (dD_2_1_L z))
-          (fun z => dB_3_1_L (dD_2_1_L z)) dB_4_1_L dC_4_2_L
-          (fun z => cBC_ADE (dD_2_1_L z)) (cAE_nil x))
-        (square_coherence_fill (fun z => dB_3_1_L (dD_2_1_L z))
-          (fun z => dD_3_2_L (dB_2_1_L z)) dC_4_2_L dC_4_2_L
-          (fun z => f_equal dC_4_2_L (cBD_AE z)) (cAE_nil x))
-        (square_coherence_fill (fun z => dD_3_2_L (dB_2_1_L z))
-          (fun z => dC_3_2_L (dB_2_1_L z)) dC_4_2_L dD_4_3_L
-          (fun z => cCD_ABE (dB_2_1_L z)) (cAE_nil x))
-        (layer_square_nat dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L dE_4_4_U cBC_ADE
-          (cDE_A (dA_0_0_U x)) (cCE_AD (dD_1_1_U (dA_0_0_U x)))
-          (cBE_AD (dD_1_1_U (dA_0_0_U x))) (cBC_AD (dD_1_1_U (dA_0_0_U x)))
-          (cBE_ACD (dC_2_1_U (dD_1_1_U (dA_0_0_U x))))
-          (cCE_ABD (dB_2_1_U (dD_1_1_U (dA_0_0_U x))))
-          (hBCE_AD (dD_1_1_U (dA_0_0_U x)))
-          (square_coherence_fill dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L cBC_ADE
-            (cDE_A (dA_0_0_U x))))
-        (square_stack
-          (square_map dC_4_2_L ((hBDE_A (dA_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dC_3_2_U dC_4_2_L dE_4_4_U cCE_ABD
-              (cBD_A (dA_0_0_U x)))))
-        (layer_square_nat dD_3_2_L dC_3_2_L dC_4_2_L dD_4_3_L dE_4_4_U cCD_ABE
-          (cBE_A (dA_0_0_U x)) (cDE_AB (dB_1_1_U (dA_0_0_U x)))
-          (cCE_AB (dB_1_1_U (dA_0_0_U x))) (cCD_AB (dB_1_1_U (dA_0_0_U x)))
-          (cCE_ABD (dD_2_2_U (dB_1_1_U (dA_0_0_U x))))
-          (cDE_ABC (dC_2_2_U (dB_1_1_U (dA_0_0_U x))))
-          (hCDE_AB (dB_1_1_U (dA_0_0_U x)))
-          (square_coherence_fill dD_3_2_L dC_3_2_L dC_4_2_L dD_4_3_L cCD_ABE
-            (cBE_A (dA_0_0_U x)))))).
-
-Local Definition raw_nat_ACD_B :=
-  @layer_cube_nat Y2 Y1 Y0 X2 X1 dE_3_3_U dE_4_4_U dA_3_0_U dD_3_3_U dC_3_2_U dA_4_0_L
-    dD_4_3_L dC_4_2_L cAE_BCD cDE_ABC cCE_ABD dC_3_1_L dD_3_2_L dA_3_0_L dC_3_2_L cAD_BCE
-    cAC_BDE cCD_ABE Y3 dD_2_1_L dC_2_1_L dA_2_0_L cCD_BE cAC_BE cAD_BE hACD_BE
-    (dB_1_0_L (dE_0_0_U x)) (dE_1_1_U (dB_0_0_U x)) (cBE_nil x)
-    (dC_2_1_U (dD_1_1_U (dB_0_0_U x))) (dD_2_2_U (dC_1_1_U (dB_0_0_U x)))
-    (dA_2_0_U (dC_1_1_U (dB_0_0_U x))) (dC_2_2_U (dA_1_0_U (dB_0_0_U x)))
-    (dA_2_0_U (dD_1_1_U (dB_0_0_U x))) (dD_2_2_U (dA_1_0_U (dB_0_0_U x)))
-    (cCD_B (dB_0_0_U x)) (cAC_B (dB_0_0_U x)) (cAD_B (dB_0_0_U x))
-    (cAD_BC (dC_1_1_U (dB_0_0_U x))) (cAC_BD (dD_1_1_U (dB_0_0_U x)))
-    (cCD_AB (dA_1_0_U (dB_0_0_U x))) (dE_2_2_U (dD_1_1_U (dB_0_0_U x)))
-    (dE_2_2_U (dC_1_1_U (dB_0_0_U x))) (dE_2_2_U (dA_1_0_U (dB_0_0_U x)))
-    (cDE_B (dB_0_0_U x)) (cCE_B (dB_0_0_U x)) (cAE_B (dB_0_0_U x))
-    (cCE_BD (dD_1_1_U (dB_0_0_U x))) (cDE_BC (dC_1_1_U (dB_0_0_U x)))
-    (cAE_BC (dC_1_1_U (dB_0_0_U x))) (cCE_AB (dA_1_0_U (dB_0_0_U x)))
-    (cAE_BD (dD_1_1_U (dB_0_0_U x))) (cDE_AB (dA_1_0_U (dB_0_0_U x)))
-    (hCDE_B (dB_0_0_U x)) (hACE_B (dB_0_0_U x)) (hADE_B (dB_0_0_U x))
-    (hACD_B (dB_0_0_U x)) (hADE_BC (dC_1_1_U (dB_0_0_U x)))
-    (hACE_BD (dD_1_1_U (dB_0_0_U x))) (hCDE_AB (dA_1_0_U (dB_0_0_U x)))
-    (kACDE_B (dB_0_0_U x))
-    (square_coherence_fill (fun z => dC_3_1_L (dD_2_1_L z))
-      (fun z => dD_3_2_L (dC_2_1_L z)) dA_4_0_L dA_4_0_L
-      (fun z => f_equal dA_4_0_L (cCD_BE z)) (cBE_nil x))
-    (square_coherence_fill (fun z => dD_3_2_L (dC_2_1_L z))
-      (fun z => dA_3_0_L (dC_2_1_L z)) dA_4_0_L dD_4_3_L (fun z => cAD_BCE (dC_2_1_L z))
-      (cBE_nil x))
-    (square_coherence_fill (fun z => dA_3_0_L (dC_2_1_L z))
-      (fun z => dC_3_2_L (dA_2_0_L z)) dD_4_3_L dD_4_3_L
-      (fun z => f_equal dD_4_3_L (cAC_BE z)) (cBE_nil x))
-    (square_coherence_fill (fun z => dC_3_1_L (dD_2_1_L z))
-      (fun z => dA_3_0_L (dD_2_1_L z)) dA_4_0_L dC_4_2_L (fun z => cAC_BDE (dD_2_1_L z))
-      (cBE_nil x))
-    (square_coherence_fill (fun z => dA_3_0_L (dD_2_1_L z))
-      (fun z => dD_3_2_L (dA_2_0_L z)) dC_4_2_L dC_4_2_L
-      (fun z => f_equal dC_4_2_L (cAD_BE z)) (cBE_nil x))
-    (square_coherence_fill (fun z => dD_3_2_L (dA_2_0_L z))
-      (fun z => dC_3_2_L (dA_2_0_L z)) dC_4_2_L dD_4_3_L (fun z => cCD_ABE (dA_2_0_L z))
-      (cBE_nil x))
-    facet_ACD_BE.
-
-Local Definition hcube_ACD_B:
-  square_cube
-    (square_compose_map dE_4_4_U (square_compose_map dE_4_4_U n_ACDB_2 n_ADCB_1) n_DACB_2)
-    (square_compose_map dE_4_4_U n_ACDB_1 (square_compose_map dE_4_4_U n_CADB_2 n_CDAB_1))
-    (f_equal (fun e => f_equal dE_4_4_U e) (hACD_B (dB_0_0_U x)))
-    (hACD_BE (dB_1_0_L (dE_0_0_U x))) :=
-  square_cube_change_faces
-    (eq_trans
-      (path_map2
-        (fun H K => square_compose_map dE_4_4_U H K)
-        (path_map2
-          (fun H K => square_compose_map dE_4_4_U H K)
-          (layer_square_map_source dD_2_1_L dC_2_1_L dC_3_1_L dD_3_2_L dE_3_3_U cCD_BE
-            dA_4_0_L dA_3_0_U dE_4_4_U cAE_BCD (cBE_nil x) (cDE_B (dB_0_0_U x))
-            (cCE_B (dB_0_0_U x)) (cCD_B (dB_0_0_U x)) (cCE_BD (dD_1_1_U (dB_0_0_U x)))
-            (cDE_BC (dC_1_1_U (dB_0_0_U x))) (hCDE_B (dB_0_0_U x)))
-          (layer_square_nat_source dC_2_1_L dD_3_2_L dA_3_0_L dA_4_0_L dD_4_3_L dE_4_4_U
-            cAD_BCE (cBE_nil x) (cCE_B (dB_0_0_U x)) (cDE_BC (dC_1_1_U (dB_0_0_U x)))
-            (cAE_BC (dC_1_1_U (dB_0_0_U x))) (cAD_BC (dC_1_1_U (dB_0_0_U x)))
-            (cAE_BCD (dD_2_2_U (dC_1_1_U (dB_0_0_U x))))
-            (cDE_ABC (dA_2_0_U (dC_1_1_U (dB_0_0_U x))))
-            (hADE_BC (dC_1_1_U (dB_0_0_U x)))))
-        (layer_square_map_source dC_2_1_L dA_2_0_L dA_3_0_L dC_3_2_L dE_3_3_U cAC_BE
-          dD_4_3_L dD_3_3_U dE_4_4_U cDE_ABC (cBE_nil x) (cCE_B (dB_0_0_U x))
-          (cAE_B (dB_0_0_U x)) (cAC_B (dB_0_0_U x)) (cAE_BC (dC_1_1_U (dB_0_0_U x)))
-          (cCE_AB (dA_1_0_U (dB_0_0_U x))) (hACE_B (dB_0_0_U x))))
-      (square_nat_route_left dE_4_4_U
-        (layer_cube_nat_side dD_2_1_L dC_3_1_L dA_4_0_L (cBE_nil x) (cDE_B (dB_0_0_U x))
-          (cCE_BD (dD_1_1_U (dB_0_0_U x)))
-          (cAE_BCD (dC_2_1_U (dD_1_1_U (dB_0_0_U x)))))
-        (layer_cube_nat_side dC_2_1_L dD_3_2_L dA_4_0_L (cBE_nil x) (cCE_B (dB_0_0_U x))
-          (cDE_BC (dC_1_1_U (dB_0_0_U x)))
-          (cAE_BCD (dD_2_2_U (dC_1_1_U (dB_0_0_U x)))))
-        (layer_cube_nat_side dC_2_1_L dA_3_0_L dD_4_3_L (cBE_nil x) (cCE_B (dB_0_0_U x))
-          (cAE_BC (dC_1_1_U (dB_0_0_U x)))
-          (cDE_ABC (dA_2_0_U (dC_1_1_U (dB_0_0_U x)))))
-        (layer_cube_nat_side dA_2_0_L dC_3_2_L dD_4_3_L (cBE_nil x) (cAE_B (dB_0_0_U x))
-          (cCE_AB (dA_1_0_U (dB_0_0_U x)))
-          (cDE_ABC (dC_2_2_U (dA_1_0_U (dB_0_0_U x)))))
-        (square_coherence_fill (fun z => dC_3_1_L (dD_2_1_L z))
-          (fun z => dD_3_2_L (dC_2_1_L z)) dA_4_0_L dA_4_0_L
-          (fun z => f_equal dA_4_0_L (cCD_BE z)) (cBE_nil x))
-        (square_coherence_fill (fun z => dD_3_2_L (dC_2_1_L z))
-          (fun z => dA_3_0_L (dC_2_1_L z)) dA_4_0_L dD_4_3_L
-          (fun z => cAD_BCE (dC_2_1_L z)) (cBE_nil x))
-        (square_coherence_fill (fun z => dA_3_0_L (dC_2_1_L z))
-          (fun z => dC_3_2_L (dA_2_0_L z)) dD_4_3_L dD_4_3_L
-          (fun z => f_equal dD_4_3_L (cAC_BE z)) (cBE_nil x))
-        (square_stack
-          (square_map dA_4_0_L ((hCDE_B (dB_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dA_3_0_U dA_4_0_L dE_4_4_U cAE_BCD
-              (cCD_B (dB_0_0_U x)))))
-        (layer_square_nat dD_3_2_L dA_3_0_L dA_4_0_L dD_4_3_L dE_4_4_U cAD_BCE
-          (cCE_B (dB_0_0_U x)) (cDE_BC (dC_1_1_U (dB_0_0_U x)))
-          (cAE_BC (dC_1_1_U (dB_0_0_U x))) (cAD_BC (dC_1_1_U (dB_0_0_U x)))
-          (cAE_BCD (dD_2_2_U (dC_1_1_U (dB_0_0_U x))))
-          (cDE_ABC (dA_2_0_U (dC_1_1_U (dB_0_0_U x))))
-          (hADE_BC (dC_1_1_U (dB_0_0_U x)))
-          (square_coherence_fill dD_3_2_L dA_3_0_L dA_4_0_L dD_4_3_L cAD_BCE
-            (cCE_B (dB_0_0_U x))))
-        (square_stack
-          (square_map dD_4_3_L ((hACE_B (dB_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dD_3_3_U dD_4_3_L dE_4_4_U cDE_ABC
-              (cAC_B (dB_0_0_U x)))))))
-    raw_nat_ACD_B
-    (eq_trans
-      (path_map2
-        (fun H K => square_compose_map dE_4_4_U H K)
-        (layer_square_nat_source dD_2_1_L dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L dE_4_4_U
-          cAC_BDE (cBE_nil x) (cDE_B (dB_0_0_U x)) (cCE_BD (dD_1_1_U (dB_0_0_U x)))
-          (cAE_BD (dD_1_1_U (dB_0_0_U x))) (cAC_BD (dD_1_1_U (dB_0_0_U x)))
-          (cAE_BCD (dC_2_1_U (dD_1_1_U (dB_0_0_U x))))
-          (cCE_ABD (dA_2_0_U (dD_1_1_U (dB_0_0_U x))))
-          (hACE_BD (dD_1_1_U (dB_0_0_U x))))
-        (path_map2
-          (fun H K => square_compose_map dE_4_4_U H K)
-          (layer_square_map_source dD_2_1_L dA_2_0_L dA_3_0_L dD_3_2_L dE_3_3_U cAD_BE
-            dC_4_2_L dC_3_2_U dE_4_4_U cCE_ABD (cBE_nil x) (cDE_B (dB_0_0_U x))
-            (cAE_B (dB_0_0_U x)) (cAD_B (dB_0_0_U x)) (cAE_BD (dD_1_1_U (dB_0_0_U x)))
-            (cDE_AB (dA_1_0_U (dB_0_0_U x))) (hADE_B (dB_0_0_U x)))
-          (layer_square_nat_source dA_2_0_L dD_3_2_L dC_3_2_L dC_4_2_L dD_4_3_L dE_4_4_U
-            cCD_ABE (cBE_nil x) (cAE_B (dB_0_0_U x)) (cDE_AB (dA_1_0_U (dB_0_0_U x)))
-            (cCE_AB (dA_1_0_U (dB_0_0_U x))) (cCD_AB (dA_1_0_U (dB_0_0_U x)))
-            (cCE_ABD (dD_2_2_U (dA_1_0_U (dB_0_0_U x))))
-            (cDE_ABC (dC_2_2_U (dA_1_0_U (dB_0_0_U x))))
-            (hCDE_AB (dA_1_0_U (dB_0_0_U x))))))
-      (square_nat_route dE_4_4_U
-        (layer_cube_nat_side dD_2_1_L dC_3_1_L dA_4_0_L (cBE_nil x) (cDE_B (dB_0_0_U x))
-          (cCE_BD (dD_1_1_U (dB_0_0_U x)))
-          (cAE_BCD (dC_2_1_U (dD_1_1_U (dB_0_0_U x)))))
-        (layer_cube_nat_side dD_2_1_L dA_3_0_L dC_4_2_L (cBE_nil x) (cDE_B (dB_0_0_U x))
-          (cAE_BD (dD_1_1_U (dB_0_0_U x)))
-          (cCE_ABD (dA_2_0_U (dD_1_1_U (dB_0_0_U x)))))
-        (layer_cube_nat_side dA_2_0_L dD_3_2_L dC_4_2_L (cBE_nil x) (cAE_B (dB_0_0_U x))
-          (cDE_AB (dA_1_0_U (dB_0_0_U x)))
-          (cCE_ABD (dD_2_2_U (dA_1_0_U (dB_0_0_U x)))))
-        (layer_cube_nat_side dA_2_0_L dC_3_2_L dD_4_3_L (cBE_nil x) (cAE_B (dB_0_0_U x))
-          (cCE_AB (dA_1_0_U (dB_0_0_U x)))
-          (cDE_ABC (dC_2_2_U (dA_1_0_U (dB_0_0_U x)))))
-        (square_coherence_fill (fun z => dC_3_1_L (dD_2_1_L z))
-          (fun z => dA_3_0_L (dD_2_1_L z)) dA_4_0_L dC_4_2_L
-          (fun z => cAC_BDE (dD_2_1_L z)) (cBE_nil x))
-        (square_coherence_fill (fun z => dA_3_0_L (dD_2_1_L z))
-          (fun z => dD_3_2_L (dA_2_0_L z)) dC_4_2_L dC_4_2_L
-          (fun z => f_equal dC_4_2_L (cAD_BE z)) (cBE_nil x))
-        (square_coherence_fill (fun z => dD_3_2_L (dA_2_0_L z))
-          (fun z => dC_3_2_L (dA_2_0_L z)) dC_4_2_L dD_4_3_L
-          (fun z => cCD_ABE (dA_2_0_L z)) (cBE_nil x))
-        (layer_square_nat dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L dE_4_4_U cAC_BDE
-          (cDE_B (dB_0_0_U x)) (cCE_BD (dD_1_1_U (dB_0_0_U x)))
-          (cAE_BD (dD_1_1_U (dB_0_0_U x))) (cAC_BD (dD_1_1_U (dB_0_0_U x)))
-          (cAE_BCD (dC_2_1_U (dD_1_1_U (dB_0_0_U x))))
-          (cCE_ABD (dA_2_0_U (dD_1_1_U (dB_0_0_U x))))
-          (hACE_BD (dD_1_1_U (dB_0_0_U x)))
-          (square_coherence_fill dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L cAC_BDE
-            (cDE_B (dB_0_0_U x))))
-        (square_stack
-          (square_map dC_4_2_L ((hADE_B (dB_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dC_3_2_U dC_4_2_L dE_4_4_U cCE_ABD
-              (cAD_B (dB_0_0_U x)))))
-        (layer_square_nat dD_3_2_L dC_3_2_L dC_4_2_L dD_4_3_L dE_4_4_U cCD_ABE
-          (cAE_B (dB_0_0_U x)) (cDE_AB (dA_1_0_U (dB_0_0_U x)))
-          (cCE_AB (dA_1_0_U (dB_0_0_U x))) (cCD_AB (dA_1_0_U (dB_0_0_U x)))
-          (cCE_ABD (dD_2_2_U (dA_1_0_U (dB_0_0_U x))))
-          (cDE_ABC (dC_2_2_U (dA_1_0_U (dB_0_0_U x))))
-          (hCDE_AB (dA_1_0_U (dB_0_0_U x)))
-          (square_coherence_fill dD_3_2_L dC_3_2_L dC_4_2_L dD_4_3_L cCD_ABE
-            (cAE_B (dB_0_0_U x)))))).
-
-Local Definition raw_nat_ABD_C :=
-  @layer_cube_nat Y2 Y1 Y0 X2 X1 dE_3_3_U dE_4_4_U dA_3_0_U dD_3_3_U dB_3_1_U dA_4_0_L
-    dD_4_3_L dB_4_1_L cAE_BCD cDE_ABC cBE_ACD dB_3_0_L dD_3_2_L dA_3_0_L dB_3_1_L cAD_BCE
-    cAB_CDE cBD_ACE Y3 dD_2_1_L dB_2_0_L dA_2_0_L cBD_CE cAB_CE cAD_CE hABD_CE
-    (dC_1_0_L (dE_0_0_U x)) (dE_1_1_U (dC_0_0_U x)) (cCE_nil x)
-    (dB_2_0_U (dD_1_1_U (dC_0_0_U x))) (dD_2_2_U (dB_1_0_U (dC_0_0_U x)))
-    (dA_2_0_U (dB_1_0_U (dC_0_0_U x))) (dB_2_1_U (dA_1_0_U (dC_0_0_U x)))
-    (dA_2_0_U (dD_1_1_U (dC_0_0_U x))) (dD_2_2_U (dA_1_0_U (dC_0_0_U x)))
-    (cBD_C (dC_0_0_U x)) (cAB_C (dC_0_0_U x)) (cAD_C (dC_0_0_U x))
-    (cAD_BC (dB_1_0_U (dC_0_0_U x))) (cAB_CD (dD_1_1_U (dC_0_0_U x)))
-    (cBD_AC (dA_1_0_U (dC_0_0_U x))) (dE_2_2_U (dD_1_1_U (dC_0_0_U x)))
-    (dE_2_2_U (dB_1_0_U (dC_0_0_U x))) (dE_2_2_U (dA_1_0_U (dC_0_0_U x)))
-    (cDE_C (dC_0_0_U x)) (cBE_C (dC_0_0_U x)) (cAE_C (dC_0_0_U x))
-    (cBE_CD (dD_1_1_U (dC_0_0_U x))) (cDE_BC (dB_1_0_U (dC_0_0_U x)))
-    (cAE_BC (dB_1_0_U (dC_0_0_U x))) (cBE_AC (dA_1_0_U (dC_0_0_U x)))
-    (cAE_CD (dD_1_1_U (dC_0_0_U x))) (cDE_AC (dA_1_0_U (dC_0_0_U x)))
-    (hBDE_C (dC_0_0_U x)) (hABE_C (dC_0_0_U x)) (hADE_C (dC_0_0_U x))
-    (hABD_C (dC_0_0_U x)) (hADE_BC (dB_1_0_U (dC_0_0_U x)))
-    (hABE_CD (dD_1_1_U (dC_0_0_U x))) (hBDE_AC (dA_1_0_U (dC_0_0_U x)))
-    (kABDE_C (dC_0_0_U x))
-    (square_coherence_fill (fun z => dB_3_0_L (dD_2_1_L z))
-      (fun z => dD_3_2_L (dB_2_0_L z)) dA_4_0_L dA_4_0_L
-      (fun z => f_equal dA_4_0_L (cBD_CE z)) (cCE_nil x))
-    (square_coherence_fill (fun z => dD_3_2_L (dB_2_0_L z))
-      (fun z => dA_3_0_L (dB_2_0_L z)) dA_4_0_L dD_4_3_L (fun z => cAD_BCE (dB_2_0_L z))
-      (cCE_nil x))
-    (square_coherence_fill (fun z => dA_3_0_L (dB_2_0_L z))
-      (fun z => dB_3_1_L (dA_2_0_L z)) dD_4_3_L dD_4_3_L
-      (fun z => f_equal dD_4_3_L (cAB_CE z)) (cCE_nil x))
-    (square_coherence_fill (fun z => dB_3_0_L (dD_2_1_L z))
-      (fun z => dA_3_0_L (dD_2_1_L z)) dA_4_0_L dB_4_1_L (fun z => cAB_CDE (dD_2_1_L z))
-      (cCE_nil x))
-    (square_coherence_fill (fun z => dA_3_0_L (dD_2_1_L z))
-      (fun z => dD_3_2_L (dA_2_0_L z)) dB_4_1_L dB_4_1_L
-      (fun z => f_equal dB_4_1_L (cAD_CE z)) (cCE_nil x))
-    (square_coherence_fill (fun z => dD_3_2_L (dA_2_0_L z))
-      (fun z => dB_3_1_L (dA_2_0_L z)) dB_4_1_L dD_4_3_L (fun z => cBD_ACE (dA_2_0_L z))
-      (cCE_nil x))
-    facet_ABD_CE.
-
-Local Definition hcube_ABD_C:
-  square_cube
-    (square_compose_map dE_4_4_U (square_compose_map dE_4_4_U n_ABDC_2 n_ADBC_1) n_DABC_2)
-    (square_compose_map dE_4_4_U n_ABDC_1 (square_compose_map dE_4_4_U n_BADC_2 n_BDAC_1))
-    (f_equal (fun e => f_equal dE_4_4_U e) (hABD_C (dC_0_0_U x)))
-    (hABD_CE (dC_1_0_L (dE_0_0_U x))) :=
-  square_cube_change_faces
-    (eq_trans
-      (path_map2
-        (fun H K => square_compose_map dE_4_4_U H K)
-        (path_map2
-          (fun H K => square_compose_map dE_4_4_U H K)
-          (layer_square_map_source dD_2_1_L dB_2_0_L dB_3_0_L dD_3_2_L dE_3_3_U cBD_CE
-            dA_4_0_L dA_3_0_U dE_4_4_U cAE_BCD (cCE_nil x) (cDE_C (dC_0_0_U x))
-            (cBE_C (dC_0_0_U x)) (cBD_C (dC_0_0_U x)) (cBE_CD (dD_1_1_U (dC_0_0_U x)))
-            (cDE_BC (dB_1_0_U (dC_0_0_U x))) (hBDE_C (dC_0_0_U x)))
-          (layer_square_nat_source dB_2_0_L dD_3_2_L dA_3_0_L dA_4_0_L dD_4_3_L dE_4_4_U
-            cAD_BCE (cCE_nil x) (cBE_C (dC_0_0_U x)) (cDE_BC (dB_1_0_U (dC_0_0_U x)))
-            (cAE_BC (dB_1_0_U (dC_0_0_U x))) (cAD_BC (dB_1_0_U (dC_0_0_U x)))
-            (cAE_BCD (dD_2_2_U (dB_1_0_U (dC_0_0_U x))))
-            (cDE_ABC (dA_2_0_U (dB_1_0_U (dC_0_0_U x))))
-            (hADE_BC (dB_1_0_U (dC_0_0_U x)))))
-        (layer_square_map_source dB_2_0_L dA_2_0_L dA_3_0_L dB_3_1_L dE_3_3_U cAB_CE
-          dD_4_3_L dD_3_3_U dE_4_4_U cDE_ABC (cCE_nil x) (cBE_C (dC_0_0_U x))
-          (cAE_C (dC_0_0_U x)) (cAB_C (dC_0_0_U x)) (cAE_BC (dB_1_0_U (dC_0_0_U x)))
-          (cBE_AC (dA_1_0_U (dC_0_0_U x))) (hABE_C (dC_0_0_U x))))
-      (square_nat_route_left dE_4_4_U
-        (layer_cube_nat_side dD_2_1_L dB_3_0_L dA_4_0_L (cCE_nil x) (cDE_C (dC_0_0_U x))
-          (cBE_CD (dD_1_1_U (dC_0_0_U x)))
-          (cAE_BCD (dB_2_0_U (dD_1_1_U (dC_0_0_U x)))))
-        (layer_cube_nat_side dB_2_0_L dD_3_2_L dA_4_0_L (cCE_nil x) (cBE_C (dC_0_0_U x))
-          (cDE_BC (dB_1_0_U (dC_0_0_U x)))
-          (cAE_BCD (dD_2_2_U (dB_1_0_U (dC_0_0_U x)))))
-        (layer_cube_nat_side dB_2_0_L dA_3_0_L dD_4_3_L (cCE_nil x) (cBE_C (dC_0_0_U x))
-          (cAE_BC (dB_1_0_U (dC_0_0_U x)))
-          (cDE_ABC (dA_2_0_U (dB_1_0_U (dC_0_0_U x)))))
-        (layer_cube_nat_side dA_2_0_L dB_3_1_L dD_4_3_L (cCE_nil x) (cAE_C (dC_0_0_U x))
-          (cBE_AC (dA_1_0_U (dC_0_0_U x)))
-          (cDE_ABC (dB_2_1_U (dA_1_0_U (dC_0_0_U x)))))
-        (square_coherence_fill (fun z => dB_3_0_L (dD_2_1_L z))
-          (fun z => dD_3_2_L (dB_2_0_L z)) dA_4_0_L dA_4_0_L
-          (fun z => f_equal dA_4_0_L (cBD_CE z)) (cCE_nil x))
-        (square_coherence_fill (fun z => dD_3_2_L (dB_2_0_L z))
-          (fun z => dA_3_0_L (dB_2_0_L z)) dA_4_0_L dD_4_3_L
-          (fun z => cAD_BCE (dB_2_0_L z)) (cCE_nil x))
-        (square_coherence_fill (fun z => dA_3_0_L (dB_2_0_L z))
-          (fun z => dB_3_1_L (dA_2_0_L z)) dD_4_3_L dD_4_3_L
-          (fun z => f_equal dD_4_3_L (cAB_CE z)) (cCE_nil x))
-        (square_stack
-          (square_map dA_4_0_L ((hBDE_C (dC_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dA_3_0_U dA_4_0_L dE_4_4_U cAE_BCD
-              (cBD_C (dC_0_0_U x)))))
-        (layer_square_nat dD_3_2_L dA_3_0_L dA_4_0_L dD_4_3_L dE_4_4_U cAD_BCE
-          (cBE_C (dC_0_0_U x)) (cDE_BC (dB_1_0_U (dC_0_0_U x)))
-          (cAE_BC (dB_1_0_U (dC_0_0_U x))) (cAD_BC (dB_1_0_U (dC_0_0_U x)))
-          (cAE_BCD (dD_2_2_U (dB_1_0_U (dC_0_0_U x))))
-          (cDE_ABC (dA_2_0_U (dB_1_0_U (dC_0_0_U x))))
-          (hADE_BC (dB_1_0_U (dC_0_0_U x)))
-          (square_coherence_fill dD_3_2_L dA_3_0_L dA_4_0_L dD_4_3_L cAD_BCE
-            (cBE_C (dC_0_0_U x))))
-        (square_stack
-          (square_map dD_4_3_L ((hABE_C (dC_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dD_3_3_U dD_4_3_L dE_4_4_U cDE_ABC
-              (cAB_C (dC_0_0_U x)))))))
-    raw_nat_ABD_C
-    (eq_trans
-      (path_map2
-        (fun H K => square_compose_map dE_4_4_U H K)
-        (layer_square_nat_source dD_2_1_L dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L dE_4_4_U
-          cAB_CDE (cCE_nil x) (cDE_C (dC_0_0_U x)) (cBE_CD (dD_1_1_U (dC_0_0_U x)))
-          (cAE_CD (dD_1_1_U (dC_0_0_U x))) (cAB_CD (dD_1_1_U (dC_0_0_U x)))
-          (cAE_BCD (dB_2_0_U (dD_1_1_U (dC_0_0_U x))))
-          (cBE_ACD (dA_2_0_U (dD_1_1_U (dC_0_0_U x))))
-          (hABE_CD (dD_1_1_U (dC_0_0_U x))))
-        (path_map2
-          (fun H K => square_compose_map dE_4_4_U H K)
-          (layer_square_map_source dD_2_1_L dA_2_0_L dA_3_0_L dD_3_2_L dE_3_3_U cAD_CE
-            dB_4_1_L dB_3_1_U dE_4_4_U cBE_ACD (cCE_nil x) (cDE_C (dC_0_0_U x))
-            (cAE_C (dC_0_0_U x)) (cAD_C (dC_0_0_U x)) (cAE_CD (dD_1_1_U (dC_0_0_U x)))
-            (cDE_AC (dA_1_0_U (dC_0_0_U x))) (hADE_C (dC_0_0_U x)))
-          (layer_square_nat_source dA_2_0_L dD_3_2_L dB_3_1_L dB_4_1_L dD_4_3_L dE_4_4_U
-            cBD_ACE (cCE_nil x) (cAE_C (dC_0_0_U x)) (cDE_AC (dA_1_0_U (dC_0_0_U x)))
-            (cBE_AC (dA_1_0_U (dC_0_0_U x))) (cBD_AC (dA_1_0_U (dC_0_0_U x)))
-            (cBE_ACD (dD_2_2_U (dA_1_0_U (dC_0_0_U x))))
-            (cDE_ABC (dB_2_1_U (dA_1_0_U (dC_0_0_U x))))
-            (hBDE_AC (dA_1_0_U (dC_0_0_U x))))))
-      (square_nat_route dE_4_4_U
-        (layer_cube_nat_side dD_2_1_L dB_3_0_L dA_4_0_L (cCE_nil x) (cDE_C (dC_0_0_U x))
-          (cBE_CD (dD_1_1_U (dC_0_0_U x)))
-          (cAE_BCD (dB_2_0_U (dD_1_1_U (dC_0_0_U x)))))
-        (layer_cube_nat_side dD_2_1_L dA_3_0_L dB_4_1_L (cCE_nil x) (cDE_C (dC_0_0_U x))
-          (cAE_CD (dD_1_1_U (dC_0_0_U x)))
-          (cBE_ACD (dA_2_0_U (dD_1_1_U (dC_0_0_U x)))))
-        (layer_cube_nat_side dA_2_0_L dD_3_2_L dB_4_1_L (cCE_nil x) (cAE_C (dC_0_0_U x))
-          (cDE_AC (dA_1_0_U (dC_0_0_U x)))
-          (cBE_ACD (dD_2_2_U (dA_1_0_U (dC_0_0_U x)))))
-        (layer_cube_nat_side dA_2_0_L dB_3_1_L dD_4_3_L (cCE_nil x) (cAE_C (dC_0_0_U x))
-          (cBE_AC (dA_1_0_U (dC_0_0_U x)))
-          (cDE_ABC (dB_2_1_U (dA_1_0_U (dC_0_0_U x)))))
-        (square_coherence_fill (fun z => dB_3_0_L (dD_2_1_L z))
-          (fun z => dA_3_0_L (dD_2_1_L z)) dA_4_0_L dB_4_1_L
-          (fun z => cAB_CDE (dD_2_1_L z)) (cCE_nil x))
-        (square_coherence_fill (fun z => dA_3_0_L (dD_2_1_L z))
-          (fun z => dD_3_2_L (dA_2_0_L z)) dB_4_1_L dB_4_1_L
-          (fun z => f_equal dB_4_1_L (cAD_CE z)) (cCE_nil x))
-        (square_coherence_fill (fun z => dD_3_2_L (dA_2_0_L z))
-          (fun z => dB_3_1_L (dA_2_0_L z)) dB_4_1_L dD_4_3_L
-          (fun z => cBD_ACE (dA_2_0_L z)) (cCE_nil x))
-        (layer_square_nat dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L dE_4_4_U cAB_CDE
-          (cDE_C (dC_0_0_U x)) (cBE_CD (dD_1_1_U (dC_0_0_U x)))
-          (cAE_CD (dD_1_1_U (dC_0_0_U x))) (cAB_CD (dD_1_1_U (dC_0_0_U x)))
-          (cAE_BCD (dB_2_0_U (dD_1_1_U (dC_0_0_U x))))
-          (cBE_ACD (dA_2_0_U (dD_1_1_U (dC_0_0_U x))))
-          (hABE_CD (dD_1_1_U (dC_0_0_U x)))
-          (square_coherence_fill dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L cAB_CDE
-            (cDE_C (dC_0_0_U x))))
-        (square_stack
-          (square_map dB_4_1_L ((hADE_C (dC_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dB_3_1_U dB_4_1_L dE_4_4_U cBE_ACD
-              (cAD_C (dC_0_0_U x)))))
-        (layer_square_nat dD_3_2_L dB_3_1_L dB_4_1_L dD_4_3_L dE_4_4_U cBD_ACE
-          (cAE_C (dC_0_0_U x)) (cDE_AC (dA_1_0_U (dC_0_0_U x)))
-          (cBE_AC (dA_1_0_U (dC_0_0_U x))) (cBD_AC (dA_1_0_U (dC_0_0_U x)))
-          (cBE_ACD (dD_2_2_U (dA_1_0_U (dC_0_0_U x))))
-          (cDE_ABC (dB_2_1_U (dA_1_0_U (dC_0_0_U x))))
-          (hBDE_AC (dA_1_0_U (dC_0_0_U x)))
-          (square_coherence_fill dD_3_2_L dB_3_1_L dB_4_1_L dD_4_3_L cBD_ACE
-            (cAE_C (dC_0_0_U x)))))).
-
-Local Definition raw_nat_ABC_D :=
-  @layer_cube_nat Y2 Y1 Y0 X2 X1 dE_3_3_U dE_4_4_U dA_3_0_U dC_3_2_U dB_3_1_U dA_4_0_L
-    dC_4_2_L dB_4_1_L cAE_BCD cCE_ABD cBE_ACD dB_3_0_L dC_3_1_L dA_3_0_L dB_3_1_L cAC_BDE
-    cAB_CDE cBC_ADE Y3 dC_2_0_L dB_2_0_L dA_2_0_L cBC_DE cAB_DE cAC_DE hABC_DE
-    (dD_1_0_L (dE_0_0_U x)) (dE_1_1_U (dD_0_0_U x)) (cDE_nil x)
-    (dB_2_0_U (dC_1_0_U (dD_0_0_U x))) (dC_2_1_U (dB_1_0_U (dD_0_0_U x)))
-    (dA_2_0_U (dB_1_0_U (dD_0_0_U x))) (dB_2_1_U (dA_1_0_U (dD_0_0_U x)))
-    (dA_2_0_U (dC_1_0_U (dD_0_0_U x))) (dC_2_1_U (dA_1_0_U (dD_0_0_U x)))
-    (cBC_D (dD_0_0_U x)) (cAB_D (dD_0_0_U x)) (cAC_D (dD_0_0_U x))
-    (cAC_BD (dB_1_0_U (dD_0_0_U x))) (cAB_CD (dC_1_0_U (dD_0_0_U x)))
-    (cBC_AD (dA_1_0_U (dD_0_0_U x))) (dE_2_2_U (dC_1_0_U (dD_0_0_U x)))
-    (dE_2_2_U (dB_1_0_U (dD_0_0_U x))) (dE_2_2_U (dA_1_0_U (dD_0_0_U x)))
-    (cCE_D (dD_0_0_U x)) (cBE_D (dD_0_0_U x)) (cAE_D (dD_0_0_U x))
-    (cBE_CD (dC_1_0_U (dD_0_0_U x))) (cCE_BD (dB_1_0_U (dD_0_0_U x)))
-    (cAE_BD (dB_1_0_U (dD_0_0_U x))) (cBE_AD (dA_1_0_U (dD_0_0_U x)))
-    (cAE_CD (dC_1_0_U (dD_0_0_U x))) (cCE_AD (dA_1_0_U (dD_0_0_U x)))
-    (hBCE_D (dD_0_0_U x)) (hABE_D (dD_0_0_U x)) (hACE_D (dD_0_0_U x))
-    (hABC_D (dD_0_0_U x)) (hACE_BD (dB_1_0_U (dD_0_0_U x)))
-    (hABE_CD (dC_1_0_U (dD_0_0_U x))) (hBCE_AD (dA_1_0_U (dD_0_0_U x)))
-    (kABCE_D (dD_0_0_U x))
-    (square_coherence_fill (fun z => dB_3_0_L (dC_2_0_L z))
-      (fun z => dC_3_1_L (dB_2_0_L z)) dA_4_0_L dA_4_0_L
-      (fun z => f_equal dA_4_0_L (cBC_DE z)) (cDE_nil x))
-    (square_coherence_fill (fun z => dC_3_1_L (dB_2_0_L z))
-      (fun z => dA_3_0_L (dB_2_0_L z)) dA_4_0_L dC_4_2_L (fun z => cAC_BDE (dB_2_0_L z))
-      (cDE_nil x))
-    (square_coherence_fill (fun z => dA_3_0_L (dB_2_0_L z))
-      (fun z => dB_3_1_L (dA_2_0_L z)) dC_4_2_L dC_4_2_L
-      (fun z => f_equal dC_4_2_L (cAB_DE z)) (cDE_nil x))
-    (square_coherence_fill (fun z => dB_3_0_L (dC_2_0_L z))
-      (fun z => dA_3_0_L (dC_2_0_L z)) dA_4_0_L dB_4_1_L (fun z => cAB_CDE (dC_2_0_L z))
-      (cDE_nil x))
-    (square_coherence_fill (fun z => dA_3_0_L (dC_2_0_L z))
-      (fun z => dC_3_1_L (dA_2_0_L z)) dB_4_1_L dB_4_1_L
-      (fun z => f_equal dB_4_1_L (cAC_DE z)) (cDE_nil x))
-    (square_coherence_fill (fun z => dC_3_1_L (dA_2_0_L z))
-      (fun z => dB_3_1_L (dA_2_0_L z)) dB_4_1_L dC_4_2_L (fun z => cBC_ADE (dA_2_0_L z))
-      (cDE_nil x))
-    facet_ABC_DE.
-
-Local Definition hcube_ABC_D:
-  square_cube
-    (square_compose_map dE_4_4_U (square_compose_map dE_4_4_U n_ABCD_2 n_ACBD_1) n_CABD_2)
-    (square_compose_map dE_4_4_U n_ABCD_1 (square_compose_map dE_4_4_U n_BACD_2 n_BCAD_1))
-    (f_equal (fun e => f_equal dE_4_4_U e) (hABC_D (dD_0_0_U x)))
-    (hABC_DE (dD_1_0_L (dE_0_0_U x))) :=
-  square_cube_change_faces
-    (eq_trans
-      (path_map2
-        (fun H K => square_compose_map dE_4_4_U H K)
-        (path_map2
-          (fun H K => square_compose_map dE_4_4_U H K)
-          (layer_square_map_source dC_2_0_L dB_2_0_L dB_3_0_L dC_3_1_L dE_3_3_U cBC_DE
-            dA_4_0_L dA_3_0_U dE_4_4_U cAE_BCD (cDE_nil x) (cCE_D (dD_0_0_U x))
-            (cBE_D (dD_0_0_U x)) (cBC_D (dD_0_0_U x)) (cBE_CD (dC_1_0_U (dD_0_0_U x)))
-            (cCE_BD (dB_1_0_U (dD_0_0_U x))) (hBCE_D (dD_0_0_U x)))
-          (layer_square_nat_source dB_2_0_L dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L dE_4_4_U
-            cAC_BDE (cDE_nil x) (cBE_D (dD_0_0_U x)) (cCE_BD (dB_1_0_U (dD_0_0_U x)))
-            (cAE_BD (dB_1_0_U (dD_0_0_U x))) (cAC_BD (dB_1_0_U (dD_0_0_U x)))
-            (cAE_BCD (dC_2_1_U (dB_1_0_U (dD_0_0_U x))))
-            (cCE_ABD (dA_2_0_U (dB_1_0_U (dD_0_0_U x))))
-            (hACE_BD (dB_1_0_U (dD_0_0_U x)))))
-        (layer_square_map_source dB_2_0_L dA_2_0_L dA_3_0_L dB_3_1_L dE_3_3_U cAB_DE
-          dC_4_2_L dC_3_2_U dE_4_4_U cCE_ABD (cDE_nil x) (cBE_D (dD_0_0_U x))
-          (cAE_D (dD_0_0_U x)) (cAB_D (dD_0_0_U x)) (cAE_BD (dB_1_0_U (dD_0_0_U x)))
-          (cBE_AD (dA_1_0_U (dD_0_0_U x))) (hABE_D (dD_0_0_U x))))
-      (square_nat_route_left dE_4_4_U
-        (layer_cube_nat_side dC_2_0_L dB_3_0_L dA_4_0_L (cDE_nil x) (cCE_D (dD_0_0_U x))
-          (cBE_CD (dC_1_0_U (dD_0_0_U x)))
-          (cAE_BCD (dB_2_0_U (dC_1_0_U (dD_0_0_U x)))))
-        (layer_cube_nat_side dB_2_0_L dC_3_1_L dA_4_0_L (cDE_nil x) (cBE_D (dD_0_0_U x))
-          (cCE_BD (dB_1_0_U (dD_0_0_U x)))
-          (cAE_BCD (dC_2_1_U (dB_1_0_U (dD_0_0_U x)))))
-        (layer_cube_nat_side dB_2_0_L dA_3_0_L dC_4_2_L (cDE_nil x) (cBE_D (dD_0_0_U x))
-          (cAE_BD (dB_1_0_U (dD_0_0_U x)))
-          (cCE_ABD (dA_2_0_U (dB_1_0_U (dD_0_0_U x)))))
-        (layer_cube_nat_side dA_2_0_L dB_3_1_L dC_4_2_L (cDE_nil x) (cAE_D (dD_0_0_U x))
-          (cBE_AD (dA_1_0_U (dD_0_0_U x)))
-          (cCE_ABD (dB_2_1_U (dA_1_0_U (dD_0_0_U x)))))
-        (square_coherence_fill (fun z => dB_3_0_L (dC_2_0_L z))
-          (fun z => dC_3_1_L (dB_2_0_L z)) dA_4_0_L dA_4_0_L
-          (fun z => f_equal dA_4_0_L (cBC_DE z)) (cDE_nil x))
-        (square_coherence_fill (fun z => dC_3_1_L (dB_2_0_L z))
-          (fun z => dA_3_0_L (dB_2_0_L z)) dA_4_0_L dC_4_2_L
-          (fun z => cAC_BDE (dB_2_0_L z)) (cDE_nil x))
-        (square_coherence_fill (fun z => dA_3_0_L (dB_2_0_L z))
-          (fun z => dB_3_1_L (dA_2_0_L z)) dC_4_2_L dC_4_2_L
-          (fun z => f_equal dC_4_2_L (cAB_DE z)) (cDE_nil x))
-        (square_stack
-          (square_map dA_4_0_L ((hBCE_D (dD_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dA_3_0_U dA_4_0_L dE_4_4_U cAE_BCD
-              (cBC_D (dD_0_0_U x)))))
-        (layer_square_nat dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L dE_4_4_U cAC_BDE
-          (cBE_D (dD_0_0_U x)) (cCE_BD (dB_1_0_U (dD_0_0_U x)))
-          (cAE_BD (dB_1_0_U (dD_0_0_U x))) (cAC_BD (dB_1_0_U (dD_0_0_U x)))
-          (cAE_BCD (dC_2_1_U (dB_1_0_U (dD_0_0_U x))))
-          (cCE_ABD (dA_2_0_U (dB_1_0_U (dD_0_0_U x))))
-          (hACE_BD (dB_1_0_U (dD_0_0_U x)))
-          (square_coherence_fill dC_3_1_L dA_3_0_L dA_4_0_L dC_4_2_L cAC_BDE
-            (cBE_D (dD_0_0_U x))))
-        (square_stack
-          (square_map dC_4_2_L ((hABE_D (dD_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dC_3_2_U dC_4_2_L dE_4_4_U cCE_ABD
-              (cAB_D (dD_0_0_U x)))))))
-    raw_nat_ABC_D
-    (eq_trans
-      (path_map2
-        (fun H K => square_compose_map dE_4_4_U H K)
-        (layer_square_nat_source dC_2_0_L dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L dE_4_4_U
-          cAB_CDE (cDE_nil x) (cCE_D (dD_0_0_U x)) (cBE_CD (dC_1_0_U (dD_0_0_U x)))
-          (cAE_CD (dC_1_0_U (dD_0_0_U x))) (cAB_CD (dC_1_0_U (dD_0_0_U x)))
-          (cAE_BCD (dB_2_0_U (dC_1_0_U (dD_0_0_U x))))
-          (cBE_ACD (dA_2_0_U (dC_1_0_U (dD_0_0_U x))))
-          (hABE_CD (dC_1_0_U (dD_0_0_U x))))
-        (path_map2
-          (fun H K => square_compose_map dE_4_4_U H K)
-          (layer_square_map_source dC_2_0_L dA_2_0_L dA_3_0_L dC_3_1_L dE_3_3_U cAC_DE
-            dB_4_1_L dB_3_1_U dE_4_4_U cBE_ACD (cDE_nil x) (cCE_D (dD_0_0_U x))
-            (cAE_D (dD_0_0_U x)) (cAC_D (dD_0_0_U x)) (cAE_CD (dC_1_0_U (dD_0_0_U x)))
-            (cCE_AD (dA_1_0_U (dD_0_0_U x))) (hACE_D (dD_0_0_U x)))
-          (layer_square_nat_source dA_2_0_L dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L dE_4_4_U
-            cBC_ADE (cDE_nil x) (cAE_D (dD_0_0_U x)) (cCE_AD (dA_1_0_U (dD_0_0_U x)))
-            (cBE_AD (dA_1_0_U (dD_0_0_U x))) (cBC_AD (dA_1_0_U (dD_0_0_U x)))
-            (cBE_ACD (dC_2_1_U (dA_1_0_U (dD_0_0_U x))))
-            (cCE_ABD (dB_2_1_U (dA_1_0_U (dD_0_0_U x))))
-            (hBCE_AD (dA_1_0_U (dD_0_0_U x))))))
-      (square_nat_route dE_4_4_U
-        (layer_cube_nat_side dC_2_0_L dB_3_0_L dA_4_0_L (cDE_nil x) (cCE_D (dD_0_0_U x))
-          (cBE_CD (dC_1_0_U (dD_0_0_U x)))
-          (cAE_BCD (dB_2_0_U (dC_1_0_U (dD_0_0_U x)))))
-        (layer_cube_nat_side dC_2_0_L dA_3_0_L dB_4_1_L (cDE_nil x) (cCE_D (dD_0_0_U x))
-          (cAE_CD (dC_1_0_U (dD_0_0_U x)))
-          (cBE_ACD (dA_2_0_U (dC_1_0_U (dD_0_0_U x)))))
-        (layer_cube_nat_side dA_2_0_L dC_3_1_L dB_4_1_L (cDE_nil x) (cAE_D (dD_0_0_U x))
-          (cCE_AD (dA_1_0_U (dD_0_0_U x)))
-          (cBE_ACD (dC_2_1_U (dA_1_0_U (dD_0_0_U x)))))
-        (layer_cube_nat_side dA_2_0_L dB_3_1_L dC_4_2_L (cDE_nil x) (cAE_D (dD_0_0_U x))
-          (cBE_AD (dA_1_0_U (dD_0_0_U x)))
-          (cCE_ABD (dB_2_1_U (dA_1_0_U (dD_0_0_U x)))))
-        (square_coherence_fill (fun z => dB_3_0_L (dC_2_0_L z))
-          (fun z => dA_3_0_L (dC_2_0_L z)) dA_4_0_L dB_4_1_L
-          (fun z => cAB_CDE (dC_2_0_L z)) (cDE_nil x))
-        (square_coherence_fill (fun z => dA_3_0_L (dC_2_0_L z))
-          (fun z => dC_3_1_L (dA_2_0_L z)) dB_4_1_L dB_4_1_L
-          (fun z => f_equal dB_4_1_L (cAC_DE z)) (cDE_nil x))
-        (square_coherence_fill (fun z => dC_3_1_L (dA_2_0_L z))
-          (fun z => dB_3_1_L (dA_2_0_L z)) dB_4_1_L dC_4_2_L
-          (fun z => cBC_ADE (dA_2_0_L z)) (cDE_nil x))
-        (layer_square_nat dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L dE_4_4_U cAB_CDE
-          (cCE_D (dD_0_0_U x)) (cBE_CD (dC_1_0_U (dD_0_0_U x)))
-          (cAE_CD (dC_1_0_U (dD_0_0_U x))) (cAB_CD (dC_1_0_U (dD_0_0_U x)))
-          (cAE_BCD (dB_2_0_U (dC_1_0_U (dD_0_0_U x))))
-          (cBE_ACD (dA_2_0_U (dC_1_0_U (dD_0_0_U x))))
-          (hABE_CD (dC_1_0_U (dD_0_0_U x)))
-          (square_coherence_fill dB_3_0_L dA_3_0_L dA_4_0_L dB_4_1_L cAB_CDE
-            (cCE_D (dD_0_0_U x))))
-        (square_stack
-          (square_map dB_4_1_L ((hACE_D (dD_0_0_U x))))
-          (eq_sym
-            (square_coherence_fill dE_3_3_U dB_3_1_U dB_4_1_L dE_4_4_U cBE_ACD
-              (cAC_D (dD_0_0_U x)))))
-        (layer_square_nat dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L dE_4_4_U cBC_ADE
-          (cAE_D (dD_0_0_U x)) (cCE_AD (dA_1_0_U (dD_0_0_U x)))
-          (cBE_AD (dA_1_0_U (dD_0_0_U x))) (cBC_AD (dA_1_0_U (dD_0_0_U x)))
-          (cBE_ACD (dC_2_1_U (dA_1_0_U (dD_0_0_U x))))
-          (cCE_ABD (dB_2_1_U (dA_1_0_U (dD_0_0_U x))))
-          (hBCE_AD (dA_1_0_U (dD_0_0_U x)))
-          (square_coherence_fill dC_3_1_L dB_3_1_L dB_4_1_L dC_4_2_L cBC_ADE
-            (cAE_D (dD_0_0_U x)))))).
+Local Definition hcube_ABC_D :=
+  layer_cube_nat dC_2_0_L dB_2_0_L dA_2_0_L cBC_DE cAB_DE cAC_DE hABC_DE
+    (cDE_nil x) (kABCE_D (dD_0_0_U x)).
 
 (** Each square face transports by pasting two prisms: naturality of
     the comparison hexagon and mapping of the source hexagon. The six
@@ -2375,11 +1388,6 @@ Local Definition n_BDC_1 :=
     (hBDE_C (dC_0_0_U x))
     (square_coherence_fill dD_2_1_L dB_2_0_L dB_3_0_L dD_3_2_L cBD_CE (cCE_nil x)).
 
-Local Definition n_DBC_2 :=
-  square_stack (square_map dD_3_2_L (hBCE_nil x))
-    (eq_sym
-      (square_coherence_fill dE_2_2_U dD_2_2_U dD_3_2_L dE_3_3_U cDE_BC (cBC_nil x))).
-
 Local Definition n_CBD_2 :=
   square_stack (square_map dC_3_1_L (hBDE_nil x))
     (eq_sym
@@ -2404,11 +1412,6 @@ Local Definition n_ADB_1 :=
     (hADE_B (dB_0_0_U x))
     (square_coherence_fill dD_2_1_L dA_2_0_L dA_3_0_L dD_3_2_L cAD_BE (cBE_nil x)).
 
-Local Definition n_DAB_2 :=
-  square_stack (square_map dD_3_2_L (hABE_nil x))
-    (eq_sym
-      (square_coherence_fill dE_2_2_U dD_2_2_U dD_3_2_L dE_3_3_U cDE_AB (cAB_nil x))).
-
 Local Definition n_ACD_2 :=
   square_stack (square_map dA_3_0_L (hCDE_nil x))
     (eq_sym
@@ -2420,11 +1423,6 @@ Local Definition n_ADC_1 :=
     (cAE_CD (dD_1_1_U (dC_0_0_U x))) (cDE_AC (dA_1_0_U (dC_0_0_U x)))
     (hADE_C (dC_0_0_U x))
     (square_coherence_fill dD_2_1_L dA_2_0_L dA_3_0_L dD_3_2_L cAD_CE (cCE_nil x)).
-
-Local Definition n_DAC_2 :=
-  square_stack (square_map dD_3_2_L (hACE_nil x))
-    (eq_sym
-      (square_coherence_fill dE_2_2_U dD_2_2_U dD_3_2_L dE_3_3_U cDE_AC (cAC_nil x))).
 
 Local Definition n_CAD_2 :=
   square_stack (square_map dC_3_1_L (hADE_nil x))

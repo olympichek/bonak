@@ -70,24 +70,6 @@ Proof.
   unfold sigT_path_map. cbn [f_equal]. now apply eq_trans_refl_l.
 Defined.
 
-Lemma sigT_path_map_dep {A B: Type} {P: A -> Type} {Q: B -> Type}
-  (f: A -> B) (F: forall x, P x -> Q (f x))
-  (R: {x: A &T P x} -> Type) (S: {y: B &T Q y} -> Type)
-  (V: forall z, R z -> S (f z.1; F z.1 z.2))
-  {x y: A} {a: P x} {b: P y} {p: x = y} {hp: rew [P] p in a = b}
-  {e: (x; a) = (y; b)} (H: e = (= p; hp))
-  {r: R (x; a)} {s: R (y; b)} (he: rew [R] e in r = s):
-  rew [fun e => rew [S] e in V (x; a) r = V (y; b) s]
-    sigT_path_map f F H in sigT_map_eq V he =
-  rew [fun e => rew [S] e in V (x; a) r = V (y; b) s]
-    f_equal_eq_existT_curried f F p hp in
-    sigT_map_eq V (rew [fun e => rew [R] e in r = s] H in he).
-Proof.
-  unfold sigT_path_map.
-  rewrite <- rew_compose.
-  now rewrite (sigT_map_eq_transport V H).
-Defined.
-
 Lemma sigT_dep_path_map_normalize {A B: Type} {P: A -> Type} {Q: B -> Type}
   (f: A -> B) (F: forall x, P x -> Q (f x))
   (R: {x: A &T P x} -> Type) (S: {y: B &T Q y} -> Type)
@@ -237,7 +219,6 @@ Proof.
   unfold square_change_horizontal; cbn [whisker_l whisker_r f_equal eq_sym].
   rewrite eq_trans_refl_l, eq_trans_refl_r. now exact HH.
 Defined.
-
 
 (** Map a square, using the comparison between mapped composites and
     composites of mapped paths on both boundaries. *)
@@ -425,14 +406,6 @@ Definition square_cube_refl_coherence_dep {X: Type} (P: X -> Type)
     ha ha hb hb hp hq HH HH eq_refl eq_refl :=
   sigT_trans_eq_units HH.
 
-Lemma square_family_cube {A X: Type} {x0 x1 y0 y1: X}
-  (a: A -> x0 = x1) (b: A -> y0 = y1)
-  (p: x0 = y0) (q: x1 = y1)
-  (N: forall z, p • b z = a z • q)
-  {z z': A} (H: z = z'):
-  square_cube (N z) (N z') (f_equal b H) (f_equal a H).
-Proof. destruct H. now apply square_cube_refl. Defined.
-
 Lemma square_family_cube_map {A B C X: Type} {x0 x1 y0 y1: X}
   (a0: A -> B) (b0: A -> C)
   (a1: B -> x0 = x1) (b1: C -> y0 = y1)
@@ -612,15 +585,6 @@ Definition square_cube_dep
   fiber_back (path_retraction rL hb hb') κ
     (sigT_square_fill_upper C HH (sigT_map_eq R D) KK).
 
-Lemma square_cube_dep_upper_mapped
-  (D: rew [fun e => rew [P] e in v0 = v1] κ in hb = hb'):
-  sigT_map_eq R (square_cube_dep_upper D) =
-    sigT_square_fill C HH (sigT_map_eq L D) KK.
-Proof.
-  now exact (path_retraction_recovery
-    rR (suffix_retraction_recovery P q hq u0) ha ha' λ _).
-Defined.
-
 Lemma square_cube_dep_mapped
   (D: rew [fun e => rew [P] e in u0 = u1] λ in ha = ha'):
   sigT_map_eq L (square_cube_dep D) =
@@ -628,16 +592,6 @@ Lemma square_cube_dep_mapped
 Proof.
   now exact (path_retraction_recovery (prefix_retraction P p hp v1)
     (prefix_retraction_recovery P p hp v1) hb hb' κ _).
-Defined.
-
-Lemma square_cube_dep_upper_coherence
-  (D: rew [fun e => rew [P] e in v0 = v1] κ in hb = hb'):
-  square_cube_coherence_dep P H K κ λ C ha ha' hb hb' hp hq HH KK
-    D (square_cube_dep_upper D).
-Proof.
-  unfold square_cube_coherence_dep.
-  rewrite square_cube_dep_upper_mapped.
-  now exact (sigT_square_fill_boundary C HH (sigT_map_eq L D) KK).
 Defined.
 
 Lemma square_cube_dep_coherence
@@ -904,7 +858,6 @@ Proof.
   now exact (square_map_along r g f j α e H Hnat).
 Defined.
 
-
 (** Extend a layer-coherence cell along a path in its source, using the
     naturality of the frame and dependent-path coherences. *)
 Definition layer_square_nat {Z V V': Type} {W X: Type}
@@ -924,7 +877,6 @@ Proof.
     (map_compose_tail g (f_equal R p) r c')).
 Defined.
 
-
 (** Changing the endpoints of a dependent path. Each correction goes from
     the new endpoint to the old one. *)
 Definition dpath_change {X: Type} {P: X -> Type} {x y: X} {p: x = y}
@@ -932,17 +884,6 @@ Definition dpath_change {X: Type} {P: X -> Type} {x y: X} {p: x = y}
   (h: rew [P] p in a = b) (t: b' = b):
   rew [P] p in a' = b' :=
   f_equal (fun a => rew [P] p in a) s • (h • eq_sym t).
-
-(** The two copies of the middle endpoint correction cancel in a composite. *)
-Lemma dpath_change_comp {X: Type} {P: X -> Type} {x y z: X} {p: x = y} {q: y = z}
-  {a a': P x} {b b': P y} {c c': P z}
-  (s: a' = a) (t: b' = b) (u: c' = c)
-  (h: rew [P] p in a = b) (k: rew [P] q in b = c):
-  dpath_change s h t ⊙ dpath_change t k u = dpath_change s (h ⊙ k) u.
-Proof.
-  destruct s, t, u. unfold dpath_change; cbn [f_equal eq_sym].
-  now rewrite 3 eq_trans_refl_l, 3 eq_trans_refl_r.
-Defined.
 
 Lemma dpath_change_map {X Y: Type} {P: X -> Type} {Q: Y -> Type} {f: X -> Y}
   (g: forall x, P x -> Q (f x)) {x y: X} {p: x = y}
@@ -955,101 +896,12 @@ Proof.
   now rewrite 2 eq_trans_refl_l, 2 eq_trans_refl_r.
 Defined.
 
-Lemma dpath_change_cell {X: Type} {P: X -> Type} {x y: X} {p q: x = y}
-  {a a': P x} {b b': P y} (s: a' = a) (t: b' = b) (K: p = q)
-  (h: rew [P] p in a = b) (k: rew [P] q in a = b):
-  rew [fun e => rew [P] e in a = b] K in h = k ->
-  rew [fun e => rew [P] e in a' = b'] K in dpath_change s h t =
-  dpath_change s k t.
-Proof.
-  intro H. refine (map_subst (fun e h => dpath_change s h t) K h • _).
-  now exact (f_equal (fun h => dpath_change s h t) H).
-Defined.
-
-Lemma dpath_change_natural {X A: Type} {P: X -> Type} {x y: X} {p: x = y}
-  (f: A -> P x) (g: A -> P y) (H: forall a, rew [P] p in f a = g a)
-  {a a': A} (s: a' = a):
-  dpath_change (f_equal f s) (H a) (f_equal g s) = H a'.
-Proof.
-  unfold dpath_change.
-  rewrite eq_trans_assoc.
-  rewrite (square_coherence_fill f g (fun v => rew [P] p in v) (fun v => v) H s).
-  rewrite f_equal_id, <- eq_trans_assoc, eq_trans_sym_inv_r.
-  now apply eq_trans_refl_r.
-Defined.
-
-(** Successive changes of endpoints compose their correction paths. *)
-Lemma dpath_change_nest {X: Type} {P: X -> Type} {x y: X} {p: x = y}
-  {a a' a'': P x} {b b' b'': P y}
-  (s: a' = a) (s': a'' = a') (t: b' = b) (t': b'' = b')
-  (h: rew [P] p in a = b):
-  dpath_change s' (dpath_change s h t) t' =
-  dpath_change (s' • s) h (t' • t).
-Proof.
-  destruct s', s, t', t. unfold dpath_change; cbn [f_equal eq_sym].
-  now rewrite 4 eq_trans_refl_l, 3 eq_trans_refl_r.
-Defined.
-
 Lemma dpath_change_id {X: Type} {P: X -> Type} {x y: X} {p: x = y}
   {a: P x} {b: P y} (h: rew [P] p in a = b):
   dpath_change eq_refl h eq_refl = h.
 Proof.
   unfold dpath_change; cbn [f_equal eq_sym].
   now rewrite eq_trans_refl_l, eq_trans_refl_r.
-Defined.
-
-Lemma dpath_change_refl {X: Type} {P: X -> Type} {x y: X} (p: x = y)
-  (a: P x) {b: P y} (t: b = rew [P] p in a):
-  dpath_change (p := p) eq_refl eq_refl t = eq_sym t.
-Proof.
-  unfold dpath_change; cbn [f_equal]. now rewrite 2 eq_trans_refl_l.
-Defined.
-
-(** Changing the source of a reflexive dependent path cancels the
-    transported source correction in its target correction. *)
-Lemma dpath_change_transport {X: Type} {P: X -> Type} {x y: X} (p: x = y)
-  {a a': P x} (s: a' = a) {b: P y} (t: b = rew [P] p in a'):
-  dpath_change s (p := p) eq_refl
-    (t • f_equal (fun a => rew [P] p in a) s) = eq_sym t.
-Proof.
-  destruct s. cbn [f_equal].
-  rewrite eq_trans_refl_r. now apply dpath_change_refl.
-Defined.
-
-(** A dependent map over a fixed base acts on paths without reindexing the base. *)
-Definition dpath_map {X: Type} {P Q: X -> Type} (g: forall x, P x -> Q x)
-  {x y: X} {p: x = y} {a: P x} {b: P y} (h: rew [P] p in a = b):
-  rew [Q] p in g x a = g y b :=
-  map_subst g p a • f_equal (g y) h.
-
-Lemma dpath_map_comp {X: Type} {P Q: X -> Type} (g: forall x, P x -> Q x)
-  {x y z: X} {p: x = y} {q: y = z} {a: P x} {b: P y} {c: P z}
-  (h: rew [P] p in a = b) (k: rew [P] q in b = c):
-  dpath_map g (h ⊙ k) = dpath_map g h ⊙ dpath_map g k.
-Proof.
-  now destruct p, q, h, k.
-Defined.
-
-(** A square of dependent maps commutes on paths, with its endpoint squares. *)
-Lemma dpath_map_square {X Y: Type} {P P': X -> Type} {Q Q': Y -> Type} {f: X -> Y}
-  (e: forall x, P x -> P' x) (e': forall y, Q y -> Q' y)
-  (g: forall x, P x -> Q (f x)) (g': forall x, P' x -> Q' (f x))
-  (N: forall x a, e' (f x) (g x a) = g' x (e x a))
-  {x y: X} {p: x = y} {a: P x} {b: P y} (h: rew [P] p in a = b):
-  dpath_map e' (sigT_map_eq g h) =
-  dpath_change (N x a) (sigT_map_eq g' (dpath_map e h)) (N y b).
-Proof.
-  destruct p, h. unfold dpath_map, dpath_change; cbn.
-  now rewrite eq_trans_refl_l, f_equal_id, eq_trans_sym_inv_r.
-Defined.
-
-(** Separating the reindexing of the base from the action in each fibre. *)
-Lemma sigT_map_eq_dpath_map {X Y: Type} {P: X -> Type} {Q: Y -> Type} {f: X -> Y}
-  (g: forall x, P x -> Q (f x)) {x y: X} {p: x = y}
-  {a: P x} {b: P y} (h: rew [P] p in a = b):
-  sigT_map_eq g h = eq_sym (rew_map Q f p (g x a)) • dpath_map g h.
-Proof.
-  now destruct p, h.
 Defined.
 
 Local Definition map_three {X Y: Type} (f: X -> Y)
