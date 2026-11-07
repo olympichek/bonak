@@ -6,12 +6,12 @@ theories/Category/Bicategory/Full.v
 theories/Category/Bicategory/Groupoids.v
 theories/Category/Bicategory/HGpdBicat.v
 theories/Category/Bicategory/HGpdDiagramEq.v
+theories/Category/Bicategory/HGpdUniv.v
 theories/Category/Bicategory/IconPath.v
 theories/Category/Bicategory/LocallyDiscrete.v
 theories/Category/Bicategory/LocallyDiscretePseudofunctor.v
 theories/Category/Bicategory/PathDiagram.v
 theories/Category/Bicategory/PathDiagramLemmas.v
-theories/Category/Bicategory/PathGroupoid.v
 theories/Category/Bicategory/Pseudofunctor.v
 theories/Category/Bicategory/PseudofunctorOps.v
 theories/Category/Bicategory/Pseudonatural.v
@@ -34,6 +34,7 @@ theories/Category/Groupoid/FamilyIdentity.v
 theories/Category/Groupoid/GraphFiber.v
 theories/Category/Groupoid/GraphFiberRoundtrip.v
 theories/Category/Groupoid/Map.v
+theories/Category/Groupoid/Path.v
 theories/Category/Groupoid/Precomposition.v
 theories/Category/Groupoid/Product.v
 theories/Category/Groupoid/Section.v

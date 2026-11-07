@@ -4,7 +4,7 @@ From Bonak.Category Require Import Category Groupoid HSetCat FunctorUnivalence
   Yoneda Completion.
 From Bonak.Category.Groupoid Require Import WeakEquivalence.
 From Bonak.Lib Require Import HGpd.
-From Bonak.Category.Bicategory Require Import PathGroupoid.
+From Bonak.Category.Groupoid Require Import Path.
 Set Primitive Projections.
 Set Universe Polymorphism.
 

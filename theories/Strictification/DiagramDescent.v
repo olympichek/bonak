@@ -5,7 +5,8 @@ From Bonak.Lib Require Import SigT HSet Notation Equiv Funext RewLemmas Truncati
 From Bonak.Lib Require Import HGpd.
 From Bonak.Strictification Require Import DiagramEvaluation.
 From Bonak.Category.Groupoid Require Import CompletionUniqueness Precomposition Strict WeakEquivalence.
-From Bonak.Category.Bicategory Require Import PathDiagram PathGroupoid Pseudonatural
+From Bonak.Category.Groupoid Require Import Path.
+From Bonak.Category.Bicategory Require Import PathDiagram Pseudonatural
   LocallyDiscretePseudofunctor HGpdDiagramEq.
 Set Primitive Projections.
 Set Keyed Unification.

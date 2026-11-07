@@ -8,7 +8,8 @@ From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Groupoid Require Import Strict.
 From Bonak.Category.Bicategory Require Import Groupoids.
 From Bonak.Category.Groupoid Require Import CompletionPseudofunctor.
-From Bonak.Category.Bicategory Require Import PseudofunctorOps LocallyDiscrete Full PathGroupoid
+From Bonak.Category.Groupoid Require Import Path.
+From Bonak.Category.Bicategory Require Import PseudofunctorOps LocallyDiscrete Full HGpdUniv
   HGpdBicat.
 Set Primitive Projections.
 Set Universe Polymorphism.

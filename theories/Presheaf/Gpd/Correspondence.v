@@ -15,7 +15,7 @@ From Bonak Require Import Univalence.
 From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import Bicategory LocallyDiscrete Pseudofunctor.
 From Bonak.Category Require Import Groupoid.
-From Bonak.Category.Bicategory Require Import PathGroupoid.
+From Bonak.Category.Bicategory Require Import HGpdUniv.
 From Bonak.Presheaf Require Import νSemiShape.
 From Bonak.Presheaf.Gpd Require Export Roundtrip.
 

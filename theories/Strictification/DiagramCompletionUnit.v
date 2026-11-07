@@ -7,8 +7,9 @@ From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Groupoid Require Import WeakEquivalence Strict.
 From Bonak.Strictification Require Import DiagramEvaluation DiagramDescent.
 From Bonak.Category.Groupoid Require Import CompletionPseudofunctor.
+From Bonak.Category.Groupoid Require Import Path.
 From Bonak.Category.Bicategory Require Import HGpdBicat BicategoryEq Pseudonatural Pseudofunctor
-  LocallyDiscrete Groupoids PseudofunctorOps Full PathGroupoid.
+  LocallyDiscrete Groupoids PseudofunctorOps Full HGpdUniv.
 From Bonak.Strictification Require Import DiagramCompletion.
 From Bonak.Category.Bicategory Require Import LocallyDiscretePseudofunctor PathDiagram.
 From Stdlib Require Import Logic.FunctionalExtensionality.

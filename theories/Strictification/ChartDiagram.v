@@ -6,7 +6,8 @@ From Bonak.Lib Require Import HGpd.
 From Bonak.Category Require Import Category FunctorAlgebra.
 From Bonak.Category.Groupoid Require Import Strict WeakEquivalence.
 From Bonak.Strictification Require Import DiagramEvaluation.
-From Bonak.Category.Bicategory Require Import PathDiagram PathDiagramLemmas PathGroupoid.
+From Bonak.Category.Groupoid Require Import Path.
+From Bonak.Category.Bicategory Require Import PathDiagram PathDiagramLemmas.
 Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.

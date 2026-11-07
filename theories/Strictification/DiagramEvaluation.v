@@ -5,7 +5,8 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas.
 From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Groupoid Require Import Strict.
-From Bonak.Category.Bicategory Require Import PathDiagram PathGroupoid.
+From Bonak.Category.Groupoid Require Import Path.
+From Bonak.Category.Bicategory Require Import PathDiagram.
 Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
