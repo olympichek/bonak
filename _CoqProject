@@ -4,7 +4,7 @@ theories/Category/Bicategory/Bicategory.v
 theories/Category/Bicategory/BicategoryEq.v
 theories/Category/Bicategory/Full.v
 theories/Category/Bicategory/Groupoids.v
-theories/Category/Bicategory/HGpd2Cat.v
+theories/Category/Bicategory/HGpdBicat.v
 theories/Category/Bicategory/HGpdDiagramEq.v
 theories/Category/Bicategory/IconPath.v
 theories/Category/Bicategory/LocallyDiscrete.v
@@ -15,7 +15,6 @@ theories/Category/Bicategory/PathGroupoid.v
 theories/Category/Bicategory/Pseudofunctor.v
 theories/Category/Bicategory/PseudofunctorOps.v
 theories/Category/Bicategory/Pseudonatural.v
-theories/Category/Bicategory/UnivGpd2Cat.v
 theories/Category/Category.v
 theories/Category/CategoryEq.v
 theories/Category/Completion.v

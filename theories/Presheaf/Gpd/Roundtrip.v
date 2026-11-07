@@ -13,7 +13,7 @@ From Bonak.Presheaf.Gpd Require Export Pseudofunctor.
 
 From Bonak.Category.Bicategory Require Import PathDiagram.
 
-From Bonak.Category.Bicategory Require Import HGpd2Cat.
+From Bonak.Category.Bicategory Require Import HGpdBicat.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -76,7 +76,7 @@ Definition ofToPseudofunctor (A: HSet) (P: νGpdPresentation A):
   • ofToPsf A P.
 
 Definition toOfPseudofunctor (A: HSet)
-  (F: Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat):
+  (F: Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpdBicat):
   toPseudofunctor A (ofPseudofunctor A F) = F :=
   f_equal (@expandPseudofunctor (Op (νSemiShape A)))
     (toOfPsf A (contractPseudofunctor F))

@@ -28,7 +28,7 @@ Module CategoryCompletion (T: PropositionalTruncation).
     subtypeCategory (functorCategory (Op C) HSetCat) (MerelyRepresentable C).
 
   Definition completionUnivalence (C: Category):
-    IsUnivalentCategory (completionCategory C) :=
+    IsUnivCategory (completionCategory C) :=
     subtypeCategoryUnivalence _ (functorCategoryUnivalence hsetCategoryUnivalence)
       (MerelyRepresentable C) (fun P => merelyProp _).
 

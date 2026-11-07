@@ -9,7 +9,7 @@ From Bonak.Category Require Import Category.
 From Bonak.Presheaf Require Import νSemiShape.
 From Bonak.Strictification Require Import ChartDiagram Completion DiagramCompletionUnit.
 From Bonak.Category.Groupoid Require Import WeakEquivalence.
-From Bonak.Category.Bicategory Require Import HGpd2Cat LocallyDiscrete Pseudofunctor
+From Bonak.Category.Bicategory Require Import HGpdBicat LocallyDiscrete Pseudofunctor
   LocallyDiscretePseudofunctor.
 From Bonak.Presheaf.StrictGpd Require Import Presentation Roundtrip.
 From Bonak.Presheaf.Gpd Require Import Presentation Pseudofunctor Roundtrip.
@@ -34,19 +34,19 @@ Module PresentationStrictification (Tr: PropositionalTruncation)
   Module Comparison := CompletionComparisonsOn Tr Complete.
 
   Definition totalDiagramCells {arity: HSet}
-    (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat): HGpd :=
+    (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat): HGpd :=
     gsigT (A := hgpdOfHSet {| Dom := nat; UIP := @natUIP |})
       (fun n => Q.(psObj) n).
 
   Definition strictDiagramOfCover {arity: HSet}
-    (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat)
+    (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat)
     (cover: Covers.SetCover (totalDiagramCells Q)):
     Functor (Op (νSemiShape arity)) StrictGroupoidCat :=
     chartDiagram (contractPseudofunctor Q)
       cover.1 (fun s => (cover.2.1 s).1) (fun s => (cover.2.1 s).2).
 
   Definition strictDiagramOfCoverEq {arity: HSet}
-    (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat)
+    (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat)
     (cover: Covers.SetCover (totalDiagramCells Q)):
     Complete.completeDiagram (strictDiagramOfCover Q cover) = Q :=
     Comparison.completeDiagramEq (strictDiagramOfCover Q cover)
@@ -59,7 +59,7 @@ Module PresentationStrictification (Tr: PropositionalTruncation)
 
   Definition completeDiagramSurjective (covers: Covers.SetsCover1Types)
     {arity: HSet}
-    (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat):
+    (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat):
     merely {F: Functor (Op (νSemiShape arity)) StrictGroupoidCat &T Complete.completeDiagram F = Q} :=
     TF.trMap
       (fun cover => (strictDiagramOfCover Q cover; strictDiagramOfCoverEq Q cover))
@@ -90,20 +90,20 @@ Module PresentationStrictification (Tr: PropositionalTruncation)
       principle for all 1-types. Any fixed arity suffices. *)
   Definition completeDiagramSurjectiveCovers {arity: HSet}
     (surjective: forall Q: Pseudofunctor
-      (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat,
+      (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat,
       merely {F: Functor (Op (νSemiShape arity)) StrictGroupoidCat &T Complete.completeDiagram F = Q}):
     Covers.SetsCover1Types.
   Proof.
     intro X. refine (TF.trMap _
       (surjective (GpdPseudofunctor.toPseudofunctor arity (constantPresentation arity X)))).
     intros [F e].
-    now exact (rew [fun Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat =>
+    now exact (rew [fun Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat =>
       Covers.SetCover (Q.(psObj) 0)] e in
       completedDiagramLevelCover F 0).
   Defined.
 
   Definition completeDiagramSurjectiveCoverEquiv (arity: HSet):
-    Equiv (forall Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat,
+    Equiv (forall Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat,
       merely {F: Functor (Op (νSemiShape arity)) StrictGroupoidCat &T Complete.completeDiagram F = Q})
       Covers.SetsCover1Types :=
     qinvEquiv completeDiagramSurjectiveCovers

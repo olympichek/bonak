@@ -238,6 +238,6 @@ Proof.
   now reflexivity.
 Defined.
 
-Definition νShapeUnivalence (A: HSet): IsUnivalentCategory (νShape A) :=
+Definition νShapeUnivalence (A: HSet): IsUnivCategory (νShape A) :=
   categoryUnivalenceFromIdentityIsos (νShape A) (@natUIP)
     νShapeIsoPath νShapeIsoEndo.

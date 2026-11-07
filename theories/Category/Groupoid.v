@@ -25,16 +25,16 @@ Proof.
 Qed.
 
 Record Groupoid := {
-  gcat:> Category;
-  groupoidInvertibility: IsGroupoid gcat;
+  groupoid:> Category;
+  groupoidInvertibility: IsGroupoid groupoid;
 }.
 
-Record UnivalentGroupoid := {
-  underlyingGroupoid:> Groupoid;
-  groupoidUnivalence: IsUnivalentCategory underlyingGroupoid;
+Record UnivGroupoid := {
+  univGroupoid:> Groupoid;
+  groupoidUnivalence: IsUnivCategory univGroupoid;
 }.
 
-Definition guniv (G: UnivalentGroupoid) (a b: G.(CObj))
+Definition guniv (G: UnivGroupoid) (a b: G.(CObj))
   (f: G.(CHom) a b): Contr {p: a = b &T idToHom p = f}.
 Proof.
   pose (e := idToIsoEquiv G.(groupoidUnivalence) a b).
@@ -49,42 +49,42 @@ Defined.
 (** The two round trips of [idToHom]. The retraction is the first component
     of the contraction applied to the fibre element [(p; eq_refl)]. *)
 
-Definition homToId {G: UnivalentGroupoid} {a b: G.(CObj)} (f: G.(CHom) a b): a = b :=
+Definition homToId {G: UnivGroupoid} {a b: G.(CObj)} (f: G.(CHom) a b): a = b :=
   ((guniv G) a b f).1.1.
 
-Definition idToHomToId {G: UnivalentGroupoid} {a b: G.(CObj)} (f: G.(CHom) a b):
+Definition idToHomToId {G: UnivGroupoid} {a b: G.(CObj)} (f: G.(CHom) a b):
   idToHom (homToId f) = f := ((guniv G) a b f).1.2.
 
-Lemma homToIdToHom {G: UnivalentGroupoid} {a b: G.(CObj)} (p: a = b):
+Lemma homToIdToHom {G: UnivGroupoid} {a b: G.(CObj)} (p: a = b):
   homToId (idToHom p) = p.
 Proof.
   now exact (f_equal (fun z => z.1)
     (((guniv G) a b (idToHom p)).2 (p; eq_refl))).
 Qed.
 
-Definition idToHomEquiv (G: UnivalentGroupoid) (a b: G.(CObj)):
+Definition idToHomEquiv (G: UnivGroupoid) (a b: G.(CObj)):
   Equiv (a = b) (G.(CHom) a b) :=
   qinvEquiv idToHom homToId homToIdToHom idToHomToId.
 
-Lemma idToHomInj {G: UnivalentGroupoid} {a b: G.(CObj)} (p q: a = b)
+Lemma idToHomInj {G: UnivGroupoid} {a b: G.(CObj)} (p q: a = b)
   (e: idToHom p = idToHom q): p = q.
 Proof.
   now exact (eq_sym (homToIdToHom p) • (f_equal homToId e • homToIdToHom q)).
 Qed.
 
-Lemma homToIdId {G: UnivalentGroupoid} (a: G.(CObj)): homToId (G.(cid) a) = eq_refl.
+Lemma homToIdId {G: UnivGroupoid} (a: G.(CObj)): homToId (G.(cid) a) = eq_refl.
 Proof.
   now exact (homToIdToHom (eq_refl: a = a)).
 Qed.
 
-Lemma homToIdComp {G: UnivalentGroupoid} {a b c: G.(CObj)} (u: G.(CHom) a b)
+Lemma homToIdComp {G: UnivGroupoid} {a b c: G.(CObj)} (u: G.(CHom) a b)
   (v: G.(CHom) b c): homToId (u ⨟ v) = homToId u • homToId v.
 Proof.
   apply idToHomInj.
   now rewrite <- idToHomTrans, 3 idToHomToId.
 Qed.
 
-Lemma homToIdFhom {G H: UnivalentGroupoid} (F: Functor G.(gcat) H.(gcat))
+Lemma homToIdFhom {G H: UnivGroupoid} (F: Functor G.(groupoid) H.(groupoid))
   {a b: G.(CObj)} (u: G.(CHom) a b):
   homToId (F.(fhom) u) = f_equal F.(fobj) (homToId u).
 Proof.
@@ -110,7 +110,7 @@ Qed.
 (** The objects of a univalent groupoid form a 1-type: their identity types retract
     onto the hom-h-sets. *)
 
-Definition gobj (G: UnivalentGroupoid): HGpd := {|
+Definition gobj (G: UnivGroupoid): HGpd := {|
   GDom := G.(CObj);
   GUIP x y := retract_UIP (@idToHom G x y) (@homToId G x y) homToIdToHom;
 |}.
@@ -212,28 +212,28 @@ Defined.
 Unset Universe Minimization ToSet.
 
 Definition functorGroupoid (C: Category) (H: Groupoid): Groupoid :=
-  {| gcat := functorCategory C H;
+  {| groupoid := functorCategory C H;
      groupoidInvertibility F G α := natInvertible α |}.
 
 (** Invertibility and univalence are properties, so univalent groupoids
     with equal underlying categories are equal. *)
 
-Lemma univalentGroupoidEqCat (G H: UnivalentGroupoid)
-  (e: G.(gcat) = H.(gcat)): G = H.
+Lemma univGroupoidEqCat (G H: UnivGroupoid)
+  (e: G.(groupoid) = H.(groupoid)): G = H.
 Proof.
   destruct G as [[Gc Gi] Gu], H as [[Hc Hi] Hu]; cbn in e. destruct e.
   destruct (isGroupoidProp Gi Hi).
-  now destruct (isUnivalentCategoryProp Gu Hu).
+  now destruct (isUnivCategoryProp Gu Hu).
 Qed.
 
-Definition univalentGroupoidFromPaths (C: Category)
+Definition univGroupoidFromPaths (C: Category)
   (u: forall a b (f: C.(CHom) a b), Contr {p: a = b &T idToHom p = f}):
-  UnivalentGroupoid.
+  UnivGroupoid.
 Proof.
   assert (gi: IsGroupoid C).
   { intros a b f. destruct (u a b f).1 as [p e]. destruct e, p.
     exact {| inverse := cid a; inverseR := C.(cidl) _; inverseL := C.(cidl) _ |}. }
-  refine {| underlyingGroupoid := {| gcat := C; groupoidInvertibility := gi |};
+  refine {| univGroupoid := {| groupoid := C; groupoidInvertibility := gi |};
             groupoidUnivalence := _ |}.
   intros a b i. destruct (u a b i.(isoHom)).1 as [p e].
   exists (p; isoEq (idToIso p) i (idToIsoHom p • e)).
@@ -245,13 +245,13 @@ Proof.
   - now apply (isoSet C a b).(UIP).
 Defined.
 
-Lemma univalentGroupoidFromPathsRet (G: UnivalentGroupoid):
-  univalentGroupoidFromPaths G (guniv G) = G.
-Proof. apply univalentGroupoidEqCat. reflexivity. Qed.
+Lemma univGroupoidFromPathsRet (G: UnivGroupoid):
+  univGroupoidFromPaths G (guniv G) = G.
+Proof. apply univGroupoidEqCat. reflexivity. Qed.
 
-Lemma univalentGroupoidFromPathsSec (C: Category)
+Lemma univGroupoidFromPathsSec (C: Category)
   (u: forall a b (f: C.(CHom) a b), Contr {p: a = b &T idToHom p = f}):
-  guniv (univalentGroupoidFromPaths C u) = u.
+  guniv (univGroupoidFromPaths C u) = u.
 Proof.
   repeat (apply functional_extensionality_dep; intro). apply contrProp.
 Qed.

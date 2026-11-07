@@ -10,16 +10,16 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation.
 From Bonak.Category Require Import Category.
 From Bonak.Lib Require Import HGpd.
-From Bonak.Category.Bicategory Require Import HGpd2Cat.
+From Bonak.Category.Bicategory Require Import HGpdBicat.
 
 Set Primitive Projections.
 Set Printing Projections.
 
 Section PathDiagram.
-Context (C: Category) (ob: C.(CObj) -> HGpd2Cat.(BObj)).
+Context (C: Category) (ob: C.(CObj) -> HGpdBicat.(BObj)).
 
 Record PathDiagramData := {
-  phom {a b} (f: C.(CHom) a b): (Hom HGpd2Cat) (ob a) (ob b);
+  phom {a b} (f: C.(CHom) a b): (Hom HGpdBicat) (ob a) (ob b);
   pid a: phom (C.(cid) a) = id1 (ob a);
   pcomp {a b c} (f: C.(CHom) a b) (g: C.(CHom) b c):
     Hom2 (phom f ⨟₁ phom g) (phom (f ⨟ g));
@@ -42,21 +42,21 @@ Definition psfUnitR (F: PathDiagramData) {a b} (f: C.(CHom) a b):
 Definition PathDiagramUnitL (F: PathDiagramData): Type :=
   forall a b (f: C.(CHom) a b),
     F.(pcomp) (C.(cid) a) f
-    = hom2Rew (B := HGpd2Cat) (eq_sym (psfUnitL F f))
+    = hom2Rew (B := HGpdBicat) (eq_sym (psfUnitL F f))
         (eq_sym (f_equal (F.(phom) (a := a) (b := b)) (C.(cidl) f)))
         (id2 (F.(phom) f)).
 
 Definition PathDiagramUnitR (F: PathDiagramData): Type :=
   forall a b (f: C.(CHom) a b),
     F.(pcomp) f (C.(cid) b)
-    = hom2Rew (B := HGpd2Cat) (eq_sym (psfUnitR F f))
+    = hom2Rew (B := HGpdBicat) (eq_sym (psfUnitR F f))
         (eq_sym (f_equal (F.(phom) (a := a) (b := b)) (C.(cidr) f)))
         (id2 (F.(phom) f)).
 
 Definition PathDiagramAssoc (F: PathDiagramData): Type :=
   forall a b c d (f: C.(CHom) a b) (g: C.(CHom) b c) (h: C.(CHom) c d),
     (F.(pcomp) f g ▷ F.(phom) h) ⨟₂ (F.(pcomp) (f ⨟ g) h)
-    = hom2Rew (B := HGpd2Cat)
+    = hom2Rew (B := HGpdBicat)
         (eq_sym (hgpdAssoc (F.(phom) f) (F.(phom) g) (F.(phom) h)))
         (eq_sym (f_equal (F.(phom) (a := a) (b := d)) (C.(cassoc) f g h)))
         ((F.(phom) f ◁ F.(pcomp) g h) ⨟₂ (F.(pcomp) f (g ⨟ h))).
@@ -78,7 +78,7 @@ Record Icon (F G: PathDiagramData) := {
     ((icCell f ▷ F.(phom) g) ⨟₂ (G.(phom) f ◁ icCell g)) ⨟₂ G.(pcomp) f g
     = F.(pcomp) f g ⨟₂ (icCell (f ⨟ g));
   icId a:
-    hom2Rew (B := HGpd2Cat) (F.(pid) a) (G.(pid) a) (icCell (C.(cid) a)) = id2 (id1 (ob a));
+    hom2Rew (B := HGpdBicat) (F.(pid) a) (G.(pid) a) (icCell (C.(cid) a)) = id2 (id1 (ob a));
 }.
 
 End PathDiagram.
@@ -86,7 +86,7 @@ End PathDiagram.
 (** A diagram together with its family of objects. *)
 
 Record PathDiagramFamily (C: Category) := {
-  pfObj: C.(CObj) -> HGpd2Cat.(BObj);
+  pfObj: C.(CObj) -> HGpdBicat.(BObj);
   pfStr: PathDiagram C pfObj;
 }.
 

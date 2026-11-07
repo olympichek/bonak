@@ -102,7 +102,7 @@ Defined.
 
 Definition MatchingObject {n} (X: Diagram A n): StrictGroupoid.
 Proof.
-  refine {| strictGroupoid := {| gcat := matchingCategory X |};
+  refine {| strictGroupoid := {| groupoid := matchingCategory X |};
     groupoidStrictness := @UIP (MatchingBoundary X) |}.
   intros a b h. refine (@Build_IsInvertible _ a b h (matchingInv h) _ _).
   - apply matchingHomExt. intros i f. now apply ginvR.

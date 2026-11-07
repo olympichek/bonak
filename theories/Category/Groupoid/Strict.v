@@ -24,7 +24,7 @@ Coercion strictGroupoidObjects: StrictGroupoid >-> HSet.
 Definition presentationGroupoid (U: Groupoid) (S: HSet)
   (p: S -> U.(CObj)): StrictGroupoid.
 Proof.
-  refine {| strictGroupoid := {| gcat :=
+  refine {| strictGroupoid := {| groupoid :=
     {| CObj := S; CHom x y := U.(CHom) (p x) (p y);
        cid x := U.(cid) (p x);
        ccomp x y z f g := f ⨟ g;
@@ -50,7 +50,7 @@ Unset Universe Minimization ToSet.
 
 Definition unitGroupoid: StrictGroupoid.
 Proof.
-  refine {| strictGroupoid := {| gcat :=
+  refine {| strictGroupoid := {| groupoid :=
     {| CObj := unit; CHom _ _ := hunit; cid _ := tt;
        ccomp _ _ _ _ _ := tt;
        cidl _ _ f := hunit_ext tt f; cidr _ _ f := hunit_ext tt f;

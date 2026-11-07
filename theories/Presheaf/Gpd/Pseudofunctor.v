@@ -1,5 +1,5 @@
 (** Translations between groupoid-valued face presentations and
-    pseudofunctors into [HGpd2Cat]. The exchange paths determine the word
+    pseudofunctors into [HGpdBicat]. The exchange paths determine the word
     compositor, and the face hexagon supplies its associativity. *)
 
 Set Warnings "-notation-overridden".
@@ -18,7 +18,7 @@ From Bonak.Category.Bicategory Require Import LocallyDiscrete Pseudofunctor
 
 From Bonak.Category.Bicategory Require Import PathDiagramLemmas.
 
-From Bonak.Category.Bicategory Require Import HGpd2Cat.
+From Bonak.Category.Bicategory Require Import HGpdBicat.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -303,9 +303,9 @@ End PackagedTranslations.
 (** The translations with their full 2-cell action and unit comparisons. *)
 
 Definition toPseudofunctor (A: HSet) (P: νGpdPresentation A):
-  Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat :=
+  Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpdBicat :=
   expandPseudofunctor (toPsfTot A P).
 
 Definition ofPseudofunctor (A: HSet)
-  (F: Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat): νGpdPresentation A :=
+  (F: Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpdBicat): νGpdPresentation A :=
   ofPsfTot A (contractPseudofunctor F).

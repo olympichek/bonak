@@ -4,7 +4,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Truncation.
 From Bonak.Category Require Import Category Groupoid.
-From Bonak.Category.Bicategory Require Import Bicategory Pseudofunctor Groupoids Full UnivGpd2Cat.
+From Bonak.Category.Bicategory Require Import Bicategory Pseudofunctor Groupoids Full.
 From Bonak.Category.Groupoid Require Import Strict Descent Completion Precomposition.
 Set Keyed Unification.
 Set Primitive Projections.
@@ -19,7 +19,7 @@ Module CompletionBicategories (T: PropositionalTruncation).
   Unset Keyed Unification.
 
   Definition CompletionHomBicat: Bicategory :=
-    fullBicategory UnivGpd2Cat (fun G: StrictGroupoid => C.completedPaths G).
+    fullBicategory UnivGpdBicat (fun G: StrictGroupoid => C.completedPaths G).
 End CompletionBicategories.
 
 Module CompletionAction (T: PropositionalTruncation).

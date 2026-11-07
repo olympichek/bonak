@@ -103,9 +103,9 @@ Module GroupoidPrecomposition (T: PropositionalTruncation).
 
   End Precomposition.
 
-  Section UnivalentPrecomposition.
+  Section UnivPrecomposition.
   Context {G H: Groupoid} (F: Functor G H) (w: IsWeakEquivalence F).
-  Context (U: UnivalentGroupoid).
+  Context (U: UnivGroupoid).
 
   Definition precomposeFunctorEquiv: Equiv (Functor H U) (Functor G U).
   Proof.
@@ -119,5 +119,5 @@ Module GroupoidPrecomposition (T: PropositionalTruncation).
       now exact (@Build_Iso (functorCategory G U) _ _ α (natInvertible α)).
   Defined.
 
-  End UnivalentPrecomposition.
+  End UnivPrecomposition.
 End GroupoidPrecomposition.

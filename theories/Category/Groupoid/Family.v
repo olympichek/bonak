@@ -31,7 +31,7 @@ Record Family {G: StrictGroupoid} := {
 Arguments Family G : clear implicits.
 
 Definition total {G: StrictGroupoid} (E: Family G): StrictGroupoid := {|
-  strictGroupoid := {| gcat := {|
+  strictGroupoid := {| groupoid := {|
     CObj := {x: G &T E.(dobj) x};
     CHom a b := E.(dhom) a.2 b.2;
     cid a := E.(did) a.2;

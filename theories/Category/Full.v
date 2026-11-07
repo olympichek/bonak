@@ -30,9 +30,9 @@ Definition liftFullIso {C: Category} {A: Type} (o: A -> C.(CObj)) {a b: A}
 Definition subtypeCategory (C: Category) (P: C.(CObj) -> Type): Category :=
   fullCategory C (fun z: {x: C.(CObj) &T P x} => z.1).
 
-Definition subtypeCategoryUnivalence (C: Category) (u: IsUnivalentCategory C)
+Definition subtypeCategoryUnivalence (C: Category) (u: IsUnivCategory C)
   (P: C.(CObj) -> Type) (h: forall x, IsHProp (P x)):
-  IsUnivalentCategory (subtypeCategory C P).
+  IsUnivCategory (subtypeCategory C P).
 Proof.
   apply categoryUnivalenceFromTotal. intro a.
   pose (o := fun z: {x: C.(CObj) &T P x} => z.1).

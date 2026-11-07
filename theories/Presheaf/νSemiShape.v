@@ -316,7 +316,7 @@ Proof.
 Defined.
 
 Definition νSemiShapeUnivalence (A: HSet):
-  IsUnivalentCategory (νSemiShape A) :=
+  IsUnivCategory (νSemiShape A) :=
   categoryUnivalenceFromIdentityIsos (νSemiShape A) (@natUIP)
     νSemiShapeIsoPath (fun p i => wordEndId p i.(isoHom)).
 

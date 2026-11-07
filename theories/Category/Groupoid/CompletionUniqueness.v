@@ -16,7 +16,7 @@ Module CompletionUniqueness (T: PropositionalTruncation).
   Set Universe Polymorphism.
 
   Section Compare.
-  Context {G: Groupoid} {U V: UnivalentGroupoid}
+  Context {G: Groupoid} {U V: UnivGroupoid}
     (i: Functor G U) (wi: IsWeakEquivalence i)
     (j: Functor G V) (wj: IsWeakEquivalence j).
 

@@ -118,8 +118,8 @@ Definition IsLocallyGroupoid (B: Bicategory): Type :=
   forall a b (f g: (B.(BHom) a b).(CObj)) (α: (B.(BHom) a b).(CHom) f g),
     IsInvertible α.
 
-Definition IsLocallyUnivalent (B: Bicategory): Type :=
-  forall a b, IsUnivalentCategory (B.(BHom) a b).
+Definition IsLocallyUniv (B: Bicategory): Type :=
+  forall a b, IsUnivCategory (B.(BHom) a b).
 
 (** Adjoint equivalences have a unit and counit satisfying both triangle
     identities, including the associators and unitors of the bicategory. *)
@@ -142,5 +142,5 @@ Record AdjointEquivalence (B: Bicategory) (a b: B.(BObj)) := {
 
 (** The total space of adjoint equivalences out of each object is
     contractible precisely when adjoint equivalences classify object paths. *)
-Definition IsGloballyUnivalent (B: Bicategory): Type :=
+Definition IsGloballyUniv (B: Bicategory): Type :=
   forall a: B.(BObj), Contr {b: B.(BObj) &T AdjointEquivalence B a b}.

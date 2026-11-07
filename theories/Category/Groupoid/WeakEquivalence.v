@@ -60,7 +60,7 @@ Module GroupoidSetCovers (T: PropositionalTruncation).
 
   Definition SetsCover1Types: Type := forall X: HGpd, merely (SetCover X).
 
-  Definition weakEquivalenceCover {G: StrictGroupoid} (U: UnivalentGroupoid)
+  Definition weakEquivalenceCover {G: StrictGroupoid} (U: UnivGroupoid)
     (F: Functor G U) (w: W.IsWeakEquivalence F): SetCover U.(CObj).
   Proof.
     refine (strictGroupoidObjects G; (F.(fobj); _)).

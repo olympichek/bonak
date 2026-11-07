@@ -9,7 +9,7 @@ Set Primitive Projections.
 Set Universe Polymorphism.
 
 Section FunctorIdentity.
-Context {C D: Category} (u: IsUnivalentCategory D) (F: Functor C D).
+Context {C D: Category} (u: IsUnivCategory D) (F: Functor C D).
 
 Local Definition ObjectIsoFamily :=
   forall x: C.(CObj), {y: D.(CObj) &T Iso D (F.(fobj) x) y}.
@@ -59,6 +59,6 @@ Definition functorIsoTotal:
   retractContr encode decode decodeEncode codeContr.
 End FunctorIdentity.
 
-Definition functorCategoryUnivalence {C D: Category} (u: IsUnivalentCategory D):
-  IsUnivalentCategory (functorCategory C D) :=
+Definition functorCategoryUnivalence {C D: Category} (u: IsUnivCategory D):
+  IsUnivCategory (functorCategory C D) :=
   categoryUnivalenceFromTotal (functorCategory C D) (functorIsoTotal u).

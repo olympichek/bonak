@@ -28,7 +28,7 @@ From Stdlib Require Import Logic.FunctionalExtensionality.
 
 From Bonak.Category.Bicategory Require Import PathDiagramLemmas.
 
-From Bonak.Category.Bicategory Require Import HGpd2Cat.
+From Bonak.Category.Bicategory Require Import HGpdBicat.
 Set Primitive Projections.
 Set Printing Projections.
 

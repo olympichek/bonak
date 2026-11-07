@@ -1,5 +1,6 @@
-(** Groupoids, functors, and natural transformations, with no univalence
-    requirement on the individual groupoids. *)
+(** The bicategory of groupoids, functors, and natural transformations, with
+    no univalence requirement on the individual groupoids, and its full
+    sub-bicategories of univalent groupoids and of strict groupoids. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas.
 From Bonak.Category Require Import Category CategoryEq Groupoid.
@@ -86,6 +87,31 @@ Definition GroupoidBicat: Bicategory := {|
         (whiskerLNat F (functorAssoc F' F'' F'''))))
     (fun x => functorPentagon F''' (F''.(fobj) (F'.(fobj) (F.(fobj) x))));
 |}.
+
+(** The full sub-bicategories of univalent groupoids and of strict groupoids *)
+
+Definition UnivGpdBicat: Bicategory :=
+  fullBicategory GroupoidBicat (fun G: UnivGroupoid => G.(univGroupoid)).
+
+Definition univGpdLocallyGroupoid: IsLocallyGroupoid UnivGpdBicat :=
+  fun G H F F' α => natInvertible α.
+
+(** Transport along functor equalities is determined by their object parts. *)
+Lemma ncompHom2Rew {G H: UnivGroupoid} {F F' K K': Functor G H}
+  (p: F = F') (q: K = K') (α: NatTrans F K) (x: G.(CObj)):
+  (@hom2Rew UnivGpdBicat G H F F' K K' p q α).(ncomp) x
+  = rew [fun o => H.(CHom) (F'.(fobj) x) (o x)] (f_equal fobj q) in
+    rew [fun o => H.(CHom) (o x) (K.(fobj) x)] (f_equal fobj p) in
+    α.(ncomp) x.
+Proof. exact (ncompRew p q α x). Qed.
+
+Lemma ncompHom2RewOn {G H: UnivGroupoid} {Fo Ko: G.(CObj) -> H.(CObj)}
+  (zF wF: FunctorOn Fo) (zK wK: FunctorOn Ko)
+  (p: ofFunctorOn zF = ofFunctorOn wF) (q: ofFunctorOn zK = ofFunctorOn wK)
+  (hp: f_equal fobj p = eq_refl) (hq: f_equal fobj q = eq_refl)
+  (α: NatTrans (ofFunctorOn zF) (ofFunctorOn zK)) (x: G.(CObj)):
+  (@hom2Rew UnivGpdBicat G H _ _ _ _ p q α).(ncomp) x = α.(ncomp) x.
+Proof. exact (ncompRewOn zF wF zK wK p q hp hq α x). Qed.
 
 Definition StrictGroupoidBicat: Bicategory :=
   fullBicategory GroupoidBicat (fun G: StrictGroupoid => G.(strictGroupoid)).

@@ -352,17 +352,17 @@ Defined.
 (** Categorical univalence identifies object paths with isomorphisms.
     It is stated as contractibility of the fibres of the canonical map. *)
 
-Definition IsUnivalentCategory (C: Category): Type :=
+Definition IsUnivCategory (C: Category): Type :=
   forall a b (f: Iso C a b), Contr {p: a = b &T idToIso p = f}.
 
-Lemma isUnivalentCategoryProp {C} (u v: IsUnivalentCategory C): u = v.
+Lemma isUnivCategoryProp {C} (u v: IsUnivCategory C): u = v.
 Proof.
   repeat (apply functional_extensionality_dep; intro). apply contrProp.
 Qed.
 
-Record UnivalentCategory := {
-  univalentCategory:> Category;
-  categoryUnivalence: IsUnivalentCategory univalentCategory;
+Record UnivCategory := {
+  univCategory:> Category;
+  categoryUnivalence: IsUnivCategory univCategory;
 }.
 
 (** A category is strict when its objects form an h-set. *)
@@ -391,7 +391,7 @@ Lemma categoryUnivalenceFromIdentityIsos (C: Category)
   (s: IsStrictCategory C)
   (isoPath: forall a b, Iso C a b -> a = b)
   (isoEndo: forall a (i: Iso C a a), i.(isoHom) = cid a):
-  IsUnivalentCategory C.
+  IsUnivCategory C.
 Proof.
   intros a b f.
   assert (h: forall b (p: a = b) (f: Iso C a b), idToIso p = f).
@@ -403,7 +403,7 @@ Proof.
   now apply (isoSet C a b).(UIP).
 Defined.
 
-Definition idToIsoEquiv {C: Category} (u: IsUnivalentCategory C)
+Definition idToIsoEquiv {C: Category} (u: IsUnivCategory C)
   (a b: C.(CObj)): Equiv (a = b) (Iso C a b).
 Proof.
   refine (qinvEquiv idToIso (fun f => (u a b f).1.1) _ _).
@@ -411,13 +411,13 @@ Proof.
   - intro f. exact (u a b f).1.2.
 Defined.
 
-Definition categoryIsoPath {C: Category} (u: IsUnivalentCategory C)
+Definition categoryIsoPath {C: Category} (u: IsUnivCategory C)
   {a b} (i: Iso C a b): a = b := invEq (idToIsoEquiv u a b) i.
 
 (** A category is univalent exactly when, for each object, the type of
     objects isomorphic to it is contractible. *)
 
-Definition categoryIsoTotal {C: Category} (u: IsUnivalentCategory C) (a: C.(CObj)):
+Definition categoryIsoTotal {C: Category} (u: IsUnivCategory C) (a: C.(CObj)):
   Contr {b: C.(CObj) &T Iso C a b}.
 Proof.
   exists (a; idToIso eq_refl). intros [b i].
@@ -430,7 +430,7 @@ Proof.
 Defined.
 
 Definition categoryUnivalenceFromTotal (C: Category)
-  (h: forall a, Contr {b: C.(CObj) &T Iso C a b}): IsUnivalentCategory C.
+  (h: forall a, Contr {b: C.(CObj) &T Iso C a b}): IsUnivCategory C.
 Proof.
   intros a b i.
   pose (e := identitySystemEquiv a (Iso C a) (idToIso eq_refl) (h a) b).

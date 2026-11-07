@@ -13,7 +13,7 @@ Unset Keyed Unification.
     A compatible cone of images of representatives is contractible in a
     univalent target. Its center supplies the descended object without choosing
     a representative from a propositional truncation. *)
-Local Definition arrowTotal (G: UnivalentGroupoid) (a: G.(CObj)):
+Local Definition arrowTotal (G: UnivGroupoid) (a: G.(CObj)):
   Contr {b: G.(CObj) &T G.(CHom) a b}.
 Proof.
   exists (a; cid a). intros [b f].
@@ -30,7 +30,7 @@ Module GroupoidDescent (T: PropositionalTruncation).
 
   Section Descent.
   Context {G H: Groupoid} (F: Functor G H) (w: IsWeakEquivalence F).
-  Context (U: UnivalentGroupoid) (E: Functor G U).
+  Context (U: UnivGroupoid) (E: Functor G U).
 
   Definition Representative (y: H.(CObj)): Type :=
     {a: G.(CObj) &T H.(CHom) (F.(fobj) a) y}.

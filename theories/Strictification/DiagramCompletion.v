@@ -9,7 +9,7 @@ From Bonak.Category.Groupoid Require Import Strict.
 From Bonak.Category.Bicategory Require Import Groupoids.
 From Bonak.Category.Groupoid Require Import CompletionPseudofunctor.
 From Bonak.Category.Bicategory Require Import PseudofunctorOps LocallyDiscrete Full PathGroupoid
-  HGpd2Cat UnivGpd2Cat.
+  HGpdBicat.
 Set Primitive Projections.
 Set Universe Polymorphism.
 Unset Universe Minimization ToSet.
@@ -20,7 +20,7 @@ Module CompletionDiagrams (Tr: PropositionalTruncation).
   Module P := A.B.C.
 
   Definition completeDiagram {S: Category} (F: Functor S StrictGroupoidCat):
-    Pseudofunctor (locallyDiscrete S) HGpd2Cat :=
+    Pseudofunctor (locallyDiscrete S) HGpdBicat :=
     composePseudofunctor
       (composePseudofunctor
         (structureMapPseudofunctor (locallyDiscreteFunctor F))
@@ -28,7 +28,7 @@ Module CompletionDiagrams (Tr: PropositionalTruncation).
       (composePseudofunctor C.completionPseudofunctor
         (composePseudofunctor
           (structureMapPseudofunctor
-            (fullInclusion UnivGpd2Cat (fun G: StrictGroupoid => P.completedPaths G)))
+            (fullInclusion UnivGpdBicat (fun G: StrictGroupoid => P.completedPaths G)))
           (structureMapPseudofunctor classify))).
 
   Lemma completeDiagramObj {S: Category} (F: Functor S StrictGroupoidCat) (a: S.(CObj)):

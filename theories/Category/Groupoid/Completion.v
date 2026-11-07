@@ -23,7 +23,7 @@ Module GroupoidCompletion (T: PropositionalTruncation).
 
   Definition completionCategory (G: Groupoid): Category := Base.completionCategory G.
   Definition completionUnivalence (G: Groupoid):
-    IsUnivalentCategory (completionCategory G) := Base.completionUnivalence G.
+    IsUnivCategory (completionCategory G) := Base.completionUnivalence G.
 
   Definition representedArrowInvertible (G: Groupoid)
     (P Q: Functor (Op G) HSetCat) (a b: G.(CObj))
@@ -50,8 +50,8 @@ Module GroupoidCompletion (T: PropositionalTruncation).
       (inverse i) (inverseR i) (inverseL i)).
   Defined.
 
-  Definition completion (G: Groupoid): UnivalentGroupoid :=
-    {| underlyingGroupoid := {| gcat := completionCategory G;
+  Definition completion (G: Groupoid): UnivGroupoid :=
+    {| univGroupoid := {| groupoid := completionCategory G;
          groupoidInvertibility := completionInvertibility G |};
        groupoidUnivalence := completionUnivalence G |}.
 
@@ -70,14 +70,14 @@ End GroupoidCompletion.
 Unset Universe Minimization ToSet.
 
 (** Univalence identifies a groupoid with the paths in its object 1-type. *)
-Definition groupoidToPaths (U: UnivalentGroupoid): Functor U (pathGpd (gobj U)) := {|
+Definition groupoidToPaths (U: UnivGroupoid): Functor U (pathGpd (gobj U)) := {|
   fobj a := a;
   fhom a b f := homToId f;
   fid := homToIdId;
   fcomp a b c f g := homToIdComp f g;
 |}.
 
-Definition groupoidToPathsFullyFaithful (U: UnivalentGroupoid):
+Definition groupoidToPathsFullyFaithful (U: UnivGroupoid):
   FullyFaithful (groupoidToPaths U).
 Proof.
   intros a b. unshelve refine (@Build_IsEquiv _ _ _ _ _ _ _).
@@ -96,13 +96,13 @@ Module PathCompletion (T: PropositionalTruncation).
   Definition classifying@{g o h c +} (G: Groupoid@{g o h}): HGpd@{c} :=
     gobj (completion G).
 
-  Definition completedPaths (G: Groupoid): UnivalentGroupoid :=
+  Definition completedPaths (G: Groupoid): UnivGroupoid :=
     pathGpd (classifying G).
 
   Definition pathCompletionUnit (G: Groupoid): Functor G (completedPaths G) :=
     compFunctor (completionUnit G) (groupoidToPaths (completion G)).
 
-  Definition toPathsWeak (U: UnivalentGroupoid): IsWeakEquivalence (groupoidToPaths U).
+  Definition toPathsWeak (U: UnivGroupoid): IsWeakEquivalence (groupoidToPaths U).
   Proof.
     refine (@Build_IsWeakEquivalence U (pathGpd (gobj U)) (groupoidToPaths U)
       (groupoidToPathsFullyFaithful U) _).

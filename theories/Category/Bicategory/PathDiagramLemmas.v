@@ -5,7 +5,7 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas Funext.
 From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Bicategory Require Export PathDiagram.
-From Bonak.Category.Bicategory Require Import HGpd2Cat Pseudofunctor
+From Bonak.Category.Bicategory Require Import HGpdBicat Pseudofunctor
   LocallyDiscretePseudofunctor LocallyDiscrete.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 Set Primitive Projections.
@@ -70,8 +70,8 @@ Proof.
   pose proof (FA a b c d f g h) as H.
   unfold hom2Rew in H.
   change (hgpdAssoc (F.(phom) f) (F.(phom) g) (F.(phom) h))
-    with (@eq_refl ((Hom HGpd2Cat) (ob a) (ob d))
-            ((comp1 (B := HGpd2Cat)) ((comp1 (B := HGpd2Cat)) (F.(phom) f) (F.(phom) g))
+    with (@eq_refl ((Hom HGpdBicat) (ob a) (ob d))
+            ((comp1 (B := HGpdBicat)) ((comp1 (B := HGpdBicat)) (F.(phom) f) (F.(phom) g))
                (F.(phom) h))) in H.
   cbn [eq_sym eq_rect] in H.
   pose proof (f_equal (fun c => c X) H) as H'; clear H.
@@ -206,7 +206,7 @@ Defined.
 
 (** The axioms of a path diagram, evaluated at a point
 
-    In [HGpd2Cat] a 2-cell is a homotopy, so each axiom becomes a family of
+    In [HGpdBicat] a 2-cell is a homotopy, so each axiom becomes a family of
     equalities between composites of paths. Equalities of source arrows
     remain parameters, since any parallel paths in a source hom-set agree. *)
 
@@ -220,7 +220,7 @@ Lemma phomEqHapply {ob: C.(CObj) -> HGpd} (F: PathDiagramData C ob)
   = phomEq F P x.
 Proof. now destruct P. Defined.
 
-(** The two unit comparisons of a pseudofunctor into [HGpd2Cat], evaluated at a
+(** The two unit comparisons of a pseudofunctor into [HGpdBicat], evaluated at a
     point. Both unit axioms transport the identity 2-cell, so once the
     identification of the unit with the identity function is consumed only the
     transport along the equality of source arrows is left. *)
@@ -277,7 +277,7 @@ Lemma pcompUnitLPt {ob: C.(CObj) -> HGpd} (F: PathDiagramData C ob)
 Proof.
   intros a b f E x.
   refine (f_equal (fun c => c x) (FU a b f) • _).
-  rewrite hom2RewPt, hgpd2CatI2Pt, !fEqualSym, eq_sym_involutive.
+  rewrite hom2RewPt, hgpdBicatI2Pt, !fEqualSym, eq_sym_involutive.
   rewrite psfUnitLPt, phomEqHapply, eq_trans_refl_l.
   refine (transCongL _ (f_equal (@eq_sym _ _ _)
     (f_equal (fun e: ccomp (C.(cid) a) f = f => phomEq F e x) _))).
@@ -289,7 +289,7 @@ Lemma pcompUnitRPt {ob: C.(CObj) -> HGpd} (F: PathDiagramData C ob)
 Proof.
   intros a b f E x.
   refine (f_equal (fun c => c x) (FU a b f) • _).
-  rewrite hom2RewPt, hgpd2CatI2Pt, !fEqualSym, eq_sym_involutive.
+  rewrite hom2RewPt, hgpdBicatI2Pt, !fEqualSym, eq_sym_involutive.
   rewrite psfUnitRPt, phomEqHapply, eq_trans_refl_l.
   refine (transCongL _ (f_equal (@eq_sym _ _ _)
     (f_equal (fun e: ccomp f (C.(cid) b) = f => phomEq F e x) _))).
@@ -323,7 +323,7 @@ Lemma pathDiagramUnitLOfPt {ob: C.(CObj) -> HGpd}
   PathDiagramUnitL C ob F.
 Proof.
   intros a b f. apply functional_extensionality_dep; intro x.
-  rewrite hom2RewPt, hgpd2CatI2Pt, !fEqualSym, eq_sym_involutive.
+  rewrite hom2RewPt, hgpdBicatI2Pt, !fEqualSym, eq_sym_involutive.
   rewrite psfUnitLPt, phomEqHapply, eq_trans_refl_l.
   now exact (H a b f x).
 Qed.
@@ -336,7 +336,7 @@ Lemma pathDiagramUnitROfPt {ob: C.(CObj) -> HGpd}
   PathDiagramUnitR C ob F.
 Proof.
   intros a b f. apply functional_extensionality_dep; intro x.
-  rewrite hom2RewPt, hgpd2CatI2Pt, !fEqualSym, eq_sym_involutive.
+  rewrite hom2RewPt, hgpdBicatI2Pt, !fEqualSym, eq_sym_involutive.
   rewrite psfUnitRPt, phomEqHapply, eq_trans_refl_l.
   now exact (H a b f x).
 Qed.
@@ -352,7 +352,7 @@ Lemma pathDiagramAssocOfPt {ob: C.(CObj) -> HGpd}
 Proof.
   intros a b c d f g h. apply functional_extensionality_dep; intro x.
   rewrite hom2RewPt.
-  cbn [hgpdAssoc eq_sym f_equal HGpd2Cat comp2 whiskerL whiskerR].
+  cbn [hgpdAssoc eq_sym f_equal HGpdBicat comp2 whiskerL whiskerR].
   rewrite eq_trans_refl_l, fEqualSym, phomEqHapply.
   apply (transCancelR _ _ (phomEq F (C.(cassoc) f g h) x)).
   rewrite transSymCancelR2.

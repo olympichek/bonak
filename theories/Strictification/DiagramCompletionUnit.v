@@ -7,8 +7,8 @@ From Bonak.Lib Require Import HGpd.
 From Bonak.Category.Groupoid Require Import WeakEquivalence Strict.
 From Bonak.Strictification Require Import DiagramEvaluation DiagramDescent.
 From Bonak.Category.Groupoid Require Import CompletionPseudofunctor.
-From Bonak.Category.Bicategory Require Import HGpd2Cat BicategoryEq Pseudonatural Pseudofunctor
-  LocallyDiscrete Groupoids PseudofunctorOps Full PathGroupoid UnivGpd2Cat.
+From Bonak.Category.Bicategory Require Import HGpdBicat BicategoryEq Pseudonatural Pseudofunctor
+  LocallyDiscrete Groupoids PseudofunctorOps Full PathGroupoid.
 From Bonak.Strictification Require Import DiagramCompletion.
 From Bonak.Category.Bicategory Require Import LocallyDiscretePseudofunctor PathDiagram.
 From Stdlib Require Import Logic.FunctionalExtensionality.
@@ -25,8 +25,8 @@ Local Lemma idTo2Refl {B: Bicategory} {a b} (f: Hom B a b):
   @idTo2 B a b f f eq_refl = id2 f.
 Proof. now reflexivity. Defined.
 
-Local Lemma idTo2Ncomp {G H: UnivalentGroupoid} (F: Functor G H) (x: G.(CObj)):
-  (@idTo2 UnivGpd2Cat G H F F eq_refl).(ncomp) x = cid (F.(fobj) x).
+Local Lemma idTo2Ncomp {G H: UnivGroupoid} (F: Functor G H) (x: G.(CObj)):
+  (@idTo2 UnivGpdBicat G H F F eq_refl).(ncomp) x = cid (F.(fobj) x).
 Proof. now reflexivity. Defined.
 
 Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
@@ -46,7 +46,7 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
       f2hom2 f2id1 locallyDiscreteFunctor strictGroupoidDiscreteInclusion
       CD.C.completionPseudofunctor completionPsfData fullInclusion classify].
     rewrite discreteIdTo2, cidr.
-    cbn [idTo2 hom2Rew id2 ccomp cid HGpd2Cat hgpdHomCategory BHom ncomp compNatTrans].
+    cbn [idTo2 hom2Rew id2 ccomp cid HGpdBicat hgpdHomCategory BHom ncomp compNatTrans].
     rewrite idTo2Ncomp, homToIdId, idTo2Refl.
     now reflexivity.
   Defined.
@@ -65,7 +65,7 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
       CD.C.completionPseudofunctor completionPsfData fullInclusion classify].
     rewrite discreteIdTo2. cbn [eq_sym].
     rewrite 3 idTo2Refl. unfold id2. rewrite 2 cidl.
-    cbn [ccomp HGpd2Cat hgpdHomCategory BHom ncomp].
+    cbn [ccomp HGpdBicat hgpdHomCategory BHom ncomp].
     change ((homToId (cid ((liftFunctor (D.(fhom) g)).(fobj)
         ((liftFunctor (D.(fhom) f)).(fobj) x)))
       • homToId ((liftComposite (D.(fhom) f) (D.(fhom) g)).(ncomp) x))
@@ -215,7 +215,7 @@ End CompletionEvaluationsOn.
 Unset Keyed Unification.
 
 Local Lemma expandContractDiagram {I: Category}
-  (F: Pseudofunctor (locallyDiscrete I) HGpd2Cat):
+  (F: Pseudofunctor (locallyDiscrete I) HGpdBicat):
   expandPseudofunctor (contractPseudofunctor F) = F.
 Proof. now exact (secEq (locallyDiscretePseudofunctorEquiv I) F). Defined.
 

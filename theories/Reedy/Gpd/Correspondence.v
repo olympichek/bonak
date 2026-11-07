@@ -5,7 +5,7 @@ From Stdlib Require Import Arith.PeanoNat.
 From Bonak.Lib Require Import HSet SigT Equiv SequentialLimit FinitePrefix
   Univalence HGpd.
 From Bonak.Category Require Import Category.
-From Bonak.Category.Bicategory Require Import Bicategory HGpd2Cat PathDiagram
+From Bonak.Category.Bicategory Require Import Bicategory HGpdBicat PathDiagram
   Pseudofunctor LocallyDiscrete LocallyDiscretePseudofunctor.
 From Bonak.Presheaf Require Import νSemiShape.
 From Bonak.Reedy.Gpd Require Import Reedy Extension.
@@ -31,14 +31,14 @@ Definition comparisonData (r: ArrowData) (d: Comparisons r): PathDiagramData C O
 Definition UnitLAt (r: ArrowData) (d: Comparisons r) a: Type :=
   forall b (f: C.(CHom) a b),
     (comparisonData r d).(pcomp) (C.(cid) a) f
-    = hom2Rew (B := HGpd2Cat) (eq_sym (psfUnitL C O (comparisonData r d) f))
+    = hom2Rew (B := HGpdBicat) (eq_sym (psfUnitL C O (comparisonData r d) f))
         (eq_sym (f_equal ((comparisonData r d).(phom) (a := a) (b := b)) (C.(cidl) f)))
         (id2 ((comparisonData r d).(phom) f)).
 
 Definition UnitRAt (r: ArrowData) (d: Comparisons r) a: Type :=
   forall b (f: C.(CHom) a b),
     (comparisonData r d).(pcomp) f (C.(cid) b)
-    = hom2Rew (B := HGpd2Cat) (eq_sym (psfUnitR C O (comparisonData r d) f))
+    = hom2Rew (B := HGpdBicat) (eq_sym (psfUnitR C O (comparisonData r d) f))
         (eq_sym (f_equal ((comparisonData r d).(phom) (a := a) (b := b)) (C.(cidr) f)))
         (id2 ((comparisonData r d).(phom) f)).
 
@@ -46,7 +46,7 @@ Definition AssocAt (r: ArrowData) (d: Comparisons r) a: Type :=
   forall b c e (f: C.(CHom) a b) (g: C.(CHom) b c) (h: C.(CHom) c e),
     ((comparisonData r d).(pcomp) f g ▷ (comparisonData r d).(phom) h)
       ⨟₂ ((comparisonData r d).(pcomp) (f ⨟ g) h)
-    = hom2Rew (B := HGpd2Cat)
+    = hom2Rew (B := HGpdBicat)
         (eq_sym (hgpdAssoc ((comparisonData r d).(phom) f)
           ((comparisonData r d).(phom) g) ((comparisonData r d).(phom) h)))
         (eq_sym (f_equal ((comparisonData r d).(phom) (a := a) (b := e))
@@ -320,7 +320,7 @@ Context (A: HSet).
 
 Definition matchingSeqEquivPseudofunctor:
   Equiv (MatchingSeq (gpdSystem A))
-    (Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat) :=
+    (Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpdBicat) :=
   compEquiv (matchingSeqEquivDiagramLimit (gpdSystem A)
     (matchingExtensionLaws (gpdSystem A) (gpdLaws A)))
     (compEquiv (diagramLimitEquivPathDiagram A)
@@ -328,17 +328,17 @@ Definition matchingSeqEquivPseudofunctor:
 
 Definition matchingSeqEqPseudofunctor:
   MatchingSeq (gpdSystem A) =
-  Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpd2Cat :=
+  Pseudofunctor (locallyDiscrete (Op (νSemiShape A))) HGpdBicat :=
   ua matchingSeqEquivPseudofunctor.
 
 End Comparison.
 
 Definition simplicialMatchingSeqEqPseudofunctor:
   AugmentedSemiSimplicialGpdMatchingSeq
-  = Pseudofunctor (locallyDiscrete (Op (νSemiShape hunit))) HGpd2Cat :=
+  = Pseudofunctor (locallyDiscrete (Op (νSemiShape hunit))) HGpdBicat :=
   matchingSeqEqPseudofunctor hunit.
 
 Definition cubicalMatchingSeqEqPseudofunctor:
   SemiCubicalGpdMatchingSeq
-  = Pseudofunctor (locallyDiscrete (Op (νSemiShape hbool))) HGpd2Cat :=
+  = Pseudofunctor (locallyDiscrete (Op (νSemiShape hbool))) HGpdBicat :=
   matchingSeqEqPseudofunctor hbool.

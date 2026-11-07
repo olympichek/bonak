@@ -1,5 +1,5 @@
 (** Path diagrams over a category are equivalent to pseudofunctors from
-    its locally discrete bicategory into [HGpd2Cat].
+    its locally discrete bicategory into [HGpdBicat].
 
     The action on equality 2-cells is determined by the arrow action.
     Functional extensionality converts the unit comparison homotopies
@@ -16,25 +16,25 @@ From Stdlib Require Import Logic.FunctionalExtensionality.
 
 From Bonak.Category.Bicategory Require Import PathDiagram.
 
-From Bonak.Category.Bicategory Require Import HGpd2Cat.
+From Bonak.Category.Bicategory Require Import HGpdBicat.
 From Bonak.Category.Bicategory Require Import Pseudofunctor Pseudonatural.
 
 Set Primitive Projections.
 Set Printing Projections.
 
 Lemma idTo2Point {X Y: HGpd} {f g: X -> Y} (p: f = g) (x: X):
-  @idTo2 HGpd2Cat X Y f g p x = happly p x.
+  @idTo2 HGpdBicat X Y f g p x = happly p x.
 Proof. destruct p. reflexivity. Qed.
 
 Lemma idTo2Funext {X Y: HGpd} {f g: X -> Y} (h: forall x, f x = g x):
-  @idTo2 HGpd2Cat X Y f g (functional_extensionality_dep_good f g h) = h.
+  @idTo2 HGpdBicat X Y f g (functional_extensionality_dep_good f g h) = h.
 Proof.
   apply functional_extensionality_dep; intro x.
   rewrite idTo2Point. exact (f_equal__functional_extensionality_dep_good h x).
 Qed.
 
 Lemma funextIdTo2 {X Y: HGpd} {f g: X -> Y} (p: f = g):
-  functional_extensionality_dep_good f g (@idTo2 HGpd2Cat X Y f g p) = p.
+  functional_extensionality_dep_good f g (@idTo2 HGpdBicat X Y f g p) = p.
 Proof.
   transitivity (functional_extensionality_dep_good f g (happly p)).
   - f_equal. apply functional_extensionality_dep; intro x. apply idTo2Point.
@@ -45,31 +45,31 @@ Section LocallyDiscretePsf.
 Context (C: Category) (ob: C.(CObj) -> HGpd).
 
 Definition expandData (N: PathDiagramData C ob):
-  PsfData (locallyDiscrete C) HGpd2Cat ob :=
-  Build_PsfData (locallyDiscrete C) HGpd2Cat ob
+  PsfData (locallyDiscrete C) HGpdBicat ob :=
+  Build_PsfData (locallyDiscrete C) HGpdBicat ob
     (fun a b f => N.(phom) f)
     (fun a b f g p x => f_equal (fun w => N.(phom) w x) p)
     (fun a => idTo2 (N.(pid) a))
     (fun a b c f g => N.(pcomp) f g).
 
 Lemma expandCellPath (N: PathDiagramData C ob) {a b} {f g: C.(CHom) a b} (p: f = g):
-  (expandData N).(psCell) p = @idTo2 HGpd2Cat (ob a) (ob b) _ _ (f_equal N.(phom) p).
+  (expandData N).(psCell) p = @idTo2 HGpdBicat (ob a) (ob b) _ _ (f_equal N.(phom) p).
 Proof. destruct p. reflexivity. Qed.
 
 Lemma expandUnitPathL (N: PathDiagramData C ob) {a b} (f: C.(CHom) a b):
-  @idTo2 HGpd2Cat (ob a) (ob b) _ _ (psfUnitL C ob N f)
+  @idTo2 HGpdBicat (ob a) (ob b) _ _ (psfUnitL C ob N f)
   = bwhiskerR ((expandData N).(psUnit) a) ((expandData N).(psHom) f).
 Proof.
   unfold psfUnitL. cbn [hgpdUnitL].
-  exact (eq_sym (@idTo2WhiskerR HGpd2Cat (ob a) (ob a) (ob b) _ _ (N.(pid) a) (N.(phom) f))).
+  exact (eq_sym (@idTo2WhiskerR HGpdBicat (ob a) (ob a) (ob b) _ _ (N.(pid) a) (N.(phom) f))).
 Qed.
 
 Lemma expandUnitPathR (N: PathDiagramData C ob) {a b} (f: C.(CHom) a b):
-  @idTo2 HGpd2Cat (ob a) (ob b) _ _ (psfUnitR C ob N f)
+  @idTo2 HGpdBicat (ob a) (ob b) _ _ (psfUnitR C ob N f)
   = bwhiskerL ((expandData N).(psHom) f) ((expandData N).(psUnit) b).
 Proof.
   unfold psfUnitR. cbn [hgpdUnitR].
-  exact (eq_sym (@idTo2WhiskerL HGpd2Cat (ob a) (ob b) (ob b) (N.(phom) f) _ _ (N.(pid) b))).
+  exact (eq_sym (@idTo2WhiskerL HGpdBicat (ob a) (ob b) (ob b) (N.(phom) f) _ _ (N.(pid) b))).
 Qed.
 
 Lemma expandUnitL (N: PathDiagramData C ob):
@@ -121,14 +121,14 @@ Lemma expandAssoc (N: PathDiagramData C ob) (H: PathDiagramAssoc C ob N):
   PsfAssoc (expandData N).
 Proof.
   intros a b c d f g h.
-  pose proof (proj1 (hom2RewEquation (B := HGpd2Cat)
+  pose proof (proj1 (hom2RewEquation (B := HGpdBicat)
     (hgpdAssoc (N.(phom) f) (N.(phom) g) (N.(phom) h))
     (f_equal N.(phom) (C.(cassoc) f g h)) _ _) (H a b c d f g h)) as e.
   rewrite <- expandCellPath in e. exact e.
 Qed.
 
 Definition expandPsf (N: PathDiagram C ob):
-  Psf (locallyDiscrete C) HGpd2Cat ob.
+  Psf (locallyDiscrete C) HGpdBicat ob.
 Proof.
   refine (Build_Psf _ _ _ (expandData (pathData _ _ N)) _).
   constructor.
@@ -143,7 +143,7 @@ Proof.
   - exact (expandAssoc _ (pathAssoc _ _ N)).
 Defined.
 
-Definition contractData (F: PsfData (locallyDiscrete C) HGpd2Cat ob):
+Definition contractData (F: PsfData (locallyDiscrete C) HGpdBicat ob):
   PathDiagramData C ob :=
   Build_PathDiagramData C ob
     (fun a b f => F.(psHom) f)
@@ -159,7 +159,7 @@ Proof.
   exact (f_equal (fun unit => Build_PathDiagramData C ob h unit c) e).
 Qed.
 
-Lemma expandContractData (F: PsfData (locallyDiscrete C) HGpd2Cat ob)
+Lemma expandContractData (F: PsfData (locallyDiscrete C) HGpdBicat ob)
   (Hi: forall a b (f: C.(CHom) a b), F.(psCell) (eq_refl: f = f) = id2 (F.(psHom) f)):
   expandData (contractData F) = F.
 Proof.
@@ -172,30 +172,30 @@ Proof.
     apply functional_extensionality_dep; intro g.
     apply functional_extensionality_dep; intro e.
     destruct e. exact (eq_sym (Hi a b f)). }
-  assert (eu: (fun a => @idTo2 HGpd2Cat (ob a) (ob a) _ _
+  assert (eu: (fun a => @idTo2 HGpdBicat (ob a) (ob a) _ _
     (functional_extensionality_dep_good _ _ (u a))) = u).
   { apply functional_extensionality_dep; intro a. apply idTo2Funext. }
-  exact (f_equal2 (fun cell unit => Build_PsfData (locallyDiscrete C) HGpd2Cat ob h cell unit p) ec eu).
+  exact (f_equal2 (fun cell unit => Build_PsfData (locallyDiscrete C) HGpdBicat ob h cell unit p) ec eu).
 Qed.
 
-Definition contractPsf (F: Psf (locallyDiscrete C) HGpd2Cat ob):
+Definition contractPsf (F: Psf (locallyDiscrete C) HGpdBicat ob):
   PathDiagram C ob.
 Proof.
   pose (N := contractData F.(psData)).
   pose proof (expandContractData F.(psData) (psCellId _ F.(psLaws))) as ed.
   refine (Build_PathDiagram C ob N _ _ _).
-  - intros a b f. apply (proj2 (hom2RewEquation (B := HGpd2Cat)
+  - intros a b f. apply (proj2 (hom2RewEquation (B := HGpdBicat)
       (psfUnitL C ob N f) (f_equal N.(phom) (C.(cidl) f)) _ _)).
     rewrite expandUnitPathL, <- expandCellPath.
     pose proof (psUnitL _ F.(psLaws) a b f) as e.
     rewrite <- ed in e. exact e.
-  - intros a b f. apply (proj2 (hom2RewEquation (B := HGpd2Cat)
+  - intros a b f. apply (proj2 (hom2RewEquation (B := HGpdBicat)
       (psfUnitR C ob N f) (f_equal N.(phom) (C.(cidr) f)) _ _)).
     rewrite expandUnitPathR, <- expandCellPath.
     pose proof (psUnitR _ F.(psLaws) a b f) as e.
     rewrite <- ed in e. exact e.
   - intros a b c d f g h.
-    apply (proj2 (hom2RewEquation (B := HGpd2Cat) (hgpdAssoc (N.(phom) f) (N.(phom) g) (N.(phom) h))
+    apply (proj2 (hom2RewEquation (B := HGpdBicat) (hgpdAssoc (N.(phom) f) (N.(phom) g) (N.(phom) h))
       (f_equal N.(phom) (C.(cassoc) f g h)) _ _)).
     rewrite <- expandCellPath.
     pose proof (psAssoc _ F.(psLaws) a b c d f g h) as e.
@@ -207,34 +207,34 @@ Proof.
   apply pathDiagramEqOn. exact (contractExpandData (pathData _ _ N)).
 Qed.
 
-Lemma expandContractPsf (F: Psf (locallyDiscrete C) HGpd2Cat ob):
+Lemma expandContractPsf (F: Psf (locallyDiscrete C) HGpdBicat ob):
   expandPsf (contractPsf F) = F.
 Proof.
   apply psfEqData. exact (expandContractData F.(psData) (psCellId _ F.(psLaws))).
 Qed.
 
 Definition locallyDiscretePsfEquiv:
-  Equiv (PathDiagram C ob) (Psf (locallyDiscrete C) HGpd2Cat ob) :=
+  Equiv (PathDiagram C ob) (Psf (locallyDiscrete C) HGpdBicat ob) :=
   qinvEquiv expandPsf contractPsf contractExpandPsf expandContractPsf.
 
 End LocallyDiscretePsf.
 
 Definition expandPseudofunctor {C: Category} (F: PathDiagramFamily C):
-  Pseudofunctor (locallyDiscrete C) HGpd2Cat :=
-  Build_Pseudofunctor (locallyDiscrete C) HGpd2Cat F.(pfObj) (expandPsf C F.(pfObj) F.(pfStr)).
+  Pseudofunctor (locallyDiscrete C) HGpdBicat :=
+  Build_Pseudofunctor (locallyDiscrete C) HGpdBicat F.(pfObj) (expandPsf C F.(pfObj) F.(pfStr)).
 
-Definition contractPseudofunctor {C: Category} (F: Pseudofunctor (locallyDiscrete C) HGpd2Cat):
+Definition contractPseudofunctor {C: Category} (F: Pseudofunctor (locallyDiscrete C) HGpdBicat):
   PathDiagramFamily C :=
   Build_PathDiagramFamily C F.(psObj) (contractPsf C F.(psObj) F.(psStr)).
 
 Definition locallyDiscretePseudofunctorEquiv (C: Category):
-  Equiv (PathDiagramFamily C) (Pseudofunctor (locallyDiscrete C) HGpd2Cat).
+  Equiv (PathDiagramFamily C) (Pseudofunctor (locallyDiscrete C) HGpdBicat).
 Proof.
   refine (qinvEquiv expandPseudofunctor contractPseudofunctor _ _).
   - intros [ob F]. cbn [expandPseudofunctor contractPseudofunctor psObj psStr pfObj pfStr].
     exact (f_equal (Build_PathDiagramFamily C ob) (retEq (locallyDiscretePsfEquiv C ob) F)).
   - intros [ob F]. cbn [expandPseudofunctor contractPseudofunctor psObj psStr pfObj pfStr].
-    exact (f_equal (Build_Pseudofunctor (locallyDiscrete C) HGpd2Cat ob) (secEq (locallyDiscretePsfEquiv C ob) F)).
+    exact (f_equal (Build_Pseudofunctor (locallyDiscrete C) HGpdBicat ob) (secEq (locallyDiscretePsfEquiv C ob) F)).
 Defined.
 
 (** Pseudonatural transformations between path diagrams from their
@@ -255,7 +255,7 @@ Definition pathDiagramTransformation {C: Category}
         (pathData _ _ G.(pfStr)).(pcomp) f g (k a x))):
   Pseudonatural (expandPseudofunctor F) (expandPseudofunctor G).
 Proof.
-  refine (@Build_Pseudonatural (locallyDiscrete C) HGpd2Cat
+  refine (@Build_Pseudonatural (locallyDiscrete C) HGpdBicat
     (expandPseudofunctor F) (expandPseudofunctor G) k
     (fun a b f => Build_Iso (hgpdHomCategory (F.(pfObj) a) (G.(pfObj) b)) _ _
       (n a b f) (hgpdLocallyGroupoid _ _ _ _ (n a b f))) _ _ _).
@@ -264,10 +264,10 @@ Proof.
     now apply eq_trans_refl_l.
   - intro a. apply functional_extensionality_dep. intro x.
     change (f_equal (k a)
-      (@idTo2 HGpd2Cat (F.(pfObj) a) (F.(pfObj) a) _ _
+      (@idTo2 HGpdBicat (F.(pfObj) a) (F.(pfObj) a) _ _
         ((pathData _ _ F.(pfStr)).(pid) a) x) =
       n a a (C.(cid) a) x •
-        @idTo2 HGpd2Cat (G.(pfObj) a) (G.(pfObj) a) _ _
+        @idTo2 HGpdBicat (G.(pfObj) a) (G.(pfObj) a) _ _
           ((pathData _ _ G.(pfStr)).(pid) a) (k a x)).
     rewrite 2 idTo2Point. now apply nu.
   - intros a b c f g. apply functional_extensionality_dep. intro x.

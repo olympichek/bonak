@@ -3,14 +3,14 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import Funext Equiv RewLemmas Notation HSet.
 From Bonak.Lib Require Import HGpd.
-From Bonak.Category.Bicategory Require Import HGpd2Cat Pseudonatural.
+From Bonak.Category.Bicategory Require Import HGpdBicat Pseudonatural.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
 
 Local Lemma hgpdPsfDataEq {S: Bicategory} {ob: S.(BObj) -> HGpd}
-  (F G: PsfData S HGpd2Cat ob)
+  (F G: PsfData S HGpdBicat ob)
   (n: forall a b (f: Hom S a b) x, F.(psHom) f x = G.(psHom) f x)
   (nc: forall a b (f g: Hom S a b) (α: Hom2 f g) x,
     F.(psCell) α x • n a b g x = n a b f x • G.(psCell) α x)
@@ -41,9 +41,9 @@ Proof.
 Defined.
 
 Local Lemma hgpdPsfIdentityEq {S: Bicategory} {ob: S.(BObj) -> HGpd}
-  (F G: Psf S HGpd2Cat ob)
-  (α: Pseudonatural (Build_Pseudofunctor S HGpd2Cat ob F)
-    (Build_Pseudofunctor S HGpd2Cat ob G))
+  (F G: Psf S HGpdBicat ob)
+  (α: Pseudonatural (Build_Pseudofunctor S HGpdBicat ob F)
+    (Build_Pseudofunctor S HGpdBicat ob G))
   (e: forall a x, α.(pnComponent) a x = x): F = G.
 Proof.
   destruct α as [k n nc nu np]. cbn [pnComponent] in e.
@@ -66,16 +66,16 @@ Proof.
 Defined.
 
 Definition hgpdPseudofunctorEq {S: Bicategory}
-  {F G: Pseudofunctor S HGpd2Cat} (α: Pseudonatural F G)
+  {F G: Pseudofunctor S HGpdBicat} (α: Pseudonatural F G)
   (e: forall a, IsEquiv (α.(pnComponent) a)): F = G.
 Proof.
   destruct F as [ob F], G as [ob' G].
   pose (E := fun a => Build_Equiv (ob a) (ob' a) (α.(pnComponent) a) (e a)).
-  enough (H: forall (G: Psf S HGpd2Cat ob')
-    (α: Pseudonatural (Build_Pseudofunctor S HGpd2Cat ob F)
-      (Build_Pseudofunctor S HGpd2Cat ob' G)),
+  enough (H: forall (G: Psf S HGpdBicat ob')
+    (α: Pseudonatural (Build_Pseudofunctor S HGpdBicat ob F)
+      (Build_Pseudofunctor S HGpdBicat ob' G)),
     (forall a x, α.(pnComponent) a x = E a x) ->
-    Build_Pseudofunctor S HGpd2Cat ob F = Build_Pseudofunctor S HGpd2Cat ob' G).
+    Build_Pseudofunctor S HGpdBicat ob F = Build_Pseudofunctor S HGpdBicat ob' G).
   { now exact (H G α (fun a x => eq_refl)). }
   clearbody E. clear α e G.
   revert ob' E. refine (hgpdFamilyEquivInd ob _ _).

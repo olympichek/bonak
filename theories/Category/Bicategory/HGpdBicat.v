@@ -36,7 +36,7 @@ Proof. rewrite f_equal_compose. now apply eq_sym, eq_trans_refl_l. Defined.
 
 (** The bicategory of 1-types, functions, and homotopies. Its coherence
     laws follow pointwise from path composition and congruence. *)
-Definition HGpd2Cat: Bicategory := {|
+Definition HGpdBicat: Bicategory := {|
   BObj := HGpd;
   BHom := hgpdHomCategory;
   bid a := fun x => x;
@@ -76,7 +76,7 @@ Local Lemma homotopyInverseL {X: Type} {x y: X} (p: x = y):
   eq_sym p • p = eq_refl.
 Proof. now destruct p. Defined.
 
-Definition hgpdLocallyGroupoid: IsLocallyGroupoid HGpd2Cat :=
+Definition hgpdLocallyGroupoid: IsLocallyGroupoid HGpdBicat :=
   fun X Y f g α =>
     @Build_IsInvertible (hgpdHomCategory X Y) f g α (fun x => eq_sym (α x))
       (functional_extensionality_dep _ _ (fun x => homotopyInverseR (α x)))
@@ -90,39 +90,39 @@ Definition hgpdUnitR {X Y: HGpd} (f: X -> Y):
 Definition hgpdAssoc {X Y Z W: HGpd} (f: X -> Y) (g: Y -> Z) (h: Z -> W):
   (fun x => h (g (f x))) = (fun x => h (g (f x))) := eq_refl.
 
-(** Evaluating transport of a 2-cell of [HGpd2Cat] at a point. *)
+(** Evaluating transport of a 2-cell of [HGpdBicat] at a point. *)
 
 Lemma hom2RewPt {X Y: HGpd} {f f' g g': X -> Y} (p: f = f') (q: g = g')
   (α: forall x: X, f x = g x) (x: X):
-  @hom2Rew HGpd2Cat X Y f f' g g' p q α x
+  @hom2Rew HGpdBicat X Y f f' g g' p q α x
   = eq_sym (f_equal (fun h => h x) p) • (α x • f_equal (fun h => h x) q).
 Proof. destruct p, q; simpl. now destruct (α x). Defined.
 
-(** Pointwise computation of transport, identities and whiskering in [HGpd2Cat]. *)
+(** Pointwise computation of transport, identities and whiskering in [HGpdBicat]. *)
 
-Lemma rewC2Pt {a d: HGpd} {U V V': (@Hom HGpd2Cat) a d} (q: V = V')
-  (β: (Hom2 (B := HGpd2Cat)) U V) (X: a):
-  (rew [fun v: (@Hom HGpd2Cat) a d => (Hom2 (B := HGpd2Cat)) U v] q in β) X
-  = β X • f_equal (fun w: (@Hom HGpd2Cat) a d => w X) q.
+Lemma rewC2Pt {a d: HGpd} {U V V': (@Hom HGpdBicat) a d} (q: V = V')
+  (β: (Hom2 (B := HGpdBicat)) U V) (X: a):
+  (rew [fun v: (@Hom HGpdBicat) a d => (Hom2 (B := HGpdBicat)) U v] q in β) X
+  = β X • f_equal (fun w: (@Hom HGpdBicat) a d => w X) q.
 Proof. now destruct q. Defined.
 
-Lemma hgpd2CatI2Pt {X Y: HGpd} (g: X -> Y) (x: X):
-  @id2 HGpd2Cat X Y g x = eq_refl.
+Lemma hgpdBicatI2Pt {X Y: HGpd} (g: X -> Y) (x: X):
+  @id2 HGpdBicat X Y g x = eq_refl.
 Proof. now reflexivity. Defined.
 
-Lemma psfUnitLAlgebra {X Y: HGpd} (g: (@Hom HGpd2Cat) X Y)
-  {u: (@Hom HGpd2Cat) X X} {c: (@Hom HGpd2Cat) X Y}
-  (P: u = (id1 (B := HGpd2Cat)) X) (K: (comp1 (B := HGpd2Cat)) ((id1 (B := HGpd2Cat)) X) g = c) (x: X):
+Lemma psfUnitLAlgebra {X Y: HGpd} (g: (@Hom HGpdBicat) X Y)
+  {u: (@Hom HGpdBicat) X X} {c: (@Hom HGpdBicat) X Y}
+  (P: u = (id1 (B := HGpdBicat)) X) (K: (comp1 (B := HGpdBicat)) ((id1 (B := HGpdBicat)) X) g = c) (x: X):
   f_equal (fun h: X -> Y => h x)
-    (f_equal (fun v: (@Hom HGpd2Cat) X X => (comp1 (B := HGpd2Cat)) v g) P • K)
+    (f_equal (fun v: (@Hom HGpdBicat) X X => (comp1 (B := HGpdBicat)) v g) P • K)
   = f_equal g (f_equal (fun h: X -> X => h x) P)
     • f_equal (fun h: X -> Y => h x) K.
 Proof. destruct K, P. now reflexivity. Defined.
 
-Lemma psfUnitRAlgebra {X Y: HGpd} (g: (@Hom HGpd2Cat) X Y)
-  {u: (@Hom HGpd2Cat) Y Y} {c: (@Hom HGpd2Cat) X Y}
-  (P: u = (id1 (B := HGpd2Cat)) Y) (K: (comp1 (B := HGpd2Cat)) g ((id1 (B := HGpd2Cat)) Y) = c) (x: X):
-  f_equal (fun h: X -> Y => h x) (f_equal (@comp1 HGpd2Cat X Y Y g) P • K)
+Lemma psfUnitRAlgebra {X Y: HGpd} (g: (@Hom HGpdBicat) X Y)
+  {u: (@Hom HGpdBicat) Y Y} {c: (@Hom HGpdBicat) X Y}
+  (P: u = (id1 (B := HGpdBicat)) Y) (K: (comp1 (B := HGpdBicat)) g ((id1 (B := HGpdBicat)) Y) = c) (x: X):
+  f_equal (fun h: X -> Y => h x) (f_equal (@comp1 HGpdBicat X Y Y g) P • K)
   = f_equal (fun h: Y -> Y => h (g x)) P
     • f_equal (fun h: X -> Y => h x) K.
 Proof. destruct K, P. now reflexivity. Defined.

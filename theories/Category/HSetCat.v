@@ -62,6 +62,6 @@ Proof.
   rewrite setIdToIsoPoint. now apply hsetEqRew.
 Qed.
 
-Definition hsetCategoryUnivalence: IsUnivalentCategory HSetCat :=
+Definition hsetCategoryUnivalence: IsUnivCategory HSetCat :=
   fun A B => equivFibers (qinvEquiv (@idToIso HSetCat A B) (@setIsoPath A B)
     setIsoPathRet setIsoPathSec).
