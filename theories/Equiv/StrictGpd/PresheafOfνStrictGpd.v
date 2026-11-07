@@ -32,10 +32,10 @@ Definition νDepsCohs2At {m} {Xpre: (νStrictGpdAt m).(prefix)}
 |}.
 
 Definition νTotal {m} {Xpre: (νStrictGpdAt m).(prefix)} (X: νStrictGpdFrom m Xpre):
-  HSetGroupoid := total (this X).
+  StrictGroupoid := total (this X).
 
 Fixpoint gF0 {m} {Xpre: (νStrictGpdAt m).(prefix)} (X: νStrictGpdFrom m Xpre)
-  (n: nat): HSetGroupoid :=
+  (n: nat): StrictGroupoid :=
   match n with
   | 0 => νTotal X
   | S n => gF0 (next X) n
@@ -181,7 +181,7 @@ Proof.
   rewrite (νFaceCoh
     ((chain2Down (νDepsCohs2At X) (m - q)).2.2.2)
     ((chain2Down (chain2Down (νDepsCohs2At X) (m - q)).2.2.1 (q - r)).2.2.2) ε ω).
-  apply (functorEqPath (νTotal X).(hsetGroupoidUIP)).
+  apply (functorEqPath (νTotal X).(groupoidStrictness)).
   unshelve econstructor; now intros.
 Defined.
 

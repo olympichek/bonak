@@ -5,7 +5,7 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Truncation.
 From Bonak.Category Require Import Category Groupoid.
 From Bonak.Category.Bicategory Require Import Bicategory Pseudofunctor Groupoids Full UnivGpd2Cat.
-From Bonak.Category.Groupoid Require Import SetBased Descent Completion Precomposition.
+From Bonak.Category.Groupoid Require Import Strict Descent Completion Precomposition.
 Set Keyed Unification.
 Set Primitive Projections.
 Set Universe Polymorphism.
@@ -19,7 +19,7 @@ Module CompletionBicategories (T: PropositionalTruncation).
   Unset Keyed Unification.
 
   Definition CompletionHomBicat: Bicategory :=
-    fullBicategory UnivGpd2Cat (fun G: HSetGroupoid => C.completedPaths G).
+    fullBicategory UnivGpd2Cat (fun G: StrictGroupoid => C.completedPaths G).
 End CompletionBicategories.
 
 Module CompletionAction (T: PropositionalTruncation).
@@ -31,29 +31,29 @@ Module CompletionAction (T: PropositionalTruncation).
   Local Opaque completedPaths pathCompletionUnit descend descentUnit extendNat.
   Set Universe Polymorphism.
 
-  Definition liftFunctor {G H: HSetGroupoid} (F: Functor G H):
+  Definition liftFunctor {G H: StrictGroupoid} (F: Functor G H):
     Functor (completedPaths G) (completedPaths H) :=
     descend (pathCompletionUnit G) (pathCompletionUnitWeak G) (completedPaths H)
       (compFunctor F (pathCompletionUnit H)).
 
-  Definition liftUnit {G H: HSetGroupoid} (F: Functor G H):
+  Definition liftUnit {G H: StrictGroupoid} (F: Functor G H):
     NatTrans (compFunctor F (pathCompletionUnit H))
       (compFunctor (pathCompletionUnit G) (liftFunctor F)) :=
     descentUnit (pathCompletionUnit G) (pathCompletionUnitWeak G) (completedPaths H)
       (compFunctor F (pathCompletionUnit H)).
 
-  Definition liftNatSource {G H: HSetGroupoid} {F F': Functor G H} (α: NatTrans F F'):
+  Definition liftNatSource {G H: StrictGroupoid} {F F': Functor G H} (α: NatTrans F F'):
     NatTrans (compFunctor (pathCompletionUnit G) (liftFunctor F))
       (compFunctor (pathCompletionUnit G) (liftFunctor F')) :=
     compNatTrans (natInv (liftUnit F))
       (compNatTrans (whiskerRNat α (pathCompletionUnit H)) (liftUnit F')).
 
-  Definition liftNat {G H: HSetGroupoid} {F F': Functor G H} (α: NatTrans F F'):
+  Definition liftNat {G H: StrictGroupoid} {F F': Functor G H} (α: NatTrans F F'):
     NatTrans (liftFunctor F) (liftFunctor F') :=
     extendNat (pathCompletionUnit G) (pathCompletionUnitWeak G) (completedPaths H)
       (liftFunctor F) (liftFunctor F') (liftNatSource α).
 
-  Lemma liftNatAt {G H: HSetGroupoid} {F F': Functor G H} (α: NatTrans F F')
+  Lemma liftNatAt {G H: StrictGroupoid} {F F': Functor G H} (α: NatTrans F F')
     (a: G.(CObj)):
     (liftNat α).(ncomp) ((pathCompletionUnit G).(fobj) a) =
       conjugateArrow ((liftUnit F).(ncomp) a) ((liftUnit F').(ncomp) a)
@@ -64,7 +64,7 @@ Module CompletionAction (T: PropositionalTruncation).
         (liftFunctor F) (liftFunctor F') (liftNatSource α))).
   Qed.
 
-  Lemma liftNatComm {G H: HSetGroupoid} {F F': Functor G H} (α: NatTrans F F')
+  Lemma liftNatComm {G H: StrictGroupoid} {F F': Functor G H} (α: NatTrans F F')
     (a: G.(CObj)):
     (liftUnit F).(ncomp) a ⨟ (liftNat α).(ncomp) ((pathCompletionUnit G).(fobj) a)
     = (pathCompletionUnit H).(fhom) (α.(ncomp) a) ⨟ (liftUnit F').(ncomp) a.
@@ -73,19 +73,19 @@ Module CompletionAction (T: PropositionalTruncation).
     now rewrite <- cassoc, ginvR, cidl.
   Qed.
 
-  Definition liftIdentitySource (G: HSetGroupoid):
+  Definition liftIdentitySource (G: StrictGroupoid):
     NatTrans (compFunctor (pathCompletionUnit G) (liftFunctor (idFunctor G)))
       (compFunctor (pathCompletionUnit G) (idFunctor (completedPaths G))) := {|
     ncomp := (natInv (liftUnit (idFunctor G))).(ncomp);
     nnat a b f := (natInv (liftUnit (idFunctor G))).(nnat) f;
   |}.
 
-  Definition liftIdentity (G: HSetGroupoid):
+  Definition liftIdentity (G: StrictGroupoid):
     NatTrans (liftFunctor (idFunctor G)) (idFunctor (completedPaths G)) :=
     extendNat (pathCompletionUnit G) (pathCompletionUnitWeak G) (completedPaths G)
       _ _ (liftIdentitySource G).
 
-  Lemma liftIdentityAt (G: HSetGroupoid) (a: G.(CObj)):
+  Lemma liftIdentityAt (G: StrictGroupoid) (a: G.(CObj)):
     (liftIdentity G).(ncomp) ((pathCompletionUnit G).(fobj) a)
     = ginv ((liftUnit (idFunctor G)).(ncomp) a).
   Proof.
@@ -94,7 +94,7 @@ Module CompletionAction (T: PropositionalTruncation).
         _ _ (liftIdentitySource G))).
   Qed.
 
-  Definition liftCompositeUnit {G H K: HSetGroupoid} (F: Functor G H) (E: Functor H K):
+  Definition liftCompositeUnit {G H K: StrictGroupoid} (F: Functor G H) (E: Functor H K):
     NatTrans (compFunctor (compFunctor F E) (pathCompletionUnit K))
       (compFunctor (pathCompletionUnit G) (compFunctor (liftFunctor F) (liftFunctor E))).
   Proof.
@@ -113,17 +113,17 @@ Module CompletionAction (T: PropositionalTruncation).
     now apply eq_sym, cassoc.
   Defined.
 
-  Definition liftCompositeSource {G H K: HSetGroupoid} (F: Functor G H) (E: Functor H K):
+  Definition liftCompositeSource {G H K: StrictGroupoid} (F: Functor G H) (E: Functor H K):
     NatTrans (compFunctor (pathCompletionUnit G) (compFunctor (liftFunctor F) (liftFunctor E)))
       (compFunctor (pathCompletionUnit G) (liftFunctor (compFunctor F E))) :=
     compNatTrans (natInv (liftCompositeUnit F E)) (liftUnit (compFunctor F E)).
 
-  Definition liftComposite {G H K: HSetGroupoid} (F: Functor G H) (E: Functor H K):
+  Definition liftComposite {G H K: StrictGroupoid} (F: Functor G H) (E: Functor H K):
     NatTrans (compFunctor (liftFunctor F) (liftFunctor E)) (liftFunctor (compFunctor F E)) :=
     extendNat (pathCompletionUnit G) (pathCompletionUnitWeak G) (completedPaths K)
       _ _ (liftCompositeSource F E).
 
-  Lemma liftCompositeAt {G H K: HSetGroupoid} (F: Functor G H) (E: Functor H K) (a: G.(CObj)):
+  Lemma liftCompositeAt {G H K: StrictGroupoid} (F: Functor G H) (E: Functor H K) (a: G.(CObj)):
     (liftComposite F E).(ncomp) ((pathCompletionUnit G).(fobj) a)
     = ginv ((liftCompositeUnit F E).(ncomp) a) ⨟ (liftUnit (compFunctor F E)).(ncomp) a.
   Proof.
@@ -132,13 +132,13 @@ Module CompletionAction (T: PropositionalTruncation).
         _ _ (liftCompositeSource F E))).
   Qed.
 
-  Lemma liftCompositeComm {G H K: HSetGroupoid} (F: Functor G H) (E: Functor H K) (a: G.(CObj)):
+  Lemma liftCompositeComm {G H K: StrictGroupoid} (F: Functor G H) (E: Functor H K) (a: G.(CObj)):
     (liftCompositeUnit F E).(ncomp) a
       ⨟ (liftComposite F E).(ncomp) ((pathCompletionUnit G).(fobj) a)
     = (liftUnit (compFunctor F E)).(ncomp) a.
   Proof. rewrite liftCompositeAt, <- cassoc, ginvR. now apply cidl. Qed.
 
-  Lemma liftNatIdentity {G H: HSetGroupoid} (F: Functor G H):
+  Lemma liftNatIdentity {G H: StrictGroupoid} (F: Functor G H):
     liftNat (idNatTrans F) = idNatTrans (liftFunctor F).
   Proof.
     apply (precomposeFaithful (pathCompletionUnit G) (pathCompletionUnitWeak G) (completedPaths H)).
@@ -149,7 +149,7 @@ Module CompletionAction (T: PropositionalTruncation).
     rewrite (pathCompletionUnit H).(fid). now apply conjugateId.
   Qed.
 
-  Lemma liftNatCompose {G H: HSetGroupoid} {F F' F'': Functor G H}
+  Lemma liftNatCompose {G H: StrictGroupoid} {F F' F'': Functor G H}
     (α: NatTrans F F') (β: NatTrans F' F''):
     liftNat (compNatTrans α β) = compNatTrans (liftNat α) (liftNat β).
   Proof.
@@ -164,7 +164,7 @@ Module CompletionAction (T: PropositionalTruncation).
     now apply eq_sym, conjugateComp.
   Qed.
 
-  Lemma liftCompositeNatL {G H K: HSetGroupoid} (F: Functor G H)
+  Lemma liftCompositeNatL {G H K: StrictGroupoid} (F: Functor G H)
     {E E': Functor H K} (α: NatTrans E E'):
     compNatTrans (whiskerLNat (liftFunctor F) (liftNat α)) (liftComposite F E')
     = compNatTrans (liftComposite F E) (liftNat (whiskerLNat F α)).
@@ -206,7 +206,7 @@ Module CompletionAction (T: PropositionalTruncation).
         • liftNatComm (whiskerLNat F α) a).
   Qed.
 
-  Lemma liftCompositeNatR {G H K: HSetGroupoid} {F F': Functor G H}
+  Lemma liftCompositeNatR {G H K: StrictGroupoid} {F F': Functor G H}
     (α: NatTrans F F') (E: Functor H K):
     compNatTrans (whiskerRNat (liftNat α) (liftFunctor E)) (liftComposite F' E)
     = compNatTrans (liftComposite F E) (liftNat (whiskerRNat α E)).
@@ -257,8 +257,8 @@ Module CompletionAction (T: PropositionalTruncation).
         • liftNatComm (whiskerRNat α E) a).
   Qed.
 
-  Definition completionPsfData: PsfData HSetGroupoidBicat B.CompletionHomBicat (fun G => G) :=
-    @Build_PsfData HSetGroupoidBicat B.CompletionHomBicat (fun G => G)
+  Definition completionPsfData: PsfData StrictGroupoidBicat B.CompletionHomBicat (fun G => G) :=
+    @Build_PsfData StrictGroupoidBicat B.CompletionHomBicat (fun G => G)
       (fun G H F => liftFunctor F) (fun G H F F' α => liftNat α)
       liftIdentity (fun G H K F E => liftComposite F E).
 End CompletionAction.

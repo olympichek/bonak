@@ -19,7 +19,7 @@ Module Export LT := LayerTheory A.
 Fixpoint mkFrameTypes p k: Type :=
   match p with
   | 0 => unit
-  | S p => { frames: mkFrameTypes p k.+1 &T HSetGroupoid }
+  | S p => { frames: mkFrameTypes p k.+1 &T StrictGroupoid }
   end.
 
 Fixpoint mkPaintingTypes p k: mkFrameTypes p k -> Type :=
@@ -98,7 +98,7 @@ Definition mkFrames `(deps: DepsRestr p k): mkFrameTypes p.+1 k :=
   (mkRestrFrameTypesAndFrames
     deps.(_paintings)).(FrameDef) deps.(_restrFrames).
 
-Definition mkFrame `(deps: DepsRestr p k): HSetGroupoid := (mkFrames deps).2.
+Definition mkFrame `(deps: DepsRestr p k): StrictGroupoid := (mkFrames deps).2.
 
 Inductive DepsRestrExtension p: forall k, DepsRestr p k -> Type :=
 | TopRestrDep {deps} (E: Family (mkFrame deps)): DepsRestrExtension p 0 deps

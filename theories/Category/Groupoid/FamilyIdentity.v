@@ -8,7 +8,7 @@ Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
 
-Record FamilyIso {G: HSetGroupoid} {E P: Family G} := {
+Record FamilyIso {G: StrictGroupoid} {E P: Family G} := {
   fisoObj: forall x, Equiv (E.(dobj) x) (P.(dobj) x);
   fisoHom: forall x y (a: E.(dobj) x) (b: E.(dobj) y),
     Equiv (E.(dhom) a b) (P.(dhom) (fisoObj x a) (fisoObj y b));
@@ -23,19 +23,19 @@ Record FamilyIso {G: HSetGroupoid} {E P: Family G} := {
 }.
 Arguments FamilyIso {G} E P.
 
-Definition familyIsoTotal {G: HSetGroupoid} {E P: Family G} (e: FamilyIso E P):
-  HSetGroupoidIso (total E) (total P) :=
-  @Build_HSetGroupoidIso (total E) (total P) (sigTEquivSnd e.(fisoObj))
+Definition familyIsoTotal {G: StrictGroupoid} {E P: Family G} (e: FamilyIso E P):
+  StrictGroupoidIso (total E) (total P) :=
+  @Build_StrictGroupoidIso (total E) (total P) (sigTEquivSnd e.(fisoObj))
     (fun a b => e.(fisoHom) a.1 b.1 a.2 b.2)
     (fun a => e.(fisoId) a.1 a.2)
     (fun a b c f g => e.(fisoComp) a.1 b.1 c.1 a.2 b.2 c.2 f g).
 
-Definition idFamilyIso {G: HSetGroupoid} (E: Family G): FamilyIso E E :=
+Definition idFamilyIso {G: StrictGroupoid} (E: Family G): FamilyIso E E :=
   @Build_FamilyIso G E E (fun _ => idEquiv) (fun _ _ _ _ => idEquiv)
     (fun _ _ _ _ _ => eq_refl) (fun _ _ => eq_refl)
     (fun _ _ _ _ _ _ _ _ => eq_refl).
 
-Definition familyIsoInd {G: HSetGroupoid} (E: Family G)
+Definition familyIsoInd {G: StrictGroupoid} (E: Family G)
   (Q: forall P: Family G, FamilyIso E P -> Type)
   (q: Q E (idFamilyIso E)) (P: Family G) (e: FamilyIso E P): Q P e.
 Proof.
@@ -102,31 +102,31 @@ Proof.
   rewrite qeb, qei, qec. now exact q.
 Defined.
 
-Definition familyIsoContr {G: HSetGroupoid} (E P: Family G) (e: FamilyIso E P):
+Definition familyIsoContr {G: StrictGroupoid} (E P: Family G) (e: FamilyIso E P):
   existT (fun R => FamilyIso E R) E (idFamilyIso E) = (P; e) :=
   familyIsoInd E (fun P e =>
     existT (fun R => FamilyIso E R) E (idFamilyIso E) = (P; e)) eq_refl P e.
 
-Definition familyEq {G: HSetGroupoid} {E P: Family G} (e: FamilyIso E P): E = P :=
+Definition familyEq {G: StrictGroupoid} {E P: Family G} (e: FamilyIso E P): E = P :=
   projT1_eq (familyIsoContr E P e).
 
-Lemma familyEqIso {G: HSetGroupoid} {E P: Family G} (e: FamilyIso E P):
+Lemma familyEqIso {G: StrictGroupoid} {E P: Family G} (e: FamilyIso E P):
   rew [FamilyIso E] (familyEq e) in idFamilyIso E = e.
 Proof. now exact (projT2_eq (familyIsoContr E P e)). Qed.
 
-Definition familyPathTotal {G: HSetGroupoid} {E P: Family G} (p: E = P):
+Definition familyPathTotal {G: StrictGroupoid} {E P: Family G} (p: E = P):
   Functor (total E) (total P) :=
   rew [fun R => Functor (total E) (total R)] p in idFunctor (total E).
 
-Lemma totalFamilyPath {G: HSetGroupoid} {E P: Family G} (q: E = P):
+Lemma totalFamilyPath {G: StrictGroupoid} {E P: Family G} (q: E = P):
   transportGroupoidFunctor (f_equal total q) = familyPathTotal q.
 Proof. now destruct q. Defined.
 
-Local Lemma familyIsoRewTotal {G: HSetGroupoid} {E P: Family G} (p: E = P):
+Local Lemma familyIsoRewTotal {G: StrictGroupoid} {E P: Family G} (p: E = P):
   familyPathTotal p =
-    hsetGroupoidIsoFunctor (familyIsoTotal (rew [FamilyIso E] p in idFamilyIso E)).
+    strictGroupoidIsoFunctor (familyIsoTotal (rew [FamilyIso E] p in idFamilyIso E)).
 Proof. now destruct p. Qed.
 
-Lemma familyEqTotalFunctor {G: HSetGroupoid} {E P: Family G} (e: FamilyIso E P):
-  familyPathTotal (familyEq e) = hsetGroupoidIsoFunctor (familyIsoTotal e).
+Lemma familyEqTotalFunctor {G: StrictGroupoid} {E P: Family G} (e: FamilyIso E P):
+  familyPathTotal (familyEq e) = strictGroupoidIsoFunctor (familyIsoTotal e).
 Proof. rewrite familyIsoRewTotal. now rewrite familyEqIso. Qed.

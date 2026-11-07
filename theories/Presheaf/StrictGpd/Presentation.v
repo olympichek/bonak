@@ -2,14 +2,14 @@
     Face exchange is equality of composite functors. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation LeSProp.
-From Bonak.Category.Groupoid Require Import SetBased.
+From Bonak.Category.Groupoid Require Import Strict.
 Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
 Unset Universe Minimization ToSet.
 
 Record νStrictGpdPresentation {arity: HSet} := {
-  G0: nat -> HSetGroupoid;
+  G0: nat -> StrictGroupoid;
   GFace n q (Hq: q <= n) (ε: arity): Functor (G0 n.+1) (G0 n);
   GFaceCoh n q (Hq: q <= n) r (Hr: r <= q) (ε ω: arity):
     GFace n.+1 r (Hr ↕ (↑ Hq)) ω ⨟ᶠ GFace n q Hq ε =

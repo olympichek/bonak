@@ -13,7 +13,7 @@ Unset Universe Minimization ToSet.
 
 Lemma presheafEqIntro {A: HSet} (P Q: νStrictGpdPresentation A)
   (e0: P.(G0) = Q.(G0))
-  (e1: rew [fun G0: nat -> HSetGroupoid =>
+  (e1: rew [fun G0: nat -> StrictGroupoid =>
     forall n q (Hq: q <= n) (ε: A), Functor (G0 (S n)) (G0 n)] e0 in
       P.(GFace) = Q.(GFace)):
   P = Q.
@@ -28,7 +28,7 @@ Proof.
   apply spropFunext; intro Hr.
   apply functional_extensionality_dep; intro ε.
   apply functional_extensionality_dep; intro ω.
-  now apply (hsetFunctorSet (Po n.+2) (Po n)).(UIP).
+  now apply (strictGroupoidFunctorSet (Po n.+2) (Po n)).(UIP).
 Defined.
 
 Lemma ofToFunctor {A: HSet} (P: νStrictGpdPresentation A):
@@ -42,7 +42,7 @@ Proof.
   now exact (categoryApplyWGen (pshStr P) n q Hq ε).
 Defined.
 
-Lemma toOfFunctor {A: HSet} (F: Functor (Op (νSemiShape A)) HSetGroupoidCat):
+Lemma toOfFunctor {A: HSet} (F: Functor (Op (νSemiShape A)) StrictGroupoidCat):
   toFunctor (ofFunctor F) = F.
 Proof.
   refine (functorEq (toFunctor (ofFunctor F)) F eq_refl _).

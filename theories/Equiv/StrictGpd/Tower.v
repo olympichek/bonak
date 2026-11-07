@@ -16,7 +16,7 @@ Definition νDataAt {m} (Xpre: (νStrictGpdAt m).(prefix)): νStrictGpdData m :=
 Definition νTowerDeps {n} (Xpre: (νStrictGpdAt n).(prefix)): DepsRestr n 0 :=
   toDepsRestr (νDataAt Xpre).(restrFrames).
 
-Definition νFrame {n} (Xpre: (νStrictGpdAt n).(prefix)): HSetGroupoid :=
+Definition νFrame {n} (Xpre: (νStrictGpdAt n).(prefix)): StrictGroupoid :=
   mkFrame (νTowerDeps Xpre).
 
 Definition νFillerType {n} (Xpre: (νStrictGpdAt n).(prefix)): Type := Family (νFrame Xpre).
@@ -28,7 +28,7 @@ Definition prefixDepsCohs {n} (Xp: (νStrictGpdAt n.+1).(prefix)): DepsCohs n 0 
   _cohs := (νDataAt Xp.1).(cohFrames) Xp.2;
 |}.
 
-Definition νTotalGpd {n} (Xp: (νStrictGpdAt n.+1).(prefix)): HSetGroupoid := total Xp.2.
+Definition νTotalGpd {n} (Xp: (νStrictGpdAt n.+1).(prefix)): StrictGroupoid := total Xp.2.
 
 Definition νStrictGpdPack (m: nat) (X: νStrictGpds):
   {Xp: (νStrictGpdAt m).(prefix) &T νStrictGpdFrom m Xp} := limitPack m X.

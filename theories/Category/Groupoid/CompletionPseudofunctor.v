@@ -2,7 +2,7 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Truncation.
 From Bonak.Category Require Import Category Groupoid.
 From Bonak.Category.Bicategory Require Import Bicategory Pseudofunctor Groupoids.
-From Bonak.Category.Groupoid Require Import SetBased Descent CompletionAction Precomposition.
+From Bonak.Category.Groupoid Require Import Strict Descent CompletionAction Precomposition.
 Set Primitive Projections.
 Set Universe Polymorphism.
 
@@ -28,7 +28,7 @@ Module CompletionUnits (T: PropositionalTruncation).
     (u: G.(CHom) a b) (f: G.(CHom) a c): u ⨟ (ginv u ⨟ f) = f.
   Proof. rewrite <- cassoc, ginvR. now apply cidl. Qed.
 
-  Lemma liftUnitLawL {G H: HSetGroupoid} (F: Functor G H):
+  Lemma liftUnitLawL {G H: StrictGroupoid} (F: Functor G H):
     compNatTrans (liftComposite (idFunctor G) F) (liftNat (functorUnitL F))
     = compNatTrans (whiskerRNat (liftIdentity G) (liftFunctor F)) (functorUnitL (liftFunctor F)).
   Proof.
@@ -61,7 +61,7 @@ Module CompletionUnits (T: PropositionalTruncation).
         ((liftUnit F).(ncomp) a)).
   Qed.
 
-  Lemma liftUnitLawR {G H: HSetGroupoid} (F: Functor G H):
+  Lemma liftUnitLawR {G H: StrictGroupoid} (F: Functor G H):
     compNatTrans (liftComposite F (idFunctor H)) (liftNat (functorUnitR F))
     = compNatTrans (whiskerLNat (liftFunctor F) (liftIdentity H)) (functorUnitR (liftFunctor F)).
   Proof.
@@ -108,12 +108,12 @@ Module CompletionAssociativity (T: PropositionalTruncation).
   Set Universe Polymorphism.
   Local Opaque completedPaths pathCompletionUnit descend descentUnit extendNat.
 
-  Definition liftTripleUnit {G H K L: HSetGroupoid}
+  Definition liftTripleUnit {G H K L: StrictGroupoid}
     (F: Functor G H) (E: Functor H K) (J: Functor K L) (a: G.(CObj)) :=
     (liftUnit J).(ncomp) (E.(fobj) (F.(fobj) a))
       ⨟ (liftFunctor J).(fhom) ((liftCompositeUnit F E).(ncomp) a).
 
-  Lemma liftTripleLeft {G H K L: HSetGroupoid}
+  Lemma liftTripleLeft {G H K L: StrictGroupoid}
     (F: Functor G H) (E: Functor H K) (J: Functor K L) (a: G.(CObj)):
     liftTripleUnit F E J a
       ⨟ (liftFunctor J).(fhom) ((liftComposite F E).(ncomp) ((pathCompletionUnit G).(fobj) a))
@@ -127,7 +127,7 @@ Module CompletionAssociativity (T: PropositionalTruncation).
       ⨟ (liftFunctor J).(fhom) v) (liftCompositeComm F E a)).
   Qed.
 
-  Lemma liftTripleRight {G H K L: HSetGroupoid}
+  Lemma liftTripleRight {G H K L: StrictGroupoid}
     (F: Functor G H) (E: Functor H K) (J: Functor K L) (a: G.(CObj)):
     liftTripleUnit F E J a
       ⨟ (liftComposite E J).(ncomp) ((liftFunctor F).(fobj) ((pathCompletionUnit G).(fobj) a))
@@ -151,7 +151,7 @@ Module CompletionAssociativity (T: PropositionalTruncation).
       (liftCompositeComm E J (F.(fobj) a))).
   Qed.
 
-  Lemma liftAssociativity {G H K L: HSetGroupoid}
+  Lemma liftAssociativity {G H K L: StrictGroupoid}
     (F: Functor G H) (E: Functor H K) (J: Functor K L):
     compNatTrans
       (compNatTrans (whiskerRNat (liftComposite F E) (liftFunctor J)) (liftComposite (compFunctor F E) J))
@@ -198,7 +198,7 @@ Module CompletionPseudofunctor (T: PropositionalTruncation).
 
   Definition completionPsfLaws: PsfLaws completionPsfData.
   Proof.
-    refine (@Build_PsfLaws HSetGroupoidBicat B.CompletionHomBicat (fun G => G)
+    refine (@Build_PsfLaws StrictGroupoidBicat B.CompletionHomBicat (fun G => G)
       completionPsfData _ _ _ _ _ _ _ _ _).
     - intro G. now apply natInvertible.
     - intros G H K F E. now apply natInvertible.
@@ -211,7 +211,7 @@ Module CompletionPseudofunctor (T: PropositionalTruncation).
     - intros G H K L F E J. now apply liftAssociativity.
   Defined.
 
-  Definition completionPseudofunctor: Pseudofunctor HSetGroupoidBicat B.CompletionHomBicat :=
-    @Build_Pseudofunctor HSetGroupoidBicat B.CompletionHomBicat (fun G => G)
-      (@Build_Psf HSetGroupoidBicat B.CompletionHomBicat (fun G => G) completionPsfData completionPsfLaws).
+  Definition completionPseudofunctor: Pseudofunctor StrictGroupoidBicat B.CompletionHomBicat :=
+    @Build_Pseudofunctor StrictGroupoidBicat B.CompletionHomBicat (fun G => G)
+      (@Build_Psf StrictGroupoidBicat B.CompletionHomBicat (fun G => G) completionPsfData completionPsfLaws).
 End CompletionPseudofunctor.

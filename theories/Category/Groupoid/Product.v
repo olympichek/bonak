@@ -6,7 +6,7 @@ Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
 
-Definition pairFunctor {X G H: HSetGroupoid} (F: Functor X G) (L: Functor X H):
+Definition pairFunctor {X G H: StrictGroupoid} (F: Functor X G) (L: Functor X H):
   Functor X (total (const G H)).
 Proof.
   refine {| fobj := fun x => (F.(fobj) x; L.(fobj) x);
@@ -15,12 +15,12 @@ Proof.
   - intros x y z f g. cbn. now rewrite F.(fcomp), L.(fcomp).
 Defined.
 
-Lemma pairComp {W X G H: HSetGroupoid} (R: Functor W X)
+Lemma pairComp {W X G H: StrictGroupoid} (R: Functor W X)
   (F: Functor X G) (L: Functor X H):
   R ⨟ᶠ pairFunctor F L ≐ pairFunctor (R ⨟ᶠ F) (R ⨟ᶠ L).
 Proof. unshelve econstructor; now intros. Defined.
 
-Local Lemma castPairArrow {G H: HSetGroupoid} {x x' y y': G} {a a' b b': H}
+Local Lemma castPairArrow {G H: StrictGroupoid} {x x' y y': G} {a a' b b': H}
   (p: x = x') (q: a = a') (r: y = y') (s: b = b')
   (f: G.(CHom) x y) (g: H.(CHom) a b):
   castArrow (G := total (const G H))
@@ -28,7 +28,7 @@ Local Lemma castPairArrow {G H: HSetGroupoid} {x x' y y': G} {a a' b b': H}
   (castArrow p r f, castArrow q s g).
 Proof. now destruct p, q, r, s. Defined.
 
-Definition pairCongr {X G H: HSetGroupoid}
+Definition pairCongr {X G H: StrictGroupoid}
   {F F': Functor X G} {L L': Functor X H} (e: F ≐ F') (h: L ≐ L'):
   pairFunctor F L ≐ pairFunctor F' L'.
 Proof.
@@ -42,18 +42,18 @@ Proof.
 Defined.
 
 (** The second component's arrow lies over the first component's base arrow. *)
-Definition familyProduct {G: HSetGroupoid} (E P: Family G): Family G :=
+Definition familyProduct {G: StrictGroupoid} (E P: Family G): Family G :=
   sigma E (reindex P (proj E)).
 
-Definition productFst {G: HSetGroupoid} (E P: Family G):
+Definition productFst {G: StrictGroupoid} (E P: Family G):
   Map (familyProduct E P) E (idFunctor G) := sigmaFst E (reindex P (proj E)).
 
-Definition productSnd {G: HSetGroupoid} (E P: Family G):
+Definition productSnd {G: StrictGroupoid} (E P: Family G):
   Map (familyProduct E P) P (idFunctor G) :=
   Build_Map (fun x a => a.2) (fun x y a b f => f.2.1)
     (fun _ _ => eq_refl) (fun _ _ _ _ _ _ _ _ => eq_refl) (fun _ _ _ _ f => f.2.2).
 
-Definition productPair {G H: HSetGroupoid} {D: Family G} {E P: Family H}
+Definition productPair {G H: StrictGroupoid} {D: Family G} {E P: Family H}
   {F: Functor G H} (m: Map D E F) (n: Map D P F): Map D (familyProduct E P) F.
 Proof.
   refine (Build_Map (fun x a => (m.(mobj) x a; n.(mobj) x a))
@@ -67,10 +67,10 @@ Proof.
   - intros. now apply m.(mbase).
 Defined.
 
-Local Definition observeProduct {G: HSetGroupoid} (E P: Family G) :=
+Local Definition observeProduct {G: StrictGroupoid} (E P: Family G) :=
   pairFunctor (totalMap (productFst E P)) (totalMap (productSnd E P)).
 
-Local Lemma observeProductObj {G: HSetGroupoid} (E P: Family G)
+Local Lemma observeProductObj {G: StrictGroupoid} (E P: Family G)
   (x y: total (familyProduct E P)):
   (observeProduct E P).(fobj) x = (observeProduct E P).(fobj) y -> x = y.
 Proof.
@@ -84,7 +84,7 @@ Proof.
   now destruct ha, hb.
 Defined.
 
-Local Lemma observeProductHom {G: HSetGroupoid} (E P: Family G)
+Local Lemma observeProductHom {G: StrictGroupoid} (E P: Family G)
   (x y: total (familyProduct E P)) (f g: (total (familyProduct E P)).(CHom) x y):
   (observeProduct E P).(fhom) f = (observeProduct E P).(fhom) g -> f = g.
 Proof.
@@ -93,22 +93,22 @@ Proof.
   - now exact (f_equal snd h).
 Defined.
 
-Lemma productExt {X G: HSetGroupoid} (E P: Family G)
+Lemma productExt {X G: StrictGroupoid} (E P: Family G)
   (F L: Functor X (total (familyProduct E P)))
   (h: F ⨟ᶠ totalMap (productFst E P) ≐ L ⨟ᶠ totalMap (productFst E P))
   (k: F ⨟ᶠ totalMap (productSnd E P) ≐ L ⨟ᶠ totalMap (productSnd E P)): F ≐ L.
 Proof.
   apply (cancelObservation (observeProduct E P)
-    (@hsetGroupoidUIP (total (const (total E) (total P))))
+    (@groupoidStrictness (total (const (total E) (total P))))
     (observeProductObj E P) (observeProductHom E P)).
   now exact (pairComp F _ _ •ᶠ (pairCongr h k •ᶠ feqSym (pairComp L _ _))).
 Defined.
 
 (** The base and fiber projections jointly determine maps into a pullback. *)
-Local Definition observeReindex {G H: HSetGroupoid} (E: Family H) (S: Functor G H) :=
+Local Definition observeReindex {G H: StrictGroupoid} (E: Family H) (S: Functor G H) :=
   pairFunctor (proj (reindex E S)) (reindexTotal E S).
 
-Local Lemma observeReindexObj {G H: HSetGroupoid} (E: Family H) (S: Functor G H)
+Local Lemma observeReindexObj {G H: StrictGroupoid} (E: Family H) (S: Functor G H)
   (x y: total (reindex E S)):
   (observeReindex E S).(fobj) x = (observeReindex E S).(fobj) y -> x = y.
 Proof.
@@ -119,7 +119,7 @@ Proof.
     (f_equal (fun z: total (const G (total E)) => z.2) h)).
 Defined.
 
-Local Lemma observeReindexHom {G H: HSetGroupoid} (E: Family H) (S: Functor G H)
+Local Lemma observeReindexHom {G H: StrictGroupoid} (E: Family H) (S: Functor G H)
   (x y: total (reindex E S)) (f g: (total (reindex E S)).(CHom) x y):
   (observeReindex E S).(fhom) f = (observeReindex E S).(fhom) g -> f = g.
 Proof.
@@ -128,13 +128,13 @@ Proof.
   - now exact (f_equal snd h).
 Defined.
 
-Lemma reindexExt {X G H: HSetGroupoid} (E: Family H) (S: Functor G H)
+Lemma reindexExt {X G H: StrictGroupoid} (E: Family H) (S: Functor G H)
   (F L: Functor X (total (reindex E S)))
   (hb: F ⨟ᶠ proj _ ≐ L ⨟ᶠ proj _)
   (hc: F ⨟ᶠ reindexTotal E S ≐ L ⨟ᶠ reindexTotal E S): F ≐ L.
 Proof.
   apply (cancelObservation (observeReindex E S)
-    (@hsetGroupoidUIP (total (const G (total E))))
+    (@groupoidStrictness (total (const G (total E))))
     (observeReindexObj E S) (observeReindexHom E S)).
   unfold observeReindex.
   now exact (pairComp F _ _ •ᶠ (pairCongr hb hc •ᶠ feqSym (pairComp L _ _))).
@@ -143,7 +143,7 @@ Defined.
 (** Reindexed composites preserve a displayed square. The fiber equality
     follows the transport hexagon; uniqueness of object paths fills its
     base coherence. *)
-Definition reindexMapEq {X Y Z G H K: HSetGroupoid}
+Definition reindexMapEq {X Y Z G H K: StrictGroupoid}
   {E: Family G} {P: Family H} {Q: Family K}
   {r r': Functor G H} {s s': Functor H K}
   (m: Map E P r) (m': Map E P r') (n: Map P Q s) (n': Map P Q s')

@@ -4,7 +4,7 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Truncation Notation Funext RewLemmas Equiv.
 From Bonak.Category Require Import Category Groupoid.
 From Bonak.Lib Require Import HGpd.
-From Bonak.Category.Groupoid Require Import WeakEquivalence SetBased.
+From Bonak.Category.Groupoid Require Import WeakEquivalence Strict.
 From Bonak.Strictification Require Import DiagramEvaluation DiagramDescent.
 From Bonak.Category.Groupoid Require Import CompletionPseudofunctor.
 From Bonak.Category.Bicategory Require Import HGpd2Cat BicategoryEq Pseudonatural Pseudofunctor
@@ -34,16 +34,16 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
   Module W := WeakEquivalences Tr.
   Import CD CD.A CD.P.
 
-  Lemma completeDiagramPsUnit: forall {S: Category} (D: Functor S HSetGroupoidCat) (a: S.(CObj))
+  Lemma completeDiagramPsUnit: forall {S: Category} (D: Functor S StrictGroupoidCat) (a: S.(CObj))
     (x: P.classifying (D.(fobj) a)),
     (psfData (completeDiagram D)).(psUnit) a x =
-    homToId ((liftNat (@idTo2 HSetGroupoidBicat _ _ _ _ (D.(fid) a))).(ncomp) x)
+    homToId ((liftNat (@idTo2 StrictGroupoidBicat _ _ _ _ (D.(fid) a))).(ncomp) x)
     • homToId ((liftIdentity (D.(fobj) a)).(ncomp) x).
   Proof.
     intros S D a x.
     cbn [completeDiagram composePseudofunctor composePsfData psfData psObj psStr
       psData psUnit psCell structureMapPseudofunctor structureMapData f2obj f2hom
-      f2hom2 f2id1 locallyDiscreteFunctor hsetGroupoidDiscreteInclusion
+      f2hom2 f2id1 locallyDiscreteFunctor strictGroupoidDiscreteInclusion
       CD.C.completionPseudofunctor completionPsfData fullInclusion classify].
     rewrite discreteIdTo2, cidr.
     cbn [idTo2 hom2Rew id2 ccomp cid HGpd2Cat hgpdHomCategory BHom ncomp compNatTrans].
@@ -51,17 +51,17 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
     now reflexivity.
   Defined.
 
-  Lemma completeDiagramPsComp: forall {S: Category} (D: Functor S HSetGroupoidCat)
+  Lemma completeDiagramPsComp: forall {S: Category} (D: Functor S StrictGroupoidCat)
     {a b c: S.(CObj)} (f: S.(CHom) a b) (g: S.(CHom) b c)
     (x: P.classifying (D.(fobj) a)),
     (psfData (completeDiagram D)).(psComp) f g x =
     homToId ((liftComposite (D.(fhom) f) (D.(fhom) g)).(ncomp) x)
-    • homToId ((liftNat (@idTo2 HSetGroupoidBicat _ _ _ _ (eq_sym (D.(fcomp) f g)))).(ncomp) x).
+    • homToId ((liftNat (@idTo2 StrictGroupoidBicat _ _ _ _ (eq_sym (D.(fcomp) f g)))).(ncomp) x).
   Proof.
     intros S D a b c f g x.
     cbn [completeDiagram composePseudofunctor composePsfData psfData psObj psStr
       psData psComp psCell structureMapPseudofunctor structureMapData f2obj f2hom
-      f2hom2 f2comp1 locallyDiscreteFunctor hsetGroupoidDiscreteInclusion
+      f2hom2 f2comp1 locallyDiscreteFunctor strictGroupoidDiscreteInclusion
       CD.C.completionPseudofunctor completionPsfData fullInclusion classify].
     rewrite discreteIdTo2. cbn [eq_sym].
     rewrite 3 idTo2Refl. unfold id2. rewrite 2 cidl.
@@ -69,10 +69,10 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
     change ((homToId (cid ((liftFunctor (D.(fhom) g)).(fobj)
         ((liftFunctor (D.(fhom) f)).(fobj) x)))
       • homToId ((liftComposite (D.(fhom) f) (D.(fhom) g)).(ncomp) x))
-      • homToId ((liftNat (@idTo2 HSetGroupoidBicat _ _ _ _
+      • homToId ((liftNat (@idTo2 StrictGroupoidBicat _ _ _ _
         (eq_sym (D.(fcomp) f g)))).(ncomp) x)
       = homToId ((liftComposite (D.(fhom) f) (D.(fhom) g)).(ncomp) x)
-      • homToId ((liftNat (@idTo2 HSetGroupoidBicat _ _ _ _
+      • homToId ((liftNat (@idTo2 StrictGroupoidBicat _ _ _ _
         (eq_sym (D.(fcomp) f g)))).(ncomp) x)).
     now rewrite homToIdId, eq_trans_refl_l.
   Defined.
@@ -84,13 +84,13 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
       • @homToIdToHom (pathGpd A) x y p).
   Defined.
 
-  Local Lemma hsetPathImage {G H: HSetGroupoid} {F K: Functor G H}
+  Local Lemma hsetPathImage {G H: StrictGroupoid} {F K: Functor G H}
     (p: F = K) (x: G) (E: Functor H (pathGpd (P.classifying H))):
-    E.(fhom) ((@idTo2 HSetGroupoidBicat G H F K p).(ncomp) x)
+    E.(fhom) ((@idTo2 StrictGroupoidBicat G H F K p).(ncomp) x)
     = f_equal E.(fobj) (f_equal (fun L: Functor G H => L.(fobj) x) p).
   Proof. destruct p. now apply E.(fid). Defined.
 
-  Definition completionEvaluationFunctor {S: Category} (D: Functor S HSetGroupoidCat) (a: S.(CObj)):
+  Definition completionEvaluationFunctor {S: Category} (D: Functor S StrictGroupoidCat) (a: S.(CObj)):
     Functor (D.(fobj) a) (pathGpd ((contractPseudofunctor (completeDiagram D)).(pfObj) a)) :=
     @Build_Functor (D.(fobj) a)
       (pathGpd ((contractPseudofunctor (completeDiagram D)).(pfObj) a))
@@ -99,7 +99,7 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
       (pathCompletionUnit (D.(fobj) a)).(fid)
       (fun x y z u v => (pathCompletionUnit (D.(fobj) a)).(fcomp) u v).
 
-  Definition completionEvaluationNaturality {S: Category} (D: Functor S HSetGroupoidCat)
+  Definition completionEvaluationNaturality {S: Category} (D: Functor S StrictGroupoidCat)
     {a b: S.(CObj)} (f: S.(CHom) a b):
     NatTrans (D.(fhom) f ⨟ᶠ completionEvaluationFunctor D b)
       (completionEvaluationFunctor D a ⨟ᶠ pathFunctor ((psfData (completeDiagram D)).(psHom) f)).
@@ -119,7 +119,7 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
       (pathFunctorFhom (liftFunctor (D.(fhom) f)) ((pathCompletionUnit (D.(fobj) a)).(fhom) u))).
   Defined.
 
-  Lemma completionEvaluationUnit {S: Category} (D: Functor S HSetGroupoidCat)
+  Lemma completionEvaluationUnit {S: Category} (D: Functor S StrictGroupoidCat)
     (a: S.(CObj)) (x: D.(fobj) a):
     (completionEvaluationNaturality D (S.(cid) a)).(ncomp) x
     • f_equal (fun k => k ((completionEvaluationFunctor D a).(fobj) x))
@@ -138,31 +138,31 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
     rewrite completeDiagramPsUnit, 2 homToIdPath.
     refine (eq_sym (eqTransAssoc
     ((liftUnit (D.(fhom) (S.(cid) a))).(ncomp) x)
-    ((liftNat (@idTo2 HSetGroupoidBicat _ _ _ _ (D.(fid) a))).(ncomp)
+    ((liftNat (@idTo2 StrictGroupoidBicat _ _ _ _ (D.(fid) a))).(ncomp)
       ((pathCompletionUnit (D.(fobj) a)).(fobj) x))
     ((liftIdentity (D.(fobj) a)).(ncomp) ((pathCompletionUnit (D.(fobj) a)).(fobj) x))) • _).
     refine (f_equal (fun p => p • (liftIdentity (D.(fobj) a)).(ncomp)
     ((pathCompletionUnit (D.(fobj) a)).(fobj) x))
-    (liftNatComm (@idTo2 HSetGroupoidBicat _ _ _ _ (D.(fid) a)) x) • _).
+    (liftNatComm (@idTo2 StrictGroupoidBicat _ _ _ _ (D.(fid) a)) x) • _).
     refine (f_equal (fun q => ((pathCompletionUnit (D.(fobj) a)).(fhom)
-    ((@idTo2 HSetGroupoidBicat _ _ _ _ (D.(fid) a)).(ncomp) x)
+    ((@idTo2 StrictGroupoidBicat _ _ _ _ (D.(fid) a)).(ncomp) x)
     ⨟ (liftUnit (idFunctor (D.(fobj) a))).(ncomp) x) ⨟ q)
     (liftIdentityAt (D.(fobj) a) x) • _).
     refine ((completedPaths (D.(fobj) a)).(cassoc)
     ((pathCompletionUnit (D.(fobj) a)).(fhom)
-    ((@idTo2 HSetGroupoidBicat _ _ _ _ (D.(fid) a)).(ncomp) x))
+    ((@idTo2 StrictGroupoidBicat _ _ _ _ (D.(fid) a)).(ncomp) x))
     ((liftUnit (idFunctor (D.(fobj) a))).(ncomp) x)
     (ginv ((liftUnit (idFunctor (D.(fobj) a))).(ncomp) x)) • _).
     refine (f_equal (fun q => (pathCompletionUnit (D.(fobj) a)).(fhom)
-    ((@idTo2 HSetGroupoidBicat _ _ _ _ (D.(fid) a)).(ncomp) x) ⨟ q)
+    ((@idTo2 StrictGroupoidBicat _ _ _ _ (D.(fid) a)).(ncomp) x) ⨟ q)
     (ginvR ((liftUnit (idFunctor (D.(fobj) a))).(ncomp) x)) • _).
     refine ((completedPaths (D.(fobj) a)).(cidr)
     ((pathCompletionUnit (D.(fobj) a)).(fhom)
-    ((@idTo2 HSetGroupoidBicat _ _ _ _ (D.(fid) a)).(ncomp) x)) • _).
+    ((@idTo2 StrictGroupoidBicat _ _ _ _ (D.(fid) a)).(ncomp) x)) • _).
     now exact (hsetPathImage (D.(fid) a) x (pathCompletionUnit (D.(fobj) a))).
   Defined.
 
-  Lemma completionEvaluationComp {S: Category} (D: Functor S HSetGroupoidCat)
+  Lemma completionEvaluationComp {S: Category} (D: Functor S StrictGroupoidCat)
     {a b c: S.(CObj)} (f: S.(CHom) a b) (g: S.(CHom) b c) (x: D.(fobj) a):
     f_equal (completionEvaluationFunctor D c).(fobj)
       (f_equal (fun F: Functor (D.(fobj) a) (D.(fobj) c) => F.(fobj) x) (D.(fcomp) f g))
@@ -186,18 +186,18 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
     rewrite <- (eqTransAssoc ((liftCompositeUnit (D.(fhom) f) (D.(fhom) g)).(ncomp) x)).
     refine (f_equal (fun t => f_equal (pathCompletionUnit (D.(fobj) c)).(fobj)
         (f_equal (fun F: Functor (D.(fobj) a) (D.(fobj) c) => F.(fobj) x) (D.(fcomp) f g))
-        • (t • (liftNat (@idTo2 HSetGroupoidBicat _ _ _ _ (eq_sym (D.(fcomp) f g)))).(ncomp)
+        • (t • (liftNat (@idTo2 StrictGroupoidBicat _ _ _ _ (eq_sym (D.(fcomp) f g)))).(ncomp)
           ((pathCompletionUnit (D.(fobj) a)).(fobj) x)))
       (liftCompositeComm (D.(fhom) f) (D.(fhom) g) x) • _).
     refine (f_equal (fun t => f_equal (pathCompletionUnit (D.(fobj) c)).(fobj)
         (f_equal (fun F: Functor (D.(fobj) a) (D.(fobj) c) => F.(fobj) x) (D.(fcomp) f g)) • t)
-      (liftNatComm (@idTo2 HSetGroupoidBicat _ _ _ _ (eq_sym (D.(fcomp) f g))) x) • _).
+      (liftNatComm (@idTo2 StrictGroupoidBicat _ _ _ _ (eq_sym (D.(fcomp) f g))) x) • _).
     rewrite hsetPathImage.
     rewrite <- 2 eq_sym_map_distr.
     now apply transSymCancelL.
   Defined.
 
-  Definition completionEvaluation {S: Category} (D: Functor S HSetGroupoidCat):
+  Definition completionEvaluation {S: Category} (D: Functor S StrictGroupoidCat):
     DiagramEvaluation D (contractPseudofunctor (completeDiagram D)) :=
     @Build_DiagramEvaluation S D (contractPseudofunctor (completeDiagram D))
       (completionEvaluationFunctor D)
@@ -205,7 +205,7 @@ Module CompletionEvaluationsOn (Tr: PropositionalTruncation)
       (completionEvaluationUnit D)
       (fun a b c f g x => completionEvaluationComp D f g x).
 
-  Definition completionEvaluationWeak {S: Category} (D: Functor S HSetGroupoidCat)
+  Definition completionEvaluationWeak {S: Category} (D: Functor S StrictGroupoidCat)
     (a: S.(CObj)): W.IsWeakEquivalence ((completionEvaluation D).(evalFunctor) a) :=
     P.pathCompletionUnitWeak (D.(fobj) a).
 End CompletionEvaluationsOn.
@@ -227,7 +227,7 @@ Module CompletionComparisonsOn (Tr: PropositionalTruncation)
   Module W := WeakEquivalences Tr.
   Import W.
 
-  Definition completeDiagramEq {I: Category} (F: Functor I HSetGroupoidCat)
+  Definition completeDiagramEq {I: Category} (F: Functor I StrictGroupoidCat)
     (X: PathDiagramFamily I) (Q: DiagramEvaluation F X)
     (wQ: forall i, IsWeakEquivalence (Q.(evalFunctor) i)):
     D.completeDiagram F = expandPseudofunctor X.

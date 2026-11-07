@@ -360,12 +360,35 @@ Proof.
   repeat (apply functional_extensionality_dep; intro). apply contrProp.
 Qed.
 
-(** A category whose objects have unique paths, whose isomorphisms relate
-    only equal objects, and whose automorphisms are identities, is
-    univalent. *)
+Record UnivalentCategory := {
+  univalentCategory:> Category;
+  categoryUnivalence: IsUnivalentCategory univalentCategory;
+}.
+
+(** A category is strict when its objects form an h-set. *)
+
+Definition IsStrictCategory (C: Category): Type :=
+  forall (a b: C.(CObj)) (p q: a = b), p = q.
+
+Lemma isStrictCategoryProp {C} (u v: IsStrictCategory C): u = v.
+Proof.
+  repeat (apply functional_extensionality_dep; intro).
+  now apply (eq_hprop_UIP (u _ _)).
+Qed.
+
+Record StrictCategory := {
+  strictCategory:> Category;
+  categoryStrictness: IsStrictCategory strictCategory;
+}.
+
+Definition strictCategoryObjects (C: StrictCategory): HSet :=
+  {| Dom := C.(CObj); UIP := C.(categoryStrictness) |}.
+
+(** A strict category whose isomorphisms relate only equal objects, and
+    whose automorphisms are identities, is univalent. *)
 
 Lemma categoryUnivalenceFromIdentityIsos (C: Category)
-  (objUIP: forall (a b: C.(CObj)) (p q: a = b), p = q)
+  (s: IsStrictCategory C)
   (isoPath: forall a b, Iso C a b -> a = b)
   (isoEndo: forall a (i: Iso C a a), i.(isoHom) = cid a):
   IsUnivalentCategory C.
@@ -375,15 +398,10 @@ Proof.
   { intros b' p; destruct p; intro g. apply isoEq.
     now exact (eq_sym (isoEndo a g)). }
   exists (isoPath a b f; h b _ f). intros [q e].
-  destruct (objUIP a b (isoPath a b f) q).
+  destruct (s a b (isoPath a b f) q).
   refine (eq_existT_curried eq_refl _).
   now apply (isoSet C a b).(UIP).
 Defined.
-
-Record UnivalentCategory := {
-  univalentCategory:> Category;
-  categoryUnivalence: IsUnivalentCategory univalentCategory;
-}.
 
 Definition idToIsoEquiv {C: Category} (u: IsUnivalentCategory C)
   (a b: C.(CObj)): Equiv (a = b) (Iso C a b).

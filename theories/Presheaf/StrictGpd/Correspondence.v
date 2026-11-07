@@ -7,18 +7,18 @@ Set Universe Polymorphism.
 Unset Universe Minimization ToSet.
 
 Definition pshEquivFunctor (A: HSet):
-  Equiv (νStrictGpdPresentation A) (Functor (Op (νSemiShape A)) HSetGroupoidCat) :=
+  Equiv (νStrictGpdPresentation A) (Functor (Op (νSemiShape A)) StrictGroupoidCat) :=
   qinvEquiv toFunctor ofFunctor ofToFunctor toOfFunctor.
 
 Definition pshEqFunctor (A: HSet):
-  νStrictGpdPresentation A = Functor (Op (νSemiShape A)) HSetGroupoidCat :=
+  νStrictGpdPresentation A = Functor (Op (νSemiShape A)) StrictGroupoidCat :=
   ua (pshEquivFunctor A).
 
 Definition simplicialPresheafEqFunctor:
   AugmentedSemiSimplicialStrictGpdPresentation
-  = Functor (Op (νSemiShape hunit)) HSetGroupoidCat :=
+  = Functor (Op (νSemiShape hunit)) StrictGroupoidCat :=
   pshEqFunctor hunit.
 
 Definition cubicalPresheafEqFunctor:
-  SemiCubicalStrictGpdPresentation = Functor (Op (νSemiShape hbool)) HSetGroupoidCat :=
+  SemiCubicalStrictGpdPresentation = Functor (Op (νSemiShape hbool)) StrictGroupoidCat :=
   pshEqFunctor hbool.

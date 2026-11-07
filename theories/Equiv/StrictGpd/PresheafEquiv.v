@@ -11,28 +11,28 @@ Set Universe Polymorphism.
 Unset Universe Minimization ToSet.
 
 Record PresheafIso {A: HSet} {P Q: νStrictGpdPresentation A} := {
-  G0Iso n: HSetGroupoidIso (P.(G0) n) (Q.(G0) n);
+  G0Iso n: StrictGroupoidIso (P.(G0) n) (Q.(G0) n);
   GFaceIso n q (Hq: q <= n) (ε: A):
-    P.(GFace) n q Hq ε ⨟ᶠ hsetGroupoidIsoFunctor (G0Iso n) ≐
-    hsetGroupoidIsoFunctor (G0Iso n.+1) ⨟ᶠ Q.(GFace) n q Hq ε;
+    P.(GFace) n q Hq ε ⨟ᶠ strictGroupoidIsoFunctor (G0Iso n) ≐
+    strictGroupoidIsoFunctor (G0Iso n.+1) ⨟ᶠ Q.(GFace) n q Hq ε;
 }.
 Arguments PresheafIso {A} P Q.
 
 (** Isomorphism induction applies to a whole family of levels at once. *)
-Local Definition levelIsoInd (G: nat -> HSetGroupoid)
-  (P: forall H: nat -> HSetGroupoid,
-    (forall n, HSetGroupoidIso (G n) (H n)) -> Type)
-  (h: P G (fun n => idHSetGroupoidIso (G n)))
-  (H: nat -> HSetGroupoid) (e: forall n, HSetGroupoidIso (G n) (H n)): P H e.
+Local Definition levelIsoInd (G: nat -> StrictGroupoid)
+  (P: forall H: nat -> StrictGroupoid,
+    (forall n, StrictGroupoidIso (G n) (H n)) -> Type)
+  (h: P G (fun n => idStrictGroupoidIso (G n)))
+  (H: nat -> StrictGroupoid) (e: forall n, StrictGroupoidIso (G n) (H n)): P H e.
 Proof.
   assert (paths: forall n,
-    ((G n; idHSetGroupoidIso (G n)): {K: HSetGroupoid &T HSetGroupoidIso (G n) K}) =
+    ((G n; idStrictGroupoidIso (G n)): {K: StrictGroupoid &T StrictGroupoidIso (G n) K}) =
     (H n; e n)).
-  { intro n. now refine (hsetGroupoidIsoInd (G n)
-      (fun K e => (G n; idHSetGroupoidIso (G n)) = (K; e)) eq_refl (H n) (e n)). }
+  { intro n. now refine (strictGroupoidIsoInd (G n)
+      (fun K e => (G n; idStrictGroupoidIso (G n)) = (K; e)) eq_refl (H n) (e n)). }
   pose (p := functional_extensionality_dep_good _ _ paths).
-  now exact (@eq_rect (forall n, {K: HSetGroupoid &T HSetGroupoidIso (G n) K})
-    (fun n => (G n; idHSetGroupoidIso (G n)))
+  now exact (@eq_rect (forall n, {K: StrictGroupoid &T StrictGroupoidIso (G n) K})
+    (fun n => (G n; idStrictGroupoidIso (G n)))
     (fun z => P (fun n => (z n).1) (fun n => (z n).2)) h
     (fun n => (H n; e n)) p).
 Defined.
@@ -48,8 +48,8 @@ Proof.
       Qf n.+1 r (Hr ↕ (↑ Hq)) ω ⨟ᶠ Qf n q Hq ε =
       Qf n.+1 q.+1 (⇑ Hq) ε ⨟ᶠ Qf n r (Hr ↕ Hq) ω),
     (forall n q (Hq: q <= n) (ε: A),
-      P.(GFace) n q Hq ε ⨟ᶠ hsetGroupoidIsoFunctor (eo n) ≐
-      hsetGroupoidIsoFunctor (eo n.+1) ⨟ᶠ Qf n q Hq ε) ->
+      P.(GFace) n q Hq ε ⨟ᶠ strictGroupoidIsoFunctor (eo n) ≐
+      strictGroupoidIsoFunctor (eo n.+1) ⨟ᶠ Qf n q Hq ε) ->
     P = {| G0 := Qo; GFace := Qf; GFaceCoh := Qc |}) _ Qo eo).
   intros Qf Qc ef.
   refine (presheafEqIntro P {| G0 := P.(G0); GFace := Qf; GFaceCoh := Qc |}
@@ -58,6 +58,6 @@ Proof.
   apply functional_extensionality_dep; intro q.
   apply spropFunext; intro Hq.
   apply functional_extensionality_dep; intro ε.
-  apply (functorEqPath (P.(G0) n).(hsetGroupoidUIP)).
+  apply (functorEqPath (P.(G0) n).(groupoidStrictness)).
   now exact (Build_FunctorEq (ef n q Hq ε).(objEq) (ef n q Hq ε).(homEq)).
 Defined.

@@ -1,7 +1,7 @@
 (** Translations between strict groupoid face presentations and presheaves. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation LeSProp.
-From Bonak.Category.Groupoid Require Export SetBased.
+From Bonak.Category.Groupoid Require Export Strict.
 From Bonak.Presheaf Require Import νSemiShape CategoryAction.
 From Bonak.Presheaf.StrictGpd Require Export Presentation.
 Set Primitive Projections.
@@ -10,20 +10,20 @@ Set Universe Polymorphism.
 Unset Universe Minimization ToSet.
 
 Definition pshStr {A: HSet} (P: νStrictGpdPresentation A):
-  CategoryFaceStr A HSetGroupoidCat :=
-  @Build_CategoryFaceStr A HSetGroupoidCat P.(G0) P.(GFace).
+  CategoryFaceStr A StrictGroupoidCat :=
+  @Build_CategoryFaceStr A StrictGroupoidCat P.(G0) P.(GFace).
 
 Definition pshCoh {A: HSet} (P: νStrictGpdPresentation A): CategoryCoh (pshStr P) :=
   P.(GFaceCoh).
 
 Definition toFunctor {A: HSet} (P: νStrictGpdPresentation A):
-  Functor (Op (νSemiShape A)) HSetGroupoidCat :=
+  Functor (Op (νSemiShape A)) StrictGroupoidCat :=
   {| fobj := P.(G0);
      fhom m n w := categoryApplyW m w (pshStr P);
      fid n := categoryApplyWId (pshStr P);
      fcomp p m n g f := eq_sym (categoryApplyWComp p m n g f (pshStr P) (pshCoh P)) |}.
 
-Definition ofFunctorCoh {A: HSet} (F: Functor (Op (νSemiShape A)) HSetGroupoidCat)
+Definition ofFunctorCoh {A: HSet} (F: Functor (Op (νSemiShape A)) StrictGroupoidCat)
   n q (Hq: q <= n) r (Hr: r <= q) (ε ω: A):
   F.(fhom) (a := S (S n)) (b := S n) (wgen (S n) r ω) ⨟ᶠ
     F.(fhom) (a := S n) (b := n) (wgen n q ε) =
@@ -36,7 +36,7 @@ Proof.
   now exact (F.(fcomp) (wgen (S n) (S q) ε) (wgen n r ω)).
 Defined.
 
-Definition ofFunctor {A: HSet} (F: Functor (Op (νSemiShape A)) HSetGroupoidCat):
+Definition ofFunctor {A: HSet} (F: Functor (Op (νSemiShape A)) StrictGroupoidCat):
   νStrictGpdPresentation A := {|
   G0 := F.(fobj);
   GFace n q Hq ε := F.(fhom) (a := S n) (b := n) (wgen n q ε);

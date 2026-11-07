@@ -6,7 +6,7 @@ Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
 
-Definition unitFamily (G: HSetGroupoid): Family G := {|
+Definition unitFamily (G: StrictGroupoid): Family G := {|
   dobj _ := hunit;
   dhom x y _ _ := G.(CHom) x y;
   dbase x y a b f := f;
@@ -23,35 +23,35 @@ Definition unitFamily (G: HSetGroupoid): Family G := {|
   dbaseInv x y a b f := eq_refl;
 |}.
 
-Definition Section {G H: HSetGroupoid} (E: Family H) (F: Functor G H) :=
+Definition Section {G H: StrictGroupoid} (E: Family H) (F: Functor G H) :=
   Map (unitFamily G) E F.
 
-Definition sectionTotal {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
+Definition sectionTotal {G H: StrictGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F): Functor G (total E) :=
   {| fobj := fun x => (F.(fobj) x; s.(mobj) x tt);
      fhom := fun x y f => s.(mhom) (a := tt) (b := tt) f;
      fid := fun x => s.(mid) tt;
      fcomp := fun x y z f g => s.(mcomp) (a := tt) (b := tt) (c := tt) f g |}.
 
-Definition sectionProj {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
+Definition sectionProj {G H: StrictGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F): sectionTotal s ⨟ᶠ proj E ≐ F.
 Proof.
   unshelve econstructor; [now intros|]. intros x y f.
   now apply s.(mbase).
 Defined.
 
-Definition unitMap {G H: HSetGroupoid} (F: Functor G H):
+Definition unitMap {G H: StrictGroupoid} (F: Functor G H):
   Map (unitFamily G) (unitFamily H) F :=
   Build_Map (fun _ _ => tt)
     (fun x y a b f => F.(fhom) f) (fun x a => F.(fid) x)
     (fun x y z a b c f g => F.(fcomp) f g)
     (fun x y a b f => eq_refl).
 
-Definition sectionPrecompose {G H K: HSetGroupoid} {E: Family K}
+Definition sectionPrecompose {G H K: StrictGroupoid} {E: Family K}
   (F: Functor G H) {R: Functor H K} (s: Section E R): Section E (F ⨟ᶠ R) :=
   compMap (unitMap F) s.
 
-Definition sectionSigma {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
+Definition sectionSigma {G H: StrictGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F) {P: Family (total E)} (t: Section P (sectionTotal s)):
   Section (sigma E P) F.
 Proof.
@@ -64,27 +64,27 @@ Proof.
   rewrite t.(mbase). now apply s.(mbase).
 Defined.
 
-Lemma sectionPrecomposeTotal {G H K: HSetGroupoid} {E: Family K}
+Lemma sectionPrecomposeTotal {G H K: StrictGroupoid} {E: Family K}
   (F: Functor G H) {R: Functor H K} (s: Section E R):
   sectionTotal (sectionPrecompose F s) ≐ F ⨟ᶠ sectionTotal s.
 Proof. unshelve econstructor; now intros. Defined.
 
-Lemma sectionSigmaTotal {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
+Lemma sectionSigmaTotal {G H: StrictGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F) {P: Family (total E)} (t: Section P (sectionTotal s)):
   sectionTotal (sectionSigma s t) ≐ sectionTotal t ⨟ᶠ totalUnassoc E P.
 Proof. unshelve econstructor; now intros. Defined.
 
-Definition unitSection (G: HSetGroupoid): Functor G (total (unitFamily G)) :=
+Definition unitSection (G: StrictGroupoid): Functor G (total (unitFamily G)) :=
   {| fobj := fun x => (x; tt);
      fhom := fun x y f => f;
      fid := fun x => eq_refl;
      fcomp := fun x y z f g => eq_refl |}.
 
-Lemma sectionTotalMap {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
+Lemma sectionTotalMap {G H: StrictGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F): sectionTotal s ≐ unitSection G ⨟ᶠ totalMap s.
 Proof. unshelve econstructor; now intros. Defined.
 
-Lemma sectionCastTotal {G H: HSetGroupoid} {E: Family H} {F L: Functor G H}
+Lemma sectionCastTotal {G H: StrictGroupoid} {E: Family H} {F L: Functor G H}
   (e: F ≐ L) (s: Section E F): sectionTotal (castBase e s) ≐ sectionTotal s.
 Proof.
   refine (sectionTotalMap _ •ᶠ _).
@@ -92,12 +92,12 @@ Proof.
   now apply feqSym, sectionTotalMap.
 Defined.
 
-Lemma sectionIntoPullTotal {G H K: HSetGroupoid} {E: Family K}
+Lemma sectionIntoPullTotal {G H K: StrictGroupoid} {E: Family K}
   (F: Functor G H) (R: Functor H K) (s: Section E (F ⨟ᶠ R)):
   sectionTotal (intoPull F R s) ⨟ᶠ reindexTotal E R ≐ sectionTotal s.
 Proof. unshelve econstructor; now intros. Defined.
 
-Lemma sectionSigmaFst {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
+Lemma sectionSigmaFst {G H: StrictGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F) {P: Family (total E)} (t: Section P (sectionTotal s)):
   sectionTotal (sectionSigma s t) ⨟ᶠ totalMap (sigmaFst E P) ≐ sectionTotal s.
 Proof.
@@ -105,7 +105,7 @@ Proof.
   now exact (t.(mbase) (a := tt) (b := tt) f).
 Defined.
 
-Lemma sectionSigmaMap {G H K: HSetGroupoid} {E: Family H} {P: Family K}
+Lemma sectionSigmaMap {G H K: StrictGroupoid} {E: Family H} {P: Family K}
   {F: Functor G H} {R: Functor H K} (s: Section E F)
   {Q: Family (total E)} (t: Section Q (sectionTotal s))
   (m: Map E P R) {U: Family (total P)} (n: Map Q U (totalMap m)):
@@ -113,7 +113,7 @@ Lemma sectionSigmaMap {G H K: HSetGroupoid} {E: Family H} {P: Family K}
   (sectionTotal t ⨟ᶠ totalMap n) ⨟ᶠ totalUnassoc P U.
 Proof. unshelve econstructor; now intros. Defined.
 
-Lemma sectionSigmaAssoc {G H: HSetGroupoid} {E: Family H} {F: Functor G H}
+Lemma sectionSigmaAssoc {G H: StrictGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F) {P: Family (total E)} (t: Section P (sectionTotal s)):
   sectionTotal (sectionSigma s t) ⨟ᶠ totalAssoc E P ≐ sectionTotal t.
 Proof. unshelve econstructor; now intros. Defined.

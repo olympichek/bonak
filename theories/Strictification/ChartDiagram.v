@@ -4,7 +4,7 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet SigT Notation RewLemmas Equiv Truncation.
 From Bonak.Lib Require Import HGpd.
 From Bonak.Category Require Import Category FunctorAlgebra.
-From Bonak.Category.Groupoid Require Import SetBased WeakEquivalence.
+From Bonak.Category.Groupoid Require Import Strict WeakEquivalence.
 From Bonak.Strictification Require Import DiagramEvaluation.
 From Bonak.Category.Bicategory Require Import PathDiagram PathDiagramLemmas PathGroupoid.
 Set Primitive Projections.
@@ -66,7 +66,7 @@ Definition chartLabels (i: C.(CObj)): HSet :=
 Definition chartValue (i: C.(CObj)) (x: chartLabels i): X.(pfObj) i :=
   D.(phom) x.2 (val x.1).
 
-Definition chartGroupoid (i: C.(CObj)): HSetGroupoid :=
+Definition chartGroupoid (i: C.(CObj)): StrictGroupoid :=
   presentationGroupoid (pathGpd (X.(pfObj) i)) (chartLabels i) (chartValue i).
 
 Definition chartEvaluation (i: C.(CObj)):
@@ -171,11 +171,11 @@ Proof.
     (fun z => D.(phom) g (D.(phom) f z)) (D.(phom) (f ⨟ g)) (D.(pcomp) f g) p).
 Defined.
 
-Definition chartDiagram: Functor C HSetGroupoidCat.
+Definition chartDiagram: Functor C StrictGroupoidCat.
 Proof.
-  refine (@Build_Functor C HSetGroupoidCat chartGroupoid (fun i j f => chartFunctor f) _ _).
-  - intro i. now apply (functorEqPath (chartGroupoid i).(hsetGroupoidUIP)), chartFunctorIdentity.
-  - intros i j k f g. apply (functorEqPath (chartGroupoid k).(hsetGroupoidUIP)), feqSym.
+  refine (@Build_Functor C StrictGroupoidCat chartGroupoid (fun i j f => chartFunctor f) _ _).
+  - intro i. now apply (functorEqPath (chartGroupoid i).(groupoidStrictness)), chartFunctorIdentity.
+  - intros i j k f g. apply (functorEqPath (chartGroupoid k).(groupoidStrictness)), feqSym.
     now apply chartFunctorComposition.
 Defined.
 

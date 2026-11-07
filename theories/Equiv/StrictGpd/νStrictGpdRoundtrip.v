@@ -90,7 +90,7 @@ Defined.
 (** A commuting frame square identifies the reconstructed strict fiber
     with the original displayed groupoid. *)
 Definition fillerIsoOfPrefix {n} {XA XB: (νStrictGpdAt n).(prefix)} (e: XA = XB)
-  {E: νFillerType XB} {C: HSetGroupoid} (HF: C = total E)
+  {E: νFillerType XB} {C: StrictGroupoid} (HF: C = total E)
   (p: Functor C (νFrame XA))
   (h: p ⨟ᶠ transportGroupoidFunctor (f_equal νFrame e) =
     transportGroupoidFunctor HF ⨟ᶠ proj E):
@@ -110,7 +110,7 @@ Proof. now destruct q. Defined.
 (** The corresponding equality of totals sends the canonical graph
     section to the original cell, on objects and arrows. *)
 Lemma fillerIsoOfPrefixWhole {n} {XA XB: (νStrictGpdAt n).(prefix)} (e: XA = XB)
-  {E: νFillerType XB} {C: HSetGroupoid} (HF: C = total E)
+  {E: νFillerType XB} {C: StrictGroupoid} (HF: C = total E)
   (p: Functor C (νFrame XA))
   (h: p ⨟ᶠ transportGroupoidFunctor (f_equal νFrame e) =
     transportGroupoidFunctor HF ⨟ᶠ proj E):
@@ -244,7 +244,7 @@ Lemma fgFrameStep {m} {XpA XpB: (νStrictGpdAt m.+1).(prefix)}
     (towerStep (g X) T rpPsh) (next SB) (DescS HD).
 Proof.
   unfold FrtInv.
-  apply (functorEqPath (νFrame ((XpB; this SB): (νStrictGpdAt m.+2).(prefix))).(hsetGroupoidUIP)).
+  apply (functorEqPath (νFrame ((XpB; this SB): (νStrictGpdAt m.+2).(prefix))).(groupoidStrictness)).
   apply (νFaceEq (dcTop := prefixDepsCohs
     ((XpB; this SB): (νStrictGpdAt m.+2).(prefix)))).
   intros p k dc cB ε. apply pathFunctorEq.
@@ -263,7 +263,7 @@ Proof.
       => mkPshFrame (g X) (towerPshDeps (g X) (towerStep (g X) T rpPsh))
         ⨟ᶠ νFace s.2 ε) ePsh • _).
     now apply (functorEqPath (total (mkPshFiller (g X)
-      (towerPshDeps (g X) T))).(hsetGroupoidUIP)), (pshνFace (g X) Cpsh Hp ε). }
+      (towerPshDeps (g X) T))).(groupoidStrictness)), (pshνFace (g X) Cpsh Hp ε). }
   rewrite functorAssocEq, (νFaceRewPrefix e cB ε).
   fold cA.
   rewrite <- functorAssocEq, hface, functorAssocEq.
@@ -279,7 +279,7 @@ Lemma frt0:
   pshF0A ⨟ᶠ transportGroupoidFunctor (f_equal νFrame (prefixEq rel0)) =
   transportGroupoidFunctor (descTotal DescZ) ⨟ᶠ proj (this X).
 Proof.
-  apply (functorEqPath unitGroupoid.(hsetGroupoidUIP)).
+  apply (functorEqPath unitGroupoid.(groupoidStrictness)).
   refine (Build_FunctorEq (fun _ => hunit_ext _ _) _).
   intros x y f. now apply hunit_ext.
 Defined.
@@ -292,7 +292,7 @@ Lemma fgFrameStep0:
   FrtInv (relStep rel0 fgThis0) (tower1 (g X)) (next X) (DescS DescZ).
 Proof.
   unfold FrtInv.
-  apply (functorEqPath (νFrame ((tt; this X): (νStrictGpdAt 1).(prefix))).(hsetGroupoidUIP)).
+  apply (functorEqPath (νFrame ((tt; this X): (νStrictGpdAt 1).(prefix))).(groupoidStrictness)).
   apply (νFaceEq (dcTop := prefixDepsCohs
     ((tt; this X): (νStrictGpdAt 1).(prefix)))).
   intros p k dc c ε.
@@ -307,7 +307,7 @@ Proof.
       νFace (dcTop := prefixDepsCohs
         ((tt; pshFiller0 (g X)): (νStrictGpdAt 1).(prefix))) DepsCohsChainNil ε =
     (g X).(GFace) 0 0 leR_O ε ⨟ᶠ graphUnit pshF0A).
-  { apply (functorEqPath (total (pshFiller0 (g X))).(hsetGroupoidUIP)).
+  { apply (functorEqPath (total (pshFiller0 (g X))).(groupoidStrictness)).
     pose proof (mkPshLayerFace (g X)
       (towerPshDeps (g X) (tower1 (g X))).(_pshPaintings (g X))
       (towerPshDeps (g X) (tower1 (g X))).(_pshRestrs (g X)) leR_O ε) as h.
@@ -318,7 +318,7 @@ Proof.
   rewrite (fillerIsoOfPrefixWhole (prefixEq rel0) (descTotal DescZ) pshF0A frt0).
   rewrite descTotalS.
   rewrite (descFace DescZ 0 0 leR_O leR_O ε).
-  apply (functorEqPath (total (this X)).(hsetGroupoidUIP)).
+  apply (functorEqPath (total (this X)).(groupoidStrictness)).
   unshelve econstructor; now intros.
 Defined.
 

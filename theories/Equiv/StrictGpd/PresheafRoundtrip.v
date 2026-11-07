@@ -81,11 +81,11 @@ Defined.
 (** The graph-fiber isomorphisms follow the same descent as the extracted levels. *)
 Fixpoint gfIso (m n: nat) {struct n}:
   forall (L: nat), L = n + m.+1 ->
-  HSetGroupoidIso (psh.(G0) L) (gF0 (pshFrom psh m.+1) n) :=
+  StrictGroupoidIso (psh.(G0) L) (gF0 (pshFrom psh m.+1) n) :=
   match n return forall L: nat, L = n + m.+1 ->
-    HSetGroupoidIso (psh.(G0) L) (gF0 (pshFrom psh m.+1) n) with
+    StrictGroupoidIso (psh.(G0) L) (gF0 (pshFrom psh m.+1) n) with
   | 0 => fun L HL =>
-      rew [fun l => HSetGroupoidIso (psh.(G0) l) (νTotal (pshFrom psh m.+1))]
+      rew [fun l => StrictGroupoidIso (psh.(G0) l) (νTotal (pshFrom psh m.+1))]
         (eq_sym HL) in graphUnitIso (mkPshFrame psh (towerPshDeps psh (pshTw psh m)))
   | S n => fun L HL => gfIso m.+1 n L (HL • plus_n_Sm n m.+1)
   end.
@@ -94,7 +94,7 @@ Lemma gfIsoIrr (m n L: nat) (HL HL': L = n + m.+1):
   gfIso m n L HL = gfIso m n L HL'.
 Proof. now rewrite (natUIP HL HL'). Defined.
 
-Definition gfF0Iso (n: nat): HSetGroupoidIso (psh.(G0) n) (gF0 (f psh) n) :=
+Definition gfF0Iso (n: nat): StrictGroupoidIso (psh.(G0) n) (gF0 (f psh) n) :=
   match n with
   | 0 => graphUnitIso (terminalFunctor (psh.(G0) 0))
   | S n => gfIso 0 n n.+1 (f_equal S (plus_n_O n) • plus_n_Sm n 0)
@@ -139,8 +139,8 @@ Defined.
 Fixpoint gfFaceIso (m n: nat) {struct n}:
   forall (L: nat) (HL: L = n + m.+1) (HL2: L.+1 = n.+1 + m.+1)
     (dim: nat) (Hd: dim <= n + m.+1) (Hd': dim <= L) (ε: arity),
-  psh.(GFace) L dim Hd' ε ⨟ᶠ hsetGroupoidIsoFunctor (gfIso m n L HL) ≐
-  hsetGroupoidIsoFunctor (gfIso m n.+1 L.+1 HL2) ⨟ᶠ
+  psh.(GFace) L dim Hd' ε ⨟ᶠ strictGroupoidIsoFunctor (gfIso m n L HL) ≐
+  strictGroupoidIsoFunctor (gfIso m n.+1 L.+1 HL2) ⨟ᶠ
     gFace (pshFrom psh m.+1) n dim Hd ε.
 Proof.
   destruct n; intros.
@@ -156,8 +156,8 @@ Proof.
 Defined.
 
 Lemma gfFaceIsoTop (n q: nat) (Hq: q <= n) (ε: arity):
-  psh.(GFace) n q Hq ε ⨟ᶠ hsetGroupoidIsoFunctor (gfF0Iso n) ≐
-  hsetGroupoidIsoFunctor (gfF0Iso n.+1) ⨟ᶠ (g (f psh)).(GFace) n q Hq ε.
+  psh.(GFace) n q Hq ε ⨟ᶠ strictGroupoidIsoFunctor (gfF0Iso n) ≐
+  strictGroupoidIsoFunctor (gfF0Iso n.+1) ⨟ᶠ (g (f psh)).(GFace) n q Hq ε.
 Proof.
   destruct n.
   - unfold gfF0Iso.

@@ -12,7 +12,7 @@ Set Primitive Projections.
 Set Printing Projections.
 
 Record Diagram {A: HSet} {n: nat} := {
-  cells: Index n -> HSetGroupoid;
+  cells: Index n -> StrictGroupoid;
   restrict {i j}: Word A (rank i) (rank j) -> Functor (cells j) (cells i);
   restrictId i: restrict (wid (rank i)) = idFunctor (cells i);
   restrictComp {i j k} (f: Word A (rank i) (rank j))
@@ -32,7 +32,7 @@ Definition MatchingBoundary {n} (X: Diagram A n): HSet :=
   {b: matchingData X &
     hforall (i j: Index n) (f: Word A (rank i) (rank j))
       (g: Word A (rank j) n),
-      @hEq (hsetGroupoidObjects (X.(cells) i))
+      @hEq (strictGroupoidObjects (X.(cells) i))
         ((X.(restrict) f).(fobj) (b j g)) (b i (wcomp g f))}.
 
 Lemma matchingBoundaryExt {n} {X: Diagram A n} (b c: MatchingBoundary X)
@@ -100,10 +100,10 @@ Proof.
   - intros a b c d h k l. apply matchingHomExt. intros i f. now apply cassoc.
 Defined.
 
-Definition MatchingObject {n} (X: Diagram A n): HSetGroupoid.
+Definition MatchingObject {n} (X: Diagram A n): StrictGroupoid.
 Proof.
-  refine {| hsetGroupoid := {| gcat := matchingCategory X |};
-    hsetGroupoidUIP := @UIP (MatchingBoundary X) |}.
+  refine {| strictGroupoid := {| gcat := matchingCategory X |};
+    groupoidStrictness := @UIP (MatchingBoundary X) |}.
   intros a b h. refine (@Build_IsInvertible _ a b h (matchingInv h) _ _).
   - apply matchingHomExt. intros i f. now apply ginvR.
   - apply matchingHomExt. intros i f. now apply ginvL.
@@ -119,7 +119,7 @@ Lemma matchingProjectionComp {n} (X: Diagram A n) (i j: Index n)
   (f: Word A (rank i) (rank j)) (g: Word A (rank j) n):
   matchingProjection X j g ⨟ᶠ X.(restrict) f = matchingProjection X i (wcomp g f).
 Proof.
-  apply (functorEqPath (X.(cells) i).(hsetGroupoidUIP)).
+  apply (functorEqPath (X.(cells) i).(groupoidStrictness)).
   refine (Build_FunctorEq (fun b => b.2 i j f g) _).
   intros b c h. now exact (h.2 i j f g).
 Defined.
@@ -130,11 +130,11 @@ Proof.
     restrict := fun (i j: Index 0) => match i with end |}; now intros [].
 Defined.
 
-Definition matchingMapCells {n} (X: Diagram A n) (G: HSetGroupoid)
-  (i: Index (S n)): HSetGroupoid :=
+Definition matchingMapCells {n} (X: Diagram A n) (G: StrictGroupoid)
+  (i: Index (S n)): StrictGroupoid :=
   match i with Some i => X.(cells) i | None => G end.
 
-Definition matchingMapRestrict {n} (X: Diagram A n) {G: HSetGroupoid}
+Definition matchingMapRestrict {n} (X: Diagram A n) {G: StrictGroupoid}
   (p: Functor G (MatchingObject X)) (i j: Index (S n)):
   Word A (rank i) (rank j) -> Functor (matchingMapCells X G j) (matchingMapCells X G i).
 Proof.
@@ -145,7 +145,7 @@ Proof.
   - now exact (fun _ => idFunctor G).
 Defined.
 
-Definition extendByMatchingMap {n} (X: Diagram A n) {G: HSetGroupoid}
+Definition extendByMatchingMap {n} (X: Diagram A n) {G: StrictGroupoid}
   (p: Functor G (MatchingObject X)): Diagram A (S n).
 Proof.
   refine {| cells := matchingMapCells X G; restrict := matchingMapRestrict X p |}.
@@ -175,7 +175,7 @@ Definition strictGpdSystem: MatchingSystem := {|
     truncate n := truncateDiagram;
     emptyPartial := emptyDiagram;
   |};
-  Cell := HSetGroupoid;
+  Cell := StrictGroupoid;
   CellMap T B := Functor T B;
   CellFamily B := Family B;
   familyTotal B E := (total E; proj E);

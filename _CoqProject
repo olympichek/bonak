@@ -38,7 +38,7 @@ theories/Category/Groupoid/Map.v
 theories/Category/Groupoid/Precomposition.v
 theories/Category/Groupoid/Product.v
 theories/Category/Groupoid/Section.v
-theories/Category/Groupoid/SetBased.v
+theories/Category/Groupoid/Strict.v
 theories/Category/Groupoid/StructureIdentity.v
 theories/Category/Groupoid/WeakEquivalence.v
 theories/Category/HSetCat.v

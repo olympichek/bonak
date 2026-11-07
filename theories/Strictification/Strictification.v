@@ -41,7 +41,7 @@ Module PresentationStrictification (Tr: PropositionalTruncation)
   Definition strictDiagramOfCover {arity: HSet}
     (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat)
     (cover: Covers.SetCover (totalDiagramCells Q)):
-    Functor (Op (νSemiShape arity)) HSetGroupoidCat :=
+    Functor (Op (νSemiShape arity)) StrictGroupoidCat :=
     chartDiagram (contractPseudofunctor Q)
       cover.1 (fun s => (cover.2.1 s).1) (fun s => (cover.2.1 s).2).
 
@@ -60,7 +60,7 @@ Module PresentationStrictification (Tr: PropositionalTruncation)
   Definition completeDiagramSurjective (covers: Covers.SetsCover1Types)
     {arity: HSet}
     (Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat):
-    merely {F: Functor (Op (νSemiShape arity)) HSetGroupoidCat &T Complete.completeDiagram F = Q} :=
+    merely {F: Functor (Op (νSemiShape arity)) StrictGroupoidCat &T Complete.completeDiagram F = Q} :=
     TF.trMap
       (fun cover => (strictDiagramOfCover Q cover; strictDiagramOfCoverEq Q cover))
       (covers (totalDiagramCells Q)).
@@ -68,7 +68,7 @@ Module PresentationStrictification (Tr: PropositionalTruncation)
   (** The objects of a strict level and its completion unit cover the
       corresponding completed level. *)
   Definition completedDiagramLevelCover {arity: HSet}
-    (F: Functor (Op (νSemiShape arity)) HSetGroupoidCat) n:
+    (F: Functor (Op (νSemiShape arity)) StrictGroupoidCat) n:
     Covers.SetCover ((Complete.completeDiagram F).(psObj) n).
   Proof.
     rewrite Complete.completeDiagramObj.
@@ -91,7 +91,7 @@ Module PresentationStrictification (Tr: PropositionalTruncation)
   Definition completeDiagramSurjectiveCovers {arity: HSet}
     (surjective: forall Q: Pseudofunctor
       (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat,
-      merely {F: Functor (Op (νSemiShape arity)) HSetGroupoidCat &T Complete.completeDiagram F = Q}):
+      merely {F: Functor (Op (νSemiShape arity)) StrictGroupoidCat &T Complete.completeDiagram F = Q}):
     Covers.SetsCover1Types.
   Proof.
     intro X. refine (TF.trMap _
@@ -104,7 +104,7 @@ Module PresentationStrictification (Tr: PropositionalTruncation)
 
   Definition completeDiagramSurjectiveCoverEquiv (arity: HSet):
     Equiv (forall Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpd2Cat,
-      merely {F: Functor (Op (νSemiShape arity)) HSetGroupoidCat &T Complete.completeDiagram F = Q})
+      merely {F: Functor (Op (νSemiShape arity)) StrictGroupoidCat &T Complete.completeDiagram F = Q})
       Covers.SetsCover1Types :=
     qinvEquiv completeDiagramSurjectiveCovers
       (fun covers => completeDiagramSurjective covers)
@@ -120,7 +120,7 @@ Module PresentationStrictification (Tr: PropositionalTruncation)
       (strictDiagramOfCover (GpdPseudofunctor.toPseudofunctor arity Q) cover).
 
   Local Definition diagramStrictificationPresentation {arity: HSet}
-    (Q: νGpdPresentation arity) (F: Functor (Op (νSemiShape arity)) HSetGroupoidCat)
+    (Q: νGpdPresentation arity) (F: Functor (Op (νSemiShape arity)) StrictGroupoidCat)
     (e: Complete.completeDiagram F = GpdPseudofunctor.toPseudofunctor arity Q):
     Complete.completePresentation (StrictFunctor.ofFunctor F) = Q :=
     f_equal (GpdPseudofunctor.ofPseudofunctor arity)

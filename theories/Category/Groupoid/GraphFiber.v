@@ -13,7 +13,7 @@ Local Lemma castArrowInv {G: Groupoid} {x x' y y': G.(CObj)}
   castArrow q p (ginv f) = ginv (castArrow p q f).
 Proof. now destruct p, q. Defined.
 
-Definition graphFiber {C B: HSetGroupoid} (p: Functor C B): Family B.
+Definition graphFiber {C B: StrictGroupoid} (p: Functor C B): Family B.
 Proof.
   unshelve refine (@Build_Family B
     (fun b => hsigT (A := C) (fun c => hEq b (p.(fobj) c)))
@@ -31,35 +31,35 @@ Proof.
     now apply (castArrowInv (G := B)).
 Defined.
 
-Definition graphPoint {C B: HSetGroupoid} (p: Functor C B) (c: C):
+Definition graphPoint {C B: StrictGroupoid} (p: Functor C B) (c: C):
   (graphFiber p).(dobj) (p.(fobj) c) := (c; eq_refl).
 
-Definition graphSection {G H: HSetGroupoid} (F: Functor G H):
+Definition graphSection {G H: StrictGroupoid} (F: Functor G H):
   Section (graphFiber F) F :=
   Build_Map
     (fun x _ => graphPoint F x) (fun x y a b f => f)
     (fun x a => eq_refl) (fun x y z a b c f g => eq_refl)
     (fun x y a b f => eq_refl).
 
-Definition graphUnit {C B: HSetGroupoid} (p: Functor C B): Functor C (total (graphFiber p)) := {|
+Definition graphUnit {C B: StrictGroupoid} (p: Functor C B): Functor C (total (graphFiber p)) := {|
   fobj c := (p.(fobj) c; graphPoint p c);
   fhom x y f := f;
   fid _ := eq_refl;
   fcomp _ _ _ _ _ := eq_refl;
 |}.
 
-Definition graphTotal {C B: HSetGroupoid} (p: Functor C B): Functor (total (graphFiber p)) C := {|
+Definition graphTotal {C B: StrictGroupoid} (p: Functor C B): Functor (total (graphFiber p)) C := {|
   fobj a := a.2.1;
   fhom x y f := f;
   fid _ := eq_refl;
   fcomp _ _ _ _ _ := eq_refl;
 |}.
 
-Definition graphUnitProj {C B: HSetGroupoid} (p: Functor C B):
+Definition graphUnitProj {C B: StrictGroupoid} (p: Functor C B):
   graphUnit p ⨟ᶠ proj (graphFiber p) ≐ p.
 Proof. unshelve econstructor; now intros. Defined.
 
-Definition graphObjectEta {C B: HSetGroupoid} (p: Functor C B)
+Definition graphObjectEta {C B: StrictGroupoid} (p: Functor C B)
   (a: total (graphFiber p)): (graphUnit p).(fobj) ((graphTotal p).(fobj) a) = a.
 Proof.
   destruct a as [b [c e]]. cbn.

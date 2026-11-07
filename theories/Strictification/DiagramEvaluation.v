@@ -4,14 +4,14 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas.
 From Bonak.Lib Require Import HGpd.
-From Bonak.Category.Groupoid Require Import SetBased.
+From Bonak.Category.Groupoid Require Import Strict.
 From Bonak.Category.Bicategory Require Import PathDiagram PathGroupoid.
 Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
 Unset Universe Minimization ToSet.
 
-Record DiagramEvaluation {C: Category} {D: Functor C HSetGroupoidCat}
+Record DiagramEvaluation {C: Category} {D: Functor C StrictGroupoidCat}
   {X: PathDiagramFamily C} := {
   evalFunctor a: Functor (D.(fobj) a) (pathGpd (X.(pfObj) a));
   evalNaturality {a b} (f: C.(CHom) a b):

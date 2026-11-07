@@ -274,9 +274,9 @@ Proof.
   - transitivity ((totalAssoc (mkLayer deps.(_restrFrames)) (mkPainting ext0) ⨟ᶠ
       (getPainting c ⨟ᶠ proj (mkPainting extTop) ⨟ᶠ getFrame (extChainDeps c))) ⨟ᶠ
       proj (mkLayer deps.(_restrFrames))).
-    + apply (functorEqPath (mkFrame deps.(1)).(hsetGroupoidUIP)).
+    + apply (functorEqPath (mkFrame deps.(1)).(groupoidStrictness)).
       unshelve econstructor; now intros.
-    + rewrite IHc. apply (functorEqPath (mkFrame deps.(1)).(hsetGroupoidUIP)).
+    + rewrite IHc. apply (functorEqPath (mkFrame deps.(1)).(groupoidStrictness)).
       unshelve econstructor; now intros.
 Defined.
 
@@ -289,7 +289,7 @@ Lemma mkRestrFrameProj {p k} (dc: DepsCohs p.+1 k) q (Hq: q <= k) ε:
   proj (mkLayer (mkDepsRestr (depsCohs := dc)).(1).(_restrFrames)) ⨟ᶠ
     mkRestrFrame (depsCohs := proj1DepsCohs dc) q.+1 (⇑ Hq) ε.
 Proof.
-  now apply (functorEqPath (mkFrame dc.(_deps).(1)).(hsetGroupoidUIP)), totalProj.
+  now apply (functorEqPath (mkFrame dc.(_deps).(1)).(groupoidStrictness)), totalProj.
 Defined.
 
 Lemma getFrameRestr {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
@@ -315,7 +315,7 @@ Proof.
   - rewrite functorIdL. now rewrite functorIdR.
   - cbn [cohsChainNext cohsChainNext1 getFrame].
     rewrite <- functorAssocEq, IHc, functorAssocEq.
-    apply (functorEqPath (mkFrame (mkDepsRestr (depsCohs := proj1DepsCohs dc)).(1)).(hsetGroupoidUIP)).
+    apply (functorEqPath (mkFrame (mkDepsRestr (depsCohs := proj1DepsCohs dc)).(1)).(groupoidStrictness)).
     unshelve econstructor; now intros.
 Defined.
 
@@ -329,7 +329,7 @@ Lemma restrShiftPair {p k} (dc2: DepsCohs2 p k) q (Hq: q <= k) ε ω:
     totalMap (mkRestrPainting dc2.(_extraDepsCohs) q Hq ε) =
   mkRestrFrame (depsCohs := mkDepsCohs dc2) q Hq ε ⨟ᶠ νHead dc2.(_depsCohs) ω.
 Proof.
-  apply (functorEqPath (total (mkPainting dc2.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+  apply (functorEqPath (total (mkPainting dc2.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
   now apply feqSym, layerFace.
 Defined.
 
@@ -347,16 +347,16 @@ Proof.
     transitivity (totalMap (sigmaFst _ (mkPainting (mkExtraDeps dc2Top.(_extraDepsCohs)))) ⨟ᶠ
       layerProj (mkPainting dc2Top.(_depsCohs).(_extraDeps))
         (fun ω => mkRestrFrame (depsCohs := dc2Top.(_depsCohs)) 0 leR_O ω) ε).
-    + now apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)), layerHeadTotal.
-    + apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+    + now apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)), layerHeadTotal.
+    + apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
       unshelve econstructor; now intros.
   - transitivity (totalAssoc _ _ ⨟ᶠ
       (getPainting (ExtChainCons (cohsChainExt (cohs2ChainCohs c))) ⨟ᶠ
        proj (mkPainting (mkExtraDeps dc2Top.(_extraDepsCohs))) ⨟ᶠ νHead dc2Top.(_depsCohs) ε)).
-    + apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+    + apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
       unshelve econstructor; now intros.
     + rewrite IHc.
-      apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+      apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
       unshelve econstructor; now intros.
 Defined.
 
@@ -375,7 +375,7 @@ Lemma νFaceCompose {P K} {dcTop: DepsCohs P K}
 Proof.
   unfold νFace. rewrite cohsChainExtCompose, cohsChainNextCompose.
   rewrite <- getFrameCompose, getPaintingCompose.
-  apply (functorEqPath (total (mkPainting dcTop.(_extraDeps))).(hsetGroupoidUIP)).
+  apply (functorEqPath (total (mkPainting dcTop.(_extraDeps))).(groupoidStrictness)).
   unshelve econstructor; now intros.
 Defined.
 
@@ -386,11 +386,11 @@ Lemma νHeadProj {p k} (dc: DepsCohs p k) ε:
 Proof.
   unfold νHead, layerProj, reindexTotal.
   rewrite functorAssocEq.
-  rewrite (functorEqPath (mkFrame dc.(_deps)).(hsetGroupoidUIP)
+  rewrite (functorEqPath (mkFrame dc.(_deps)).(groupoidStrictness)
     (totalProj (forgetPull (mkPainting dc.(_extraDeps))
       (mkRestrFrame (depsCohs := dc) 0 leR_O ε)))).
   rewrite <- functorAssocEq.
-  now rewrite (functorEqPath (mkFrame (mkDepsRestr (depsCohs := dc)).(1)).(hsetGroupoidUIP) (nthProj _ ε)).
+  now rewrite (functorEqPath (mkFrame (mkDepsRestr (depsCohs := dc)).(1)).(groupoidStrictness) (nthProj _ ε)).
 Defined.
 
 Lemma νFaceProjection {P K} {dcTop: DepsCohs P K}
@@ -404,7 +404,7 @@ Proof.
   transitivity ((getFrame (cohsChainNext a) ⨟ᶠ νFace b ε) ⨟ᶠ
     (getPainting (cohsChainExt a) ⨟ᶠ proj (mkPainting dcTop.(_extraDeps)) ⨟ᶠ
       getFrame (cohsChainDeps a))).
-  - apply (functorEqPath (mkFrame dcMid.(_deps)).(hsetGroupoidUIP)).
+  - apply (functorEqPath (mkFrame dcMid.(_deps)).(groupoidStrictness)).
     unshelve econstructor; now intros.
   - rewrite <- extChainDepsExt, getFrameGetPainting. now reflexivity.
 Defined.
@@ -422,7 +422,7 @@ Proof.
       νHead (proj1DepsCohs (mkDepsCohs dc2)) ω) ⨟ᶠ
     (getPainting (ExtChainCons (cohsChainExt (cohs2ChainCohs c))) ⨟ᶠ
       proj (mkPainting (mkExtraDeps dc2Top.(_extraDepsCohs))) ⨟ᶠ νHead dc2Top.(_depsCohs) ε)).
-  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
     unshelve econstructor; now intros. }
   rewrite getPaintingRestr2.
   transitivity ((getFrame (cohsChainNext (cohs2ChainCohs c)) ⨟ᶠ
@@ -431,7 +431,7 @@ Proof.
       totalMap (mkRestrPainting dc2.(_extraDepsCohs)
         (cohsChainLen (cohs2ChainDepsCohs c)) (cohsChainLe (cohs2ChainDepsCohs c)) ε)) ⨟ᶠ
     getPainting (cohsChainExt (cohs2ChainDepsCohs c))).
-  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
     unshelve econstructor; now intros. }
   rewrite restrShiftPair, getFrameNext1.
   rewrite <- (mkRestrFrameLenIrr (cohs2ChainLenEq c)
@@ -443,11 +443,11 @@ Proof.
       mkRestrFrame (depsCohs := mkDepsCohs dc2) (cohsChainLen (cohs2ChainCohs c))
         (cohsChainLe (cohs2ChainCohs c)) ε)) ⨟ᶠ
     νHead dc2.(_depsCohs) ω ⨟ᶠ getPainting (cohsChainExt (cohs2ChainDepsCohs c))).
-  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
     unshelve econstructor; now intros. }
   rewrite <- getFrameRestr, cohs2ChainDepsNext.
   unfold νFace. rewrite νHeadProj.
-  apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+  apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
   unshelve econstructor; now intros.
 Defined.
 
@@ -474,7 +474,7 @@ Proof.
       proj (mkPainting (mkExtraDeps dc2Top.(_extraDepsCohs))) ⨟ᶠ
       getFrame (cohsChainNext (cohs2ChainDepsCohs c1))) ⨟ᶠ
     νHead dc2Q.(_depsCohs) ε ⨟ᶠ getPainting (cohsChainExt (cohs2ChainDepsCohs c1))).
-  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
     unshelve econstructor; now intros. }
   rewrite <- cohs2ChainDepsNext.
   rewrite (νFaceProjection (cohs2ChainCohs c1) (DepsCohsChainCons (cohs2ChainCohs c2)) ω).
@@ -482,7 +482,7 @@ Proof.
     (νFace (DepsCohsChainCons (cohs2ChainCohs c2)) ω ⨟ᶠ
       proj (mkPainting (mkExtraDeps dc2Q.(_extraDepsCohs))) ⨟ᶠ νHead dc2Q.(_depsCohs) ε) ⨟ᶠ
     getPainting (cohsChainExt (cohs2ChainDepsCohs c1))).
-  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+  { apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
     unshelve econstructor; now intros. }
   rewrite νFaceCohHead.
   rewrite νFaceCompose.
@@ -491,10 +491,10 @@ Proof.
       getFrame (cohsChainDeps (cohs2ChainCohs c1))) ⨟ᶠ
     νFace (cohs2ChainDepsCohs c2) ω ⨟ᶠ getPainting (cohsChainExt (cohs2ChainDepsCohs c1))).
   - rewrite (νFaceProjection (cohs2ChainCohs c1) DepsCohsChainNil ε).
-    apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+    apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
     unshelve econstructor; now intros.
   - rewrite cohs2ChainDepsNext.
-    apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(hsetGroupoidUIP)).
+    apply (functorEqPath (total (mkPainting dc2Top.(_depsCohs).(_extraDeps))).(groupoidStrictness)).
     unshelve econstructor; now intros.
 Defined.
 
@@ -538,26 +538,26 @@ Proof.
   - now apply functorIdL.
   - cbn [getPainting getPaintingInv].
     rewrite <- functorAssocEq, (functorAssocEq _ (getPainting c)), IHc, functorIdR.
-    apply (functorEqPath (total (mkPainting (AddRestrDep deps ext0))).(hsetGroupoidUIP)).
+    apply (functorEqPath (total (mkPainting (AddRestrDep deps ext0))).(groupoidStrictness)).
     unshelve econstructor; now intros.
 Defined.
 
 Lemma getPaintingEq {P K} {depsTop: DepsRestr P K}
   {extTop: DepsRestrExtension P K depsTop}
   {p k} {deps: DepsRestr p k} {ext: DepsRestrExtension p k deps}
-  (c: ExtChain extTop ext) {X: HSetGroupoid}
+  (c: ExtChain extTop ext) {X: StrictGroupoid}
   (F L: Functor X (total (mkPainting ext)))
   (e: F ⨟ᶠ getPainting c ≐ L ⨟ᶠ getPainting c): F ≐ L.
 Proof.
   apply pathFunctorEq.
   pose proof (f_equal (fun R => R ⨟ᶠ getPaintingInv c)
-    (functorEqPath (total (mkPainting extTop)).(hsetGroupoidUIP) e)) as h.
+    (functorEqPath (total (mkPainting extTop)).(groupoidStrictness) e)) as h.
   cbn beta in h.
   rewrite 2 functorAssocEq, getPaintingInvR, 2 functorIdR in h. now exact h.
 Defined.
 
 Lemma frameEqStep {P K} {dcTop: DepsCohs P K} {p k} {dc: DepsCohs p k}
-  (c: DepsCohsChain dcTop dc) {X: HSetGroupoid}
+  (c: DepsCohsChain dcTop dc) {X: StrictGroupoid}
   (F L: Functor X (mkFrame (mkDepsRestr (depsCohs := dcTop))))
   (Hfaces: forall ε, F ⨟ᶠ νFace c ε ≐ L ⨟ᶠ νFace c ε)
   (Hb: (F ⨟ᶠ getFrame (cohsChainNext c)) ⨟ᶠ proj _ ≐
@@ -572,7 +572,7 @@ Proof.
   - intros x y f. now exact ((Hfaces ε).(homEq) x y f).
 Defined.
 
-Lemma frameEqDescend {P K} {dcTop: DepsCohs P K} {X: HSetGroupoid}
+Lemma frameEqDescend {P K} {dcTop: DepsCohs P K} {X: StrictGroupoid}
   (F L: Functor X (mkFrame (mkDepsRestr (depsCohs := dcTop))))
   (Hfaces: forall p k (dc: DepsCohs p k) (c: DepsCohsChain dcTop dc) ε,
     F ⨟ᶠ νFace c ε ≐ L ⨟ᶠ νFace c ε)
@@ -595,7 +595,7 @@ Fixpoint fullCohsChainSig {P}: forall {K} (dcTop: DepsCohs P K),
         cohsChainCompose (DepsCohsChainCons DepsCohsChainNil) s.2.2))
   end.
 
-Lemma νFaceEq {P K} {dcTop: DepsCohs P K} {X: HSetGroupoid}
+Lemma νFaceEq {P K} {dcTop: DepsCohs P K} {X: StrictGroupoid}
   (F L: Functor X (mkFrame (mkDepsRestr (depsCohs := dcTop))))
   (Hfaces: forall p k (dc: DepsCohs p k) (c: DepsCohsChain dcTop dc) ε,
     F ⨟ᶠ νFace c ε ≐ L ⨟ᶠ νFace c ε): F ≐ L.

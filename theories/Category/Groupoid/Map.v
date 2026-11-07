@@ -7,7 +7,7 @@ Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
 
-Record Map {G H: HSetGroupoid} {E: Family G} {P: Family H} {F: Functor G H} := {
+Record Map {G H: StrictGroupoid} {E: Family G} {P: Family H} {F: Functor G H} := {
   mobj: forall x, E.(dobj) x -> P.(dobj) (F.(fobj) x);
   mhom: forall {x y} {a: E.(dobj) x} {b: E.(dobj) y},
     E.(dhom) a b -> P.(dhom) (mobj x a) (mobj y b);
@@ -21,7 +21,7 @@ Record Map {G H: HSetGroupoid} {E: Family G} {P: Family H} {F: Functor G H} := {
 Arguments Map {G H} E P F.
 Arguments Build_Map {G H E P F} & _ _ _ _ _.
 
-Definition totalMap {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Definition totalMap {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F: Functor G H} (m: Map E P F): Functor (total E) (total P) := {|
   fobj a := (F.(fobj) a.1; m.(mobj) a.1 a.2);
   fhom a b := m.(mhom);
@@ -30,7 +30,7 @@ Definition totalMap {G H: HSetGroupoid} {E: Family G} {P: Family H}
 |}.
 
 (** Equality of displayed maps over a specified equality of base functors. *)
-Record MapEq {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Record MapEq {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F L: Functor G H} {e: F ≐ L} {m: Map E P F} {n: Map E P L}: Prop := {
   mapObjEq: forall x (a: E.(dobj) x),
     rew [fun y => P.(dobj) y] e.(objEq) x in m.(mobj) x a = n.(mobj) x a;
@@ -41,14 +41,14 @@ Record MapEq {G H: HSetGroupoid} {E: Family G} {P: Family H}
 }.
 Arguments MapEq {G H E P F L} e m n.
 
-Definition totalMapEq {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Definition totalMapEq {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F L: Functor G H} (e: F ≐ L) {m: Map E P F} {n: Map E P L}
   (h: MapEq e m n): totalMap m ≐ totalMap n :=
   Build_FunctorEq
     (fun a => (= e.(objEq) a.1; h.(mapObjEq) a.1 a.2))
     (fun a b f => h.(mapHomEq) a.1 b.1 a.2 b.2 f).
 
-Definition mapEqOfTotal {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Definition mapEqOfTotal {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F L: Functor G H} (e: F ≐ L) {m: Map E P F} {n: Map E P L}
   (h: totalMap m ≐ totalMap n): MapEq e m n.
 Proof.
@@ -64,7 +64,7 @@ Defined.
 
 (** These law proofs match [compFunctor], so [totalMap] preserves composition
     definitionally, including the functor laws. *)
-Definition compMap {G H K: HSetGroupoid} {E: Family G} {P: Family H} {Q: Family K}
+Definition compMap {G H K: StrictGroupoid} {E: Family G} {P: Family H} {Q: Family K}
   {F: Functor G H} {L: Functor H K} (m: Map E P F) (n: Map P Q L):
   Map E Q (F ⨟ᶠ L).
 Proof.
@@ -77,11 +77,11 @@ Proof.
   - intros. cbn. now rewrite n.(mbase), m.(mbase).
 Defined.
 
-Definition idMap {G: HSetGroupoid} (E: Family G): Map E E (idFunctor G) :=
+Definition idMap {G: StrictGroupoid} (E: Family G): Map E E (idFunctor G) :=
   Build_Map (fun _ a => a) (fun _ _ _ _ f => f)
     (fun _ _ => eq_refl) (fun _ _ _ _ _ _ _ _ => eq_refl) (fun _ _ _ _ _ => eq_refl).
 
-Definition precomposeMapId {G H: HSetGroupoid} {E P: Family G} {Q: Family H}
+Definition precomposeMapId {G H: StrictGroupoid} {E P: Family G} {Q: Family H}
   {F: Functor G H} (m: Map E P (idFunctor G)) (n: Map P Q F): Map E Q F.
 Proof.
   refine (Build_Map (fun x a => n.(mobj) x (m.(mobj) x a))
@@ -92,34 +92,34 @@ Proof.
     now exact (n.(mbase) (m.(mhom) f) • f_equal F.(fhom) (m.(mbase) f)).
 Defined.
 
-Lemma precomposeMapIdTotal {G H: HSetGroupoid} {E P: Family G} {Q: Family H}
+Lemma precomposeMapIdTotal {G H: StrictGroupoid} {E P: Family G} {Q: Family H}
   {F: Functor G H} (m: Map E P (idFunctor G)) (n: Map P Q F):
   totalMap (precomposeMapId m n) ≐ totalMap m ⨟ᶠ totalMap n.
 Proof. unshelve econstructor; now intros. Defined.
 
-Definition castHom {G: HSetGroupoid} (E: Family G) {x x' y y': G}
+Definition castHom {G: StrictGroupoid} (E: Family G) {x x' y y': G}
   (hx: x = x') (hy: y = y') {a: E.(dobj) x} {b: E.(dobj) y} (f: E.(dhom) a b):
   E.(dhom) (rew [fun x => E.(dobj) x] hx in a) (rew [fun y => E.(dobj) y] hy in b).
 Proof. now destruct hx, hy. Defined.
 
-Lemma castHomId {G: HSetGroupoid} (E: Family G) {x y: G}
+Lemma castHomId {G: StrictGroupoid} (E: Family G) {x y: G}
   (p: x = y) (a: E.(dobj) x):
   castHom E p p (E.(did) a) = E.(did) (rew [fun x => E.(dobj) x] p in a).
 Proof. now destruct p. Defined.
 
-Lemma castHomComp {G: HSetGroupoid} (E: Family G) {x x' y y' z z': G}
+Lemma castHomComp {G: StrictGroupoid} (E: Family G) {x x' y y' z z': G}
   (p: x = x') (q: y = y') (r: z = z')
   {a: E.(dobj) x} {b: E.(dobj) y} {c: E.(dobj) z}
   (f: E.(dhom) a b) (g: E.(dhom) b c):
   castHom E p r (E.(dcomp) f g) = E.(dcomp) (castHom E p q f) (castHom E q r g).
 Proof. now destruct p, q, r. Defined.
 
-Lemma castHomBase {G: HSetGroupoid} (E: Family G) {x x' y y': G}
+Lemma castHomBase {G: StrictGroupoid} (E: Family G) {x x' y y': G}
   (p: x = x') (q: y = y') {a: E.(dobj) x} {b: E.(dobj) y} (f: E.(dhom) a b):
   E.(dbase) (castHom E p q f) = castArrow p q (E.(dbase) f).
 Proof. now destruct p, q. Defined.
 
-Definition castBase {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Definition castBase {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F L: Functor G H} (e: F ≐ L) (m: Map E P F): Map E P L.
 Proof.
   refine (Build_Map
@@ -130,13 +130,13 @@ Proof.
   - intros x y a b f. cbn beta. rewrite castHomBase, m.(mbase). now apply e.(homEq).
 Defined.
 
-Lemma castTotalHom {G: HSetGroupoid} (E: Family G) {x x' y y': G}
+Lemma castTotalHom {G: StrictGroupoid} (E: Family G) {x x' y y': G}
   (p: x = x') (q: y = y') {a: E.(dobj) x} {b: E.(dobj) y} (f: E.(dhom) a b):
   castArrow (G := total E)
     (eq_existT_rew p a) (eq_existT_rew q b) (castHom E p q f) = f.
 Proof. now destruct p, q. Defined.
 
-Definition castBaseTotal {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Definition castBaseTotal {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F L: Functor G H} (e: F ≐ L) (m: Map E P F): totalMap (castBase e m) ≐ totalMap m.
 Proof.
   refine (Build_FunctorEq
@@ -144,7 +144,7 @@ Proof.
   intros a b f. now apply (castTotalHom P).
 Defined.
 
-Definition pull {G H K: HSetGroupoid} {E: Family H} {P: Family K}
+Definition pull {G H K: StrictGroupoid} {E: Family H} {P: Family K}
   {R: Functor H K} (m: Map E P R) (F: Functor G H):
   Map (reindex E F) P (F ⨟ᶠ R).
 Proof.
@@ -154,7 +154,7 @@ Proof.
   intros. cbn. now rewrite m.(mbase), f.2.2.
 Defined.
 
-Definition intoPull {G H K: HSetGroupoid} {E: Family G} {P: Family K}
+Definition intoPull {G H K: StrictGroupoid} {E: Family G} {P: Family K}
   (F: Functor G H) (R: Functor H K) (m: Map E P (F ⨟ᶠ R)):
   Map E (reindex P R) F.
 Proof.
@@ -169,23 +169,23 @@ Proof.
   - now intros.
 Defined.
 
-Definition sigmaFst {G: HSetGroupoid} (E: Family G) (P: Family (total E)):
+Definition sigmaFst {G: StrictGroupoid} (E: Family G) (P: Family (total E)):
   Map (sigma E P) E (idFunctor G) :=
   Build_Map
     (fun x a => a.1) (fun x y a b => P.(dbase))
     (fun x a => P.(dbaseId) a.2) (fun x y z a b c => P.(dbaseComp))
     (fun x y a b f => eq_refl).
 
-Definition forgetPull {G H: HSetGroupoid} (E: Family H) (F: Functor G H):
+Definition forgetPull {G H: StrictGroupoid} (E: Family H) (F: Functor G H):
   Map (reindex E F) E F :=
   Build_Map (fun x a => a)
     (fun x y a b f => f.2.1) (fun x a => eq_refl)
     (fun x y z a b c f g => eq_refl) (fun x y a b f => f.2.2).
 
-Definition reindexTotal {G H: HSetGroupoid} (E: Family H) (F: Functor G H):
+Definition reindexTotal {G H: StrictGroupoid} (E: Family H) (F: Functor G H):
   Functor (total (reindex E F)) (total E) := totalMap (forgetPull E F).
 
-Definition sigmaMap {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Definition sigmaMap {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F: Functor G H} (m: Map E P F) {Q: Family (total E)} {R: Family (total P)}
   (n: Map Q R (totalMap m)): Map (sigma E Q) (sigma P R) F.
 Proof.
@@ -199,7 +199,7 @@ Defined.
 
 (** A dependent-sum equality pairs the displayed equality of its first
     component with the equality of the second component over that pair path. *)
-Definition sigmaMapEq {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Definition sigmaMapEq {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F L: Functor G H} (e: F ≐ L) {m: Map E P F} {m': Map E P L}
   (h: MapEq e m m') {Q: Family (total E)} {R: Family (total P)}
   {n: Map Q R (totalMap m)} {n': Map Q R (totalMap m')}
@@ -228,7 +228,7 @@ Proof.
   now exact (k.(mapHomEq) (x; a.1) (y; b.1) a.2 b.2 f).
 Defined.
 
-Lemma sigmaCompositeMapEq {G H K: HSetGroupoid}
+Lemma sigmaCompositeMapEq {G H K: StrictGroupoid}
   {E: Family G} {P: Family H} {Q: Family K}
   {F F': Functor G H} {L L': Functor H K}
   {m: Map E P F} {m': Map E P F'} {n: Map P Q L} {n': Map P Q L'}
@@ -247,18 +247,18 @@ Proof.
 Defined.
 
 (** Reindex a displayed map along a commuting square. *)
-Definition reindexMap {X Y G H: HSetGroupoid} {E: Family G} {P: Family H}
+Definition reindexMap {X Y G H: StrictGroupoid} {E: Family G} {P: Family H}
   {R: Functor G H} (m: Map E P R) (S: Functor X G) (T: Functor Y H)
   (F: Functor X Y) (c: S ⨟ᶠ R ≐ F ⨟ᶠ T): Map (reindex E S) (reindex P T) F :=
   intoPull F T (castBase c (pull m S)).
 
-Lemma totalProj {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Lemma totalProj {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F: Functor G H} (m: Map E P F): totalMap m ⨟ᶠ proj P ≐ proj E ⨟ᶠ F.
 Proof.
   unshelve econstructor; [now intros|]. intros x y f. now apply m.(mbase).
 Defined.
 
-Lemma reindexMapTotal {X Y G H: HSetGroupoid} {E: Family G} {P: Family H}
+Lemma reindexMapTotal {X Y G H: StrictGroupoid} {E: Family G} {P: Family H}
   {R: Functor G H} (m: Map E P R) (S: Functor X G) (T: Functor Y H)
   (F: Functor X Y) (c: S ⨟ᶠ R ≐ F ⨟ᶠ T):
   totalMap (reindexMap m S T F c) ⨟ᶠ reindexTotal P T ≐ reindexTotal E S ⨟ᶠ totalMap m.
@@ -271,7 +271,7 @@ Proof.
 Defined.
 
 (** Projection of a dependent-sum map. *)
-Lemma sigmaFstTotal {G H: HSetGroupoid} {E: Family G} {P: Family H}
+Lemma sigmaFstTotal {G H: StrictGroupoid} {E: Family G} {P: Family H}
   {F: Functor G H} (m: Map E P F) {Q: Family (total E)} {R: Family (total P)}
   (n: Map Q R (totalMap m)):
   totalMap (sigmaMap m n) ⨟ᶠ totalMap (sigmaFst P R) ≐

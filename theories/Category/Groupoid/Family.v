@@ -1,13 +1,13 @@
 (** Displayed groupoids with h-set object fibers and h-set arrows.
     Each arrow records its image in the base; no lift is required. *)
 Set Warnings "-notation-overridden".
-From Bonak.Category.Groupoid Require Export SetBased.
+From Bonak.Category.Groupoid Require Export Strict.
 From Bonak.Lib Require Import HSet SigT Notation.
 Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
 
-Record Family {G: HSetGroupoid} := {
+Record Family {G: StrictGroupoid} := {
   dobj: G -> HSet;
   dhom: forall {x y}, dobj x -> dobj y -> HSet;
   dbase: forall {x y} {a: dobj x} {b: dobj y}, dhom a b -> G.(CHom) x y;
@@ -30,8 +30,8 @@ Record Family {G: HSetGroupoid} := {
 }.
 Arguments Family G : clear implicits.
 
-Definition total {G: HSetGroupoid} (E: Family G): HSetGroupoid := {|
-  hsetGroupoid := {| gcat := {|
+Definition total {G: StrictGroupoid} (E: Family G): StrictGroupoid := {|
+  strictGroupoid := {| gcat := {|
     CObj := {x: G &T E.(dobj) x};
     CHom a b := E.(dhom) a.2 b.2;
     cid a := E.(did) a.2;
@@ -41,21 +41,21 @@ Definition total {G: HSetGroupoid} (E: Family G): HSetGroupoid := {|
     cassoc a b c d := E.(dassoc) |};
     groupoidInvertibility a b f :=
       @Build_IsInvertible _ a b f (E.(dinv) f) (E.(dinvR) f) (E.(dinvL) f) |};
-  hsetGroupoidUIP := @sigT_UIP G E.(dobj);
+  groupoidStrictness := @sigT_UIP G E.(dobj);
 |}.
 
-Definition proj {G: HSetGroupoid} (E: Family G): Functor (total E) G := {|
+Definition proj {G: StrictGroupoid} (E: Family G): Functor (total E) G := {|
   fobj a := a.1;
   fhom a b f := E.(dbase) f;
   fid a := E.(dbaseId) a.2;
   fcomp a b c f g := E.(dbaseComp) f g;
 |}.
 
-Definition Over {G: HSetGroupoid} (E: Family G) {x y} (f: G.(CHom) x y)
+Definition Over {G: StrictGroupoid} (E: Family G) {x y} (f: G.(CHom) x y)
   (a: E.(dobj) x) (b: E.(dobj) y): HSet :=
   {h: E.(dhom) a b & hEq (E.(dbase) h) f}.
 
-Definition reindex {G H: HSetGroupoid} (E: Family H) (F: Functor G H): Family G.
+Definition reindex {G H: StrictGroupoid} (E: Family H) (F: Functor G H): Family G.
 Proof.
   unshelve refine {| dobj x := E.(dobj) (F.(fobj) x);
     dhom x y a b := {f: G.(CHom) x y & Over E (F.(fhom) f) a b};
@@ -86,7 +86,7 @@ Proof.
   - now intros.
 Defined.
 
-Definition sigma {G: HSetGroupoid} (E: Family G) (P: Family (total E)): Family G.
+Definition sigma {G: StrictGroupoid} (E: Family G) (P: Family (total E)): Family G.
 Proof.
   unshelve refine {| dobj x := {a: E.(dobj) x & P.(dobj) (x; a)};
     dhom x y a b := P.(dhom) a.2 b.2;
@@ -102,7 +102,7 @@ Proof.
   - intros x y a b f. rewrite P.(dbaseInv). now apply E.(dbaseInv).
 Defined.
 
-Definition const (G H: HSetGroupoid): Family G.
+Definition const (G H: StrictGroupoid): Family G.
 Proof.
   unshelve refine {| dobj _ := H;
     dhom x y a b := prodSet (G.(CHom) x y) (H.(CHom) a b);
@@ -120,7 +120,7 @@ Proof.
 Defined.
 
 (** Reassociation of total dependent sums. *)
-Definition totalAssoc {G: HSetGroupoid} (E: Family G) (P: Family (total E)):
+Definition totalAssoc {G: StrictGroupoid} (E: Family G) (P: Family (total E)):
   Functor (total (sigma E P)) (total P) := {|
   fobj a := ((a.1; a.2.1); a.2.2);
   fhom a b f := f;
@@ -128,7 +128,7 @@ Definition totalAssoc {G: HSetGroupoid} (E: Family G) (P: Family (total E)):
   fcomp a b c f g := eq_refl;
 |}.
 
-Definition totalUnassoc {G: HSetGroupoid} (E: Family G) (P: Family (total E)):
+Definition totalUnassoc {G: StrictGroupoid} (E: Family G) (P: Family (total E)):
   Functor (total P) (total (sigma E P)) := {|
   fobj a := (a.1.1; (a.1.2; a.2));
   fhom a b f := f;
@@ -145,7 +145,7 @@ Infix "Σᵍ" := sigma (at level 35, right associativity): displayed_gpd_scope.
 (** [Gpd] denotes h-set-based groupoids. The family arrow denotes displayed
     groupoid structure over the whole base, and the total-groupoid notation
     makes that base explicit. *)
-Notation "'Gpd'" := HSetGroupoid: displayed_gpd_scope.
+Notation "'Gpd'" := StrictGroupoid: displayed_gpd_scope.
 Notation "'unitᵍ'" := unitGroupoid: displayed_gpd_scope.
 Notation "'!ᵍ'" := (terminalFunctor _): displayed_gpd_scope.
 Local Set Warnings "-postfix-notation-not-level-1".

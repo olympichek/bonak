@@ -3,7 +3,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Truncation.
 From Bonak.Category Require Import Groupoid.
-From Bonak.Category.Groupoid Require Import SetBased.
+From Bonak.Category.Groupoid Require Import Strict.
 From Bonak.Lib Require Import HGpd.
 From Bonak.Category Require Export FullyFaithful.
 Set Primitive Projections.
@@ -60,10 +60,10 @@ Module GroupoidSetCovers (T: PropositionalTruncation).
 
   Definition SetsCover1Types: Type := forall X: HGpd, merely (SetCover X).
 
-  Definition weakEquivalenceCover {G: HSetGroupoid} (U: UnivalentGroupoid)
+  Definition weakEquivalenceCover {G: StrictGroupoid} (U: UnivalentGroupoid)
     (F: Functor G U) (w: W.IsWeakEquivalence F): SetCover U.(CObj).
   Proof.
-    refine (hsetGroupoidObjects G; (F.(fobj); _)).
+    refine (strictGroupoidObjects G; (F.(fobj); _)).
     intro y. refine (TF.trMap _ (W.weakEssentiallySurjective _ w y)).
     intros [x f]. now exact (x; homToId f).
   Defined.

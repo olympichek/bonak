@@ -4,7 +4,7 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Funext RewLemmas Truncation.
 From Bonak.Lib Require Import HGpd.
 From Bonak.Strictification Require Import DiagramEvaluation.
-From Bonak.Category.Groupoid Require Import CompletionUniqueness Precomposition SetBased WeakEquivalence.
+From Bonak.Category.Groupoid Require Import CompletionUniqueness Precomposition Strict WeakEquivalence.
 From Bonak.Category.Bicategory Require Import PathDiagram PathGroupoid Pseudonatural
   LocallyDiscretePseudofunctor HGpdDiagramEq.
 Set Primitive Projections.
@@ -26,7 +26,7 @@ Module DiagramDescent (Tr: PropositionalTruncation).
   Set Universe Polymorphism.
 
   Section Comparison.
-  Context {C: Category} {D: Functor C HSetGroupoidCat}
+  Context {C: Category} {D: Functor C StrictGroupoidCat}
     {Y X: PathDiagramFamily C}
     (E: DiagramEvaluation D Y) (Q: DiagramEvaluation D X)
     (wE: forall a, IsWeakEquivalence (E.(evalFunctor) a)).
@@ -197,7 +197,7 @@ Module DiagramComparisons (Tr: PropositionalTruncation).
   Module W := WeakEquivalences Tr.
   Import K W.
 
-  Definition evaluationComparison {I: Category} {D: Functor I HSetGroupoidCat}
+  Definition evaluationComparison {I: Category} {D: Functor I StrictGroupoidCat}
     {Y X: PathDiagramFamily I} (E: DiagramEvaluation D Y) (Q: DiagramEvaluation D X)
     (wE: forall i, IsWeakEquivalence (E.(evalFunctor) i)):
     Pseudonatural (expandPseudofunctor Y) (expandPseudofunctor X) :=
@@ -207,7 +207,7 @@ Module DiagramComparisons (Tr: PropositionalTruncation).
       (fun i x => K.comparisonUnitLaw E Q wE i x)
       (fun i j k f g x => K.comparisonCompLaw E Q wE f g x).
 
-  Definition evaluationComparisonEq {I: Category} {D: Functor I HSetGroupoidCat}
+  Definition evaluationComparisonEq {I: Category} {D: Functor I StrictGroupoidCat}
     {Y X: PathDiagramFamily I} (E: DiagramEvaluation D Y) (Q: DiagramEvaluation D X)
     (wE: forall i, IsWeakEquivalence (E.(evalFunctor) i))
     (wQ: forall i, IsWeakEquivalence (Q.(evalFunctor) i)):

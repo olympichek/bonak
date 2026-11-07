@@ -3,7 +3,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas.
 From Bonak.Category Require Import Category CategoryEq Groupoid.
-From Bonak.Category.Groupoid Require Import SetBased.
+From Bonak.Category.Groupoid Require Import Strict.
 From Bonak.Category.Bicategory Require Import Bicategory BicategoryEq Full
   LocallyDiscrete.
 Set Primitive Projections.
@@ -87,40 +87,40 @@ Definition GroupoidBicat: Bicategory := {|
     (fun x => functorPentagon F''' (F''.(fobj) (F'.(fobj) (F.(fobj) x))));
 |}.
 
-Definition HSetGroupoidBicat: Bicategory :=
-  fullBicategory GroupoidBicat (fun G: HSetGroupoid => G.(hsetGroupoid)).
+Definition StrictGroupoidBicat: Bicategory :=
+  fullBicategory GroupoidBicat (fun G: StrictGroupoid => G.(strictGroupoid)).
 
 (** Strict groupoid functors embed into the bicategory of groupoids.
     Equalities of functors act by their canonical natural transformations. *)
-Local Lemma hsetFunctorPathComponent {G H: HSetGroupoid} {F K: Functor G H}
+Local Lemma strictFunctorPathComponent {G H: StrictGroupoid} {F K: Functor G H}
   (p: F = K) (x: G):
-  (@idTo2 HSetGroupoidBicat G H F K p).(ncomp) x
+  (@idTo2 StrictGroupoidBicat G H F K p).(ncomp) x
   = idToHom (f_equal (fun L: Functor G H => L.(fobj) x) p).
 Proof. now destruct p. Defined.
 
-Definition hsetGroupoidDiscreteInclusion:
-  BicategoryStructureMap (locallyDiscrete HSetGroupoidCat) HSetGroupoidBicat.
+Definition strictGroupoidDiscreteInclusion:
+  BicategoryStructureMap (locallyDiscrete StrictGroupoidCat) StrictGroupoidBicat.
 Proof.
   refine (@Build_BicategoryStructureMap
-    (locallyDiscrete HSetGroupoidCat) HSetGroupoidBicat
+    (locallyDiscrete StrictGroupoidCat) StrictGroupoidBicat
     (fun G => G) (fun G H F => F) (fun G => eq_refl)
     (fun G H K F L => eq_refl)
-    (fun G H F K p => @idTo2 HSetGroupoidBicat G H F K p)
+    (fun G H F K p => @idTo2 StrictGroupoidBicat G H F K p)
     _ _ _ _ _ _ _).
   - now intros G H F.
   - intros G H F K L p q. destruct p, q.
-    now apply eq_sym, (HSetGroupoidBicat.(BHom) G H).(cidl).
+    now apply eq_sym, (StrictGroupoidBicat.(BHom) G H).(cidl).
   - intros G H K F L M p. destruct p.
-    now apply eq_sym, HSetGroupoidBicat.(bwhiskerLId).
+    now apply eq_sym, StrictGroupoidBicat.(bwhiskerLId).
   - intros G H K F L p M. destruct p.
-    now apply eq_sym, HSetGroupoidBicat.(bwhiskerRId).
+    now apply eq_sym, StrictGroupoidBicat.(bwhiskerRId).
   - intros G H F. apply natTransEq; intro x.
-    rewrite hsetFunctorPathComponent.
+    rewrite strictFunctorPathComponent.
     now rewrite (@UIP H _ _ _ eq_refl).
   - intros G H F. apply natTransEq; intro x.
-    rewrite hsetFunctorPathComponent.
+    rewrite strictFunctorPathComponent.
     now rewrite (@UIP H _ _ _ eq_refl).
   - intros G H K L F R S. apply natTransEq; intro x.
-    rewrite hsetFunctorPathComponent.
+    rewrite strictFunctorPathComponent.
     now rewrite (@UIP L _ _ _ eq_refl).
 Defined.
