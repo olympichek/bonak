@@ -6,6 +6,7 @@
     and [k] variable positions. *)
 
 Set Warnings "-notation-overridden".
+From Stdlib Require Import Arith.PeanoNat.
 From Bonak.Lib Require Import HSet SigT Notation NatLemmas.
 From Bonak.Category Require Import Category.
 From Bonak.Presheaf Require Export νSemiShape.
@@ -196,3 +197,47 @@ Arguments shapeFace {A p n} f.
 Arguments shapeMask {A p n} d.
 Arguments cross {A m k l} f d.
 Arguments shapeSandwich {A p k l n} r f s.
+
+(** Univalence: an isomorphism relates equal ranks and an automorphism is the
+    identity, so object paths and isomorphisms agree. *)
+
+(** The middle rank of a shape is bounded by its source and target ranks. *)
+
+Lemma shapeBound {A: HSet} {p n} (s: Shape A p n): s.1 <= p /\ s.1 <= n.
+Proof.
+  now exact (conj (wordBound (fst s.2)) (wordBound (snd s.2))).
+Defined.
+
+(** A shape that has a left inverse retains every position of its source. *)
+
+Lemma shapeSectionRank {A: HSet} {p n} (f: Shape A p n) (g: Shape A n p)
+  (e: shapeComp f g = shapeId p): p <= f.1.
+Proof.
+  now exact (rew [fun k => k <= f.1] f_equal (fun s => s.1) e in
+    proj1 (shapeBound (cross (snd f.2) (fst g.2)))).
+Defined.
+
+Lemma νShapeIsoPath {A: HSet} (p n: nat) (i: Iso (νShape A) p n): p = n.
+Proof.
+  destruct i as [f [g r l]]; cbn in *.
+  apply Nat.le_antisymm.
+  - now exact (Nat.le_trans _ _ _ (shapeSectionRank f g r)
+      (proj2 (shapeBound f))).
+  - now exact (Nat.le_trans _ _ _ (shapeSectionRank g f l)
+      (proj2 (shapeBound g))).
+Defined.
+
+Lemma νShapeIsoEndo {A: HSet} (p: nat) (i: Iso (νShape A) p p):
+  i.(isoHom) = shapeId p.
+Proof.
+  destruct i as [f [g r l]]; cbn in *.
+  pose proof (shapeSectionRank f g r) as h.
+  destruct f as [k [m w]]; cbn in h.
+  assert (e: k = p) by now exact (Nat.le_antisymm _ _ (wordBound m) h).
+  subst k. rewrite (wordEndId p m), (wordEndId p w).
+  now reflexivity.
+Defined.
+
+Definition νShapeUnivalence (A: HSet): IsUnivalentCategory (νShape A) :=
+  categoryUnivalenceFromIdentityIsos (νShape A) (@natUIP)
+    νShapeIsoPath νShapeIsoEndo.

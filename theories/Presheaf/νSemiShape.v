@@ -305,6 +305,21 @@ Proof.
     + cbn. now rewrite (IH w).
 Defined.
 
+(** Univalence: an isomorphism relates equal ranks and an automorphism is the
+    identity, so object paths and isomorphisms agree. *)
+
+Lemma νSemiShapeIsoPath {A: HSet} (p n: nat) (i: Iso (νSemiShape A) p n):
+  p = n.
+Proof.
+  now exact (Nat.le_antisymm _ _ (wordBound i.(isoHom))
+    (wordBound (inverse i.(isoInvertible)))).
+Defined.
+
+Definition νSemiShapeUnivalence (A: HSet):
+  IsUnivalentCategory (νSemiShape A) :=
+  categoryUnivalenceFromIdentityIsos (νSemiShape A) (@natUIP)
+    νSemiShapeIsoPath (fun p i => wordEndId p i.(isoHom)).
+
 (** Closes a goal with a word in the context whose target lies strictly below
     its source rank. *)
 Ltac wordAboveAbsurd :=

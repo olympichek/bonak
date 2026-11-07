@@ -360,6 +360,26 @@ Proof.
   repeat (apply functional_extensionality_dep; intro). apply contrProp.
 Qed.
 
+(** A category whose objects have unique paths, whose isomorphisms relate
+    only equal objects, and whose automorphisms are identities, is
+    univalent. *)
+
+Lemma categoryUnivalenceFromIdentityIsos (C: Category)
+  (objUIP: forall (a b: C.(CObj)) (p q: a = b), p = q)
+  (isoPath: forall a b, Iso C a b -> a = b)
+  (isoEndo: forall a (i: Iso C a a), i.(isoHom) = cid a):
+  IsUnivalentCategory C.
+Proof.
+  intros a b f.
+  assert (h: forall b (p: a = b) (f: Iso C a b), idToIso p = f).
+  { intros b' p; destruct p; intro g. apply isoEq.
+    now exact (eq_sym (isoEndo a g)). }
+  exists (isoPath a b f; h b _ f). intros [q e].
+  destruct (objUIP a b (isoPath a b f) q).
+  refine (eq_existT_curried eq_refl _).
+  now apply (isoSet C a b).(UIP).
+Defined.
+
 Record UnivalentCategory := {
   univalentCategory:> Category;
   categoryUnivalence: IsUnivalentCategory univalentCategory;
