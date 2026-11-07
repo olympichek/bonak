@@ -1,6 +1,6 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Truncation.
-From Bonak.Category Require Import Category Groupoid UnivalenceFacts FunctorUnivalence.
+From Bonak.Category Require Import Category Groupoid FunctorUnivalence.
 From Bonak.Category.Groupoid Require Import WeakEquivalence Descent.
 From Stdlib.Logic Require Import FunctionalExtensionality.
 Set Primitive Projections.

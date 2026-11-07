@@ -1,6 +1,6 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Contractible.
-From Bonak.Category Require Import Category UnivalenceFacts.
+From Bonak.Category Require Import Category.
 Set Primitive Projections.
 Set Universe Polymorphism.
 

@@ -3,7 +3,7 @@
     their objectwise isomorphisms, then their forced action on arrows. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Contractible.
-From Bonak.Category Require Import Category CategoryEq UnivalenceFacts.
+From Bonak.Category Require Import Category CategoryEq.
 From Stdlib Require Import Logic.FunctionalExtensionality.
 Set Primitive Projections.
 Set Universe Polymorphism.

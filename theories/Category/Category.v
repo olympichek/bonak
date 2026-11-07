@@ -413,3 +413,28 @@ Defined.
 
 Definition categoryIsoPath {C: Category} (u: IsUnivalentCategory C)
   {a b} (i: Iso C a b): a = b := invEq (idToIsoEquiv u a b) i.
+
+(** A category is univalent exactly when, for each object, the type of
+    objects isomorphic to it is contractible. *)
+
+Definition categoryIsoTotal {C: Category} (u: IsUnivalentCategory C) (a: C.(CObj)):
+  Contr {b: C.(CObj) &T Iso C a b}.
+Proof.
+  exists (a; idToIso eq_refl). intros [b i].
+  pose (p := categoryIsoPath u i).
+  assert (h: idToIso p = i) by now apply (secEq (idToIsoEquiv u a b)).
+  refine (eq_existT_curried p _).
+  transitivity (idToIso p).
+  - now destruct p.
+  - now exact h.
+Defined.
+
+Definition categoryUnivalenceFromTotal (C: Category)
+  (h: forall a, Contr {b: C.(CObj) &T Iso C a b}): IsUnivalentCategory C.
+Proof.
+  intros a b i.
+  pose (e := identitySystemEquiv a (Iso C a) (idToIso eq_refl) (h a) b).
+  assert (q: e.(eqvFun) = @idToIso C a b).
+  { apply functional_extensionality_dep; intro p. now destruct p. }
+  rewrite <- q. now apply equivFibers.
+Defined.

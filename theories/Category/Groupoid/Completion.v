@@ -1,6 +1,6 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Truncation.
-From Bonak.Category Require Import Category Groupoid HSetCat UnivalenceFacts FunctorUnivalence
+From Bonak.Category Require Import Category Groupoid HSetCat FunctorUnivalence
   Yoneda Completion.
 From Bonak.Category.Groupoid Require Import WeakEquivalence.
 From Bonak.Lib Require Import HGpd.

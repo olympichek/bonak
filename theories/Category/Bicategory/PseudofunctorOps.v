@@ -1,6 +1,5 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet Notation RewLemmas.
-From Bonak.Category Require Import UnivalenceFacts.
 From Bonak.Category.Bicategory Require Export BicategoryEq Pseudofunctor.
 Set Primitive Projections.
 Set Universe Polymorphism.

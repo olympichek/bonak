@@ -1,6 +1,6 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Equiv Truncation.
-From Bonak.Category Require Import Category HSetCat UnivalenceFacts FunctorUnivalence Full
+From Bonak.Category Require Import Category HSetCat FunctorUnivalence Full
   Yoneda WeakEquivalence.
 Set Primitive Projections.
 Set Universe Polymorphism.
