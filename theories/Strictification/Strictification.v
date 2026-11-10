@@ -201,7 +201,7 @@ Module IndexedStrictification (Tr: PropositionalTruncation)
   Module Presentations := PresentationStrictification Tr Complete.
   Module TF := TruncationFacts Tr.
 
-  Module On (A: LayerSig) (B: LayerGpdSig with Definition arity := A.arity.(Dom))
+  Module On (A: LayerSig) (B: LayerGpdSig with Definition arity := A.arity)
     (S: νStrictGpdSig A) (W: νGpdSig B)
     (StrictMaps: StrictGpd.Constructions.ConstructionsSig A S)
     (WeakMaps: Gpd.Constructions.ConstructionsSig B W)

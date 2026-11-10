@@ -15,7 +15,7 @@ Local Set Keyed Unification.
     level-1 extensionality ([ext2]). *)
 
 Module Type LayerGpdSig.
-  Parameter arity: Type.
+  Parameter arity: HSet.
   Parameter Layer: forall (B: arity -> HGpd), HGpd.
   Parameter nth: forall {B: arity -> HGpd}, Layer B -> forall ε, B ε.
   Parameter lam: forall {B: arity -> HGpd}, (forall ε, B ε) -> Layer B.
@@ -496,7 +496,7 @@ Defined.
 End LayerGpdTheory.
 
 Module SimplicialGpdLayer <: LayerGpdSig.
-  Definition arity: Type := unit.
+  Definition arity: HSet := hunit.
   Definition Layer (B: arity -> HGpd): HGpd := B tt.
   Definition nth {B: arity -> HGpd} (l: Layer B) (ε: arity): B ε :=
     match ε with tt => l end.
@@ -522,7 +522,7 @@ Module SimplicialGpdLayer <: LayerGpdSig.
 End SimplicialGpdLayer.
 
 Module CubicalGpdLayer <: LayerGpdSig.
-  Definition arity: Type := bool.
+  Definition arity: HSet := hbool.
 
   Definition Layer (B: arity -> HGpd): HGpd :=
     gsigT (A := B false) (fun _ => B true).

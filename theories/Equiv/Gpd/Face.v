@@ -16,6 +16,7 @@ Import Logic.EqNotations.
 Set Warnings "-notation-overridden".
 From Bonak Require Import SigT LeSProp Notation RewLemmas HGpd νGpd.Layer
   νGpd.Lemmas νGpd.
+From Bonak.Lib Require Import HSet.
 From Bonak.Equiv.Gpd Require Tower.
 
 From Bonak Require Import Limit.

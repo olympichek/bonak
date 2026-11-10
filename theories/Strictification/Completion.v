@@ -62,7 +62,7 @@ Module IndexedCompletionOn (Tr: PropositionalTruncation)
 
   (** The two layer formers share an arity; their representations of layers
       and their indexed cores may differ. *)
-  Module On (A: LayerSig) (B: LayerGpdSig with Definition arity := A.arity.(Dom))
+  Module On (A: LayerSig) (B: LayerGpdSig with Definition arity := A.arity)
     (S: νStrictGpdSig A) (W: νGpdSig B)
     (Strict: StrictGpd.Constructions.ConstructionsSig A S)
     (Weak: Gpd.Constructions.ConstructionsSig B W).
