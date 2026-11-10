@@ -36,7 +36,7 @@ Module Export PresentationRoundtrip := PresheafRoundtripOn A S Base.
 Definition presentationRoundtrip (P: νStrictGpdPresentation arity): g (f P) = P :=
   eq_sym (presheafIsoEq (gf P)).
 
-Definition indexedRoundtrip (X: νStrictGpds): f (g X) = X := νStrictGpdsEquivEq (fg X).
+Definition indexedRoundtrip (X: νStrictGpds): f (g X) = X := fg X.
 
 Definition presheafνStrictGpdsEquiv: Equiv (νStrictGpdPresentation arity) νStrictGpds :=
   qinvEquiv f g presentationRoundtrip indexedRoundtrip.

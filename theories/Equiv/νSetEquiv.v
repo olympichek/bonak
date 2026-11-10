@@ -9,15 +9,7 @@
     [rewTotalνFillerEq] computes that transport on a total-space element:
     the frame component moves along the lower prefix path, the filler
     component through the inverse of the equivalence. This is the one place
-    where the computation rules of [ua] enter.
-
-    An equality of towers then follows from [limitEqIntro], which asks for a
-    family of paths between the stored prefixes commuting with the bonding
-    map. The paths are indexed by [νSetPack], the unfolding whose stage at
-    [m.+1] is definitionally a Σ-type over its stage at [m], whereas a
-    tower stores [approx], for which that holds only up to [approxS].
-    [packPath] identifies the two and [packPathS] shows the identification
-    commutes with the bonding maps, so the paths transfer. *)
+    where the computation rules of [ua] enter. *)
 
 Import Logic.EqNotations.
 
@@ -166,59 +158,6 @@ Qed.
 
 Definition νSetPack (m: nat) (S: νSets):
   {Xp: (νSetAt m).(prefix) &T νSetFrom m Xp} := limitPack m S.
-
-(** Reading the finite unfoldings off the chain
-
-    [νSetPack] rebuilds the level-[m] prefix by iterating the
-    destructors. [packPath] identifies that prefix with level [m] of the
-    tower's stored chain. *)
-
-Definition packPath (m: nat) (S: νSets):
-  (νSetPack m S).1 = S.(approx) m leR_O := limitPackPath m S.
-
-Lemma packPathS (m: nat) (S: νSets):
-  f_equal (fun Y: (νSetAt m.+1).(prefix) => Y.1) (packPath m.+1 S)
-    • S.(approxS) m leR_O leR_O = packPath m S.
-Proof.
-  pose proof (limitPackPathS m S) as H.
-  now rewrite eq_trans_refl_l in H.
-Qed.
-
-(** From coherent prefix paths to tower equality
-
-    Conjugating the given paths by [packPath] gives paths between the
-    stored prefixes, and [packPathS] turns their coherence into the square
-    [limitEqIntro] asks for. The base coherence lives in the [unit] prefix
-    of level 0, hence is free. *)
-
-Lemma νSetsEqFromPaths {SA SB: νSets}
-  (p: forall m, (νSetPack m SA).1 = (νSetPack m SB).1)
-  (ps: forall m,
-    f_equal (fun Xp: (νSetAt m.+1).(prefix) => Xp.1) (p m.+1) = p m):
-  SA = SB.
-Proof.
-  unshelve eapply limitEqIntro.
-  - exact (fun l => eq_sym (packPath l SA) • (p l • packPath l SB)).
-  - now apply unit_UIP.
-  - intro l; cbv beta.
-    rewrite eq_trans_map_distr, eq_trans_map_distr, <- eq_sym_map_distr.
-    rewrite (ps l).
-    rewrite <- (packPathS l SA), <- (packPathS l SB).
-    apply eq_trans_conj_comp.
-Qed.
-
-(** The first projection of an extended prefix path is the lower prefix
-    path. [extendCong] takes the two components of a stage as independent
-    variables, which is what lets both paths be inducted on. *)
-
-Lemma extendCongFst {n} {XA XB: (νSetAt n).(prefix)} (e: XA = XB)
-  {EA: νFillerType XA} {EB: νFillerType XB}
-  (h: rew [νFillerType] e in EA = EB):
-  f_equal (fun Xp: (νSetAt n.+1).(prefix) => Xp.1)
-    (extendCong (T := νSetTel) e h) = e.
-Proof.
-  now destruct e, h.
-Qed.
 
 End νSetEquivOn.
 

@@ -472,38 +472,30 @@ Proof.
         ((νSetPack m.+1 X).2) (descAt m.+1) s)).
 Defined.
 
-Fixpoint fgChain (m: nat):
-  {e: (νSetPack m.+1 (f (g X))).1 = (νSetPack m.+1 X).1 &T
-   FgState m (νSetPack m.+1 (f (g X))) e} :=
+(** The state at every level: at level [0] the prefix path is the
+    canonical one, above it the state of [fgStep]. *)
+
+Definition FgChainState (m: nat):
+  (νSetPack m (f (g X))).1 = (νSetPack m X).1 -> Type :=
   match m with
-  | 0 => (fgPathStep0; (eq_refl; fgFrameStep0))
-  | S m =>
-    let s := fgChain m in
-    let E := fgStep m (νSetPack m.+1 (f (g X))) s.1 s.2 in
-    (extendCong (T := νSetTel) s.1 (νFillerEq s.1 E.1); E.2)
+  | 0 => fun e => e = fgPrefix0
+  | S m => FgState m (νSetPack m.+1 (f (g X)))
   end.
 
-Definition fgPrefix (m: nat):
-  (νSetPack m (f (g X))).1 = (νSetPack m X).1 :=
-  match m with
-  | 0 => fgPrefix0
-  | S m => (fgChain m).1
-  end.
-
-(** Each path is the extension of the one below, so its first projection
-    is the one below ([extendCongFst]). *)
-
-Lemma fgPrefixBond (m: nat):
-  f_equal (fun Xp: (νSetAt m.+1).(prefix) => Xp.1) (fgPrefix m.+1) =
-  fgPrefix m.
+Lemma fgChainStep (m: nat) (e: (νSetPack m (f (g X))).1 = (νSetPack m X).1)
+  (s: FgChainState m e):
+  { h: rew [νFillerType] e in this (νSetPack m (f (g X))).2
+       = this (νSetPack m X).2 &T
+    FgChainState m.+1 (extendCong (T := νSetTel) e h) }.
 Proof.
-  destruct m as [|m].
-  - now exact (extendCongFst fgPrefix0 (νFillerEq fgPrefix0 fgThis0)).
-  - now exact (extendCongFst (fgChain m).1 (νFillerEq (fgChain m).1
-      (fgStep m (νSetPack m.+1 (f (g X))) (fgChain m).1 (fgChain m).2).1)).
-Qed.
+  destruct m as [|m]; cbn in s.
+  - subst e. now exact (νFillerEq fgPrefix0 fgThis0; (eq_refl; fgFrameStep0)).
+  - pose (st := fgStep m _ e s).
+    now exact (νFillerEq e st.1; st.2).
+Defined.
 
-Definition fg: f (g X) = X := νSetsEqFromPaths fgPrefix fgPrefixBond.
+Definition fg: f (g X) = X :=
+  limitEqOfChain (f (g X)) X FgChainState eq_refl fgChainStep.
 End FG.
 
 End νSetRoundtripOn.

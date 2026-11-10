@@ -1271,6 +1271,7 @@ Definition trTel (SA SB: νGpds): Telescope := {|
   bond m P := P.1;
   head m P := P.2;
   bondExtend m P E := eq_refl;
+  headExtend _ _ _ := eq_refl;
   extendHead m P := eq_refl;
   bondExtendHead _ _ := eq_refl;
 |}.

@@ -35,13 +35,8 @@ Definition νFillerType {n} (Xpre: (νGpdAt n).(prefix)): Type :=
     The [m]-step unfolding of a νGpd: the reached prefix, packed with the
     remaining tower so the recursion needs no arithmetic. *)
 
-Fixpoint νGpdPack (m: nat) (S: νGpds):
-  {Xp: (νGpdAt m).(prefix) &T νGpdFrom m Xp} :=
-  match m with
-  | 0 => (tt; S)
-  | S m => (((νGpdPack m S).1; this ((νGpdPack m S).2));
-            next ((νGpdPack m S).2))
-  end.
+Definition νGpdPack (m: nat) (S: νGpds):
+  {Xp: (νGpdAt m).(prefix) &T νGpdFrom m Xp} := limitPack m S.
 
 End TowerOn.
 

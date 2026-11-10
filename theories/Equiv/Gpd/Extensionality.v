@@ -1,6 +1,6 @@
 (** A levelwise equivalence [νGpdsEquiv SA SB] determines compatible
-    paths between finite prefixes. [νGpdsEqFromPaths] turns these into
-    tower equality through [Limit.limitEqIntro].
+    paths between finite prefixes. [limitEqOfPackPaths] turns these into
+    tower equality.
 
     Univalence and function extensionality identify filler families.
     The invariant below compares transport along each prefix path with
@@ -69,100 +69,6 @@ Proof.
   rewrite (rew_map (fun h: HGpd => h.(GDom)) (fun E: νFillerType X1 => E d0)).
   rewrite <- eq_sym_f_equal.
   now rewrite (f_equal__functional_extensionality_dep_good H d0).
-Qed.
-
-(** Reading the finite unfoldings off the chain
-
-    [νGpdPack] rebuilds the level-[m] prefix by iterating the
-    destructors. [packPath] identifies that prefix with level [m] of the
-    tower's stored chain. *)
-
-Fixpoint packApprox (m: nat) (S: νGpds) (l: nat) {struct m}:
-  forall Hl: m <= l, ((νGpdPack m S).2).(approx) l Hl = S.(approx) l leR_O :=
-  match m return forall Hl: m <= l,
-    ((νGpdPack m S).2).(approx) l Hl = S.(approx) l leR_O with
-  | 0 => fun _ => eq_refl
-  | m.+1 => fun Hl => packApprox m S l (↓ Hl)
-  end.
-
-Definition packPath (m: nat) (S: νGpds):
-  (νGpdPack m S).1 = S.(approx) m leR_O :=
-  eq_sym ((νGpdPack m S).2).(approxO)
-  • packApprox m S m leR_refl.
-
-(** Reading it off is compatible with the bonding equations:
-    [νGpdPack]'s own bonding equation is [eq_refl] (its prefix at [m.+1]
-    is literally a pair over its prefix at [m]), the tower's is
-    [approxS]. *)
-
-Lemma packApproxS (m: nat) (S: νGpds) (l: nat) (Hl: m <= l) (HSl: m <= l.+1):
-  f_equal (fun Y: (νGpdAt l.+1).(prefix) => Y.1) (packApprox m S l.+1 HSl)
-    • S.(approxS) l leR_O leR_O
-  = ((νGpdPack m S).2).(approxS) l Hl HSl • packApprox m S l Hl.
-Proof.
-  revert l Hl HSl; induction m as [|m IH]; intros l Hl HSl.
-  - cbn. now rewrite eq_trans_refl_l.
-  - now exact (IH l (↓ Hl) (↓ HSl)).
-Qed.
-
-(** The generic truncation law at this telescope: its [bondExtend] is
-    [eq_refl], so the trailing composite disappears and [bondApproxEta]
-    reads as the first projection of the Σ-equality [approxEta] is built
-    from. *)
-
-Definition approxEtaProj {n} {X: (νGpdAt n).(prefix)} (ν: νGpdFrom n X):
-  f_equal (fun Y: (νGpdAt n.+1).(prefix) => Y.1) (approxEta ν)
-  = ν.(approxS) n leR_refl (↑ leR_refl) • ν.(approxO) :=
-  bondApproxEta ν.
-
-Lemma packPathS (m: nat) (S: νGpds):
-  f_equal (fun Y: (νGpdAt m.+1).(prefix) => Y.1) (packPath m.+1 S)
-    • S.(approxS) m leR_O leR_O = packPath m S.
-Proof.
-  unfold packPath.
-  change ((νGpdPack m.+1 S).2).(approxO)
-    with (approxEta ((νGpdPack m S).2)).
-  change (packApprox m.+1 S m.+1 leR_refl)
-    with (packApprox m S m.+1 (↓ leR_refl)).
-  rewrite eq_trans_map_distr, <- eq_sym_map_distr.
-  rewrite (approxEtaProj ((νGpdPack m S).2)).
-  rewrite <- eq_trans_assoc.
-  rewrite (packApproxS m S m leR_refl (↓ leR_refl)).
-  now apply eq_trans_sym_cancel_common.
-Qed.
-
-(** From coherent prefix paths to tower equality
-
-    Conjugating the given paths by [packPath] gives paths between the
-    stored prefixes, and [packPathS] turns their coherence into the square
-    [limitEqIntro] asks for. The base coherence lives in the [unit] prefix
-    of level 0, hence is free. *)
-
-Lemma νGpdsEqFromPaths {SA SB: νGpds}
-  (p: forall m, (νGpdPack m SA).1 = (νGpdPack m SB).1)
-  (ps: forall m,
-    f_equal (fun Xp: (νGpdAt m.+1).(prefix) => Xp.1) (p m.+1) = p m):
-  SA = SB.
-Proof.
-  unshelve eapply limitEqIntro.
-  - now exact (fun l => eq_sym (packPath l SA) • (p l • packPath l SB)).
-  - now apply unit_UIP.
-  - intro l; cbv beta.
-    rewrite eq_trans_map_distr, eq_trans_map_distr, <- eq_sym_map_distr.
-    rewrite (ps l).
-    rewrite <- (packPathS l SA), <- (packPathS l SB).
-    now apply eq_trans_conj_comp.
-Qed.
-
-(** The first component of an extended prefix path. *)
-
-Lemma extendCongFst {n} {XA XB: (νGpdAt n).(prefix)} (e: XA = XB)
-  {EA: νFillerType XA} {EB: νFillerType XB}
-  (h: rew [νFillerType] e in EA = EB):
-  f_equal (fun Xp: (νGpdAt n.+1).(prefix) => Xp.1)
-    (extendCong (T := νGpdTel) e h) = e.
-Proof.
-  now destruct e, h.
 Qed.
 
 (** Transport along a prefix path
@@ -2085,17 +1991,19 @@ Fixpoint invAt (m: nat):
   end.
 
 Lemma invAtS (m: nat):
-  f_equal (fun Xp: (νGpdAt m.+1).(prefix) => Xp.1) (invEq (invAt m.+1))
-  = invEq (invAt m).
+  f_equal (@bond νGpdTel m) (invEq (invAt m.+1)) • eq_refl
+  = eq_refl • invEq (invAt m).
 Proof.
   cbn [invAt].
   rewrite (invStep _ _).2.
-  unfold extOf. rewrite extendCongFst.
+  unfold extOf.
+  refine (extendCongBond _ _ • _).
+  apply f_equal.
   now apply invEqRew.
 Qed.
 
 Definition νGpdsEquivEq: SA = SB :=
-  νGpdsEqFromPaths (fun m => invEq (invAt m)) invAtS.
+  limitEqOfPackPaths SA SB (fun m => invEq (invAt m)) eq_refl invAtS.
 
 End Conversion.
 

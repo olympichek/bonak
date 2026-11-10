@@ -61,6 +61,7 @@ Definition prefixTelescope: Telescope := {|
   bond n X := X.1;
   head n X := X.2;
   bondExtend n X E := eq_refl;
+  headExtend _ _ _ := eq_refl;
   extendHead n X := eq_refl;
   bondExtendHead n X := eq_refl;
 |}.

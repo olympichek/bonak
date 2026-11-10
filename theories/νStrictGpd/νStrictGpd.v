@@ -520,6 +520,7 @@ Definition νStrictGpdTel: Telescope := {|
   bond l Y := Y.1;
   head l Y := Y.2;
   bondExtend l X E := eq_refl;
+  headExtend _ _ _ := eq_refl;
   extendHead l Y := eq_refl;
   bondExtendHead _ _ := eq_refl;
 |}.
