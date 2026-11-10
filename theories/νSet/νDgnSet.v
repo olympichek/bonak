@@ -2579,6 +2579,12 @@ Definition νDgnSets := νDgnSetFrom 0 (tt; tt).
 
 End νDgnSet.
 
+(** An indexed construction can be shared as a module parameter while
+    retaining the identity of its generated types. *)
+Module Type νDgnSetSig (A: LayerSig).
+Include νDgnSet A.
+End νDgnSetSig.
+
 Module νDgnSetSimplicial := νDgnSet SimplicialLayer.
 Module νDgnSetCubical := νDgnSet CubicalLayer.
 
