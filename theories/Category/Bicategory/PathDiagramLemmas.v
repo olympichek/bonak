@@ -381,8 +381,9 @@ Proof. destruct e. now exact (whiskerAlg _ κ κ' (F.(pcomp) g w X)). Defined.
 
 Lemma pcompWhiskerR {ob: C.(CObj) -> HGpd}
   (F: PathDiagramData C ob) (FA: PathDiagramAssoc C ob F)
-  {a b c d} (u: C.(CHom) a b)
-  {v v': C.(CHom) b c} {w w': C.(CHom) c d}
+  {a b c c' d} (u: C.(CHom) a b)
+  {v: C.(CHom) b c} {w: C.(CHom) c d}
+  {v': C.(CHom) b c'} {w': C.(CHom) c' d}
   (e: v ⨟ w = v' ⨟ w') (X: ob a):
   F.(pcomp) v w (F.(phom) u X)
   • (f_equal (fun z => F.(phom) z (F.(phom) u X)) e

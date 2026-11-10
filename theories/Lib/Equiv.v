@@ -96,6 +96,19 @@ Definition compEquiv {A B C} (e: Equiv A B) (e': Equiv B C): Equiv A C := {|
 Definition symEquiv {A B} (e: Equiv A B): Equiv B A :=
   qinvEquiv (invEq e) e.(eqvFun) (secEq e) (retEq e).
 
+(** A map that closes a commuting square whose three other sides are
+    equivalences is an equivalence. *)
+Definition equivOfSquare {A B C D} (u: Equiv A C) (v: Equiv A B)
+  (w: Equiv B D) (f: C -> D) (square: forall a, w (v a) = f (u a)):
+  Equiv C D.
+Proof.
+  pose (e := compEquiv (symEquiv u) (compEquiv v w)).
+  pose (h := fun c => square (invEq u c) • f_equal f (secEq u c)).
+  refine (qinvEquiv f (invEq e) _ _).
+  - intro c. now exact (f_equal (invEq e) (eq_sym (h c)) • retEq e c).
+  - intro d. now exact (eq_sym (h (invEq e d)) • secEq e d).
+Defined.
+
 (** Adjointification
 
     [IsHAE f] is Definition 4.2.1's [ishae f] written as a record, field for
