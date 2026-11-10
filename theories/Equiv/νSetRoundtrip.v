@@ -424,17 +424,11 @@ Qed.
 
 (** The chain of prefix paths
 
-    The paths are produced level by level by a chain fixpoint whose state
-    carries what the next level needs: the frame identification, and the
-    identification of the presheaf-side approximation with the one
-    [νSetPack] reaches.
-
-    [νSetPack m (f (g X))] and [(pshApprox (g X) m; pshFrom (g X) m)] are
-    two recursions on [m] that agree, but neither reduces at a variable
-    level, so the state also carries their identification. It is [eq_refl]
-    at every level: once the two agree at [m], the [νSetPack] step is the
-    presheaf step by conversion, because [pshApprox] bonds by [eq_refl].
-    The presheaf-side state steps definitionally in the same way,
+    The paths are produced level by level by [limitEqOfPositions], over
+    the presheaf positions [(pshApprox (g X) m; pshFrom (g X) m)], which
+    unfold one level up to the next position by conversion, because
+    [pshApprox] bonds by [eq_refl]. The state carries the frame
+    identification, which steps definitionally on the presheaf side,
     [pshTw (g X) m.+1] being
     [towerStep (g X) (pshTw (g X) m) (pshTwRp (g X) m)]. *)
 
@@ -444,58 +438,38 @@ Fixpoint descAt (m: nat): Desc ((νSetPack m X).2) :=
   | S m => DescS (descAt m)
   end.
 
-Definition FgState (m: nat)
-  (P: {Xp: (νSetAt m.+1).(prefix) &T νSetFrom m.+1 Xp})
-  (e: P.1 = (νSetPack m.+1 X).1): Type :=
-  { HP: (pshApprox (g X) m.+1; pshFrom (g X) m.+1) = P &T
-    FrtInv (rew <- [fun Q: {Xp: (νSetAt m.+1).(prefix) &T νSetFrom m.+1 Xp}
-                      => Q.1 = (νSetPack m.+1 X).1] HP in e)
-      (pshTw (g X) m) ((νSetPack m.+1 X).2) (descAt m.+1) }.
+(** The state: at level [0] the prefix path is the canonical one, above
+    it the frame identification. *)
 
-(** The level step: it extends the prefix path by the level's filler path
-    and rebuilds the state one level up, with the identification of the
-    two approximations consumed first so that the filler equivalence is
-    the presheaf-side one. *)
-
-Lemma fgStep (m: nat)
-  (P: {Xp: (νSetAt m.+1).(prefix) &T νSetFrom m.+1 Xp})
-  (e: P.1 = (νSetPack m.+1 X).1) (s: FgState m P e):
-  { E: νFillerEqvType e (this P.2) (this ((νSetPack m.+1 X).2)) &T
-    FgState m.+1 ((P.1; this P.2); next P.2)
-      (extendCong (T := νSetTel) e (νFillerEq e E)) }.
-Proof.
-  destruct s as (HP, s); revert e s; destruct HP; intros e s; cbn in s |- *.
-  now exact
-    (fgThis e (pshTw (g X) m) ((νSetPack m.+1 X).2) (descAt m.+1) s;
-     (eq_refl;
-      fgFrameStep e (pshTw (g X) m) (pshTwRp (g X) m)
-        ((νSetPack m.+1 X).2) (descAt m.+1) s)).
-Defined.
-
-(** The state at every level: at level [0] the prefix path is the
-    canonical one, above it the state of [fgStep]. *)
-
-Definition FgChainState (m: nat):
-  (νSetPack m (f (g X))).1 = (νSetPack m X).1 -> Type :=
+Definition FgState (m: nat): pshApprox (g X) m = (νSetPack m X).1 -> Type :=
   match m with
   | 0 => fun e => e = fgPrefix0
-  | S m => FgState m (νSetPack m.+1 (f (g X)))
+  | S m => fun e =>
+      FrtInv e (pshTw (g X) m) ((νSetPack m.+1 X).2) (descAt m.+1)
   end.
 
-Lemma fgChainStep (m: nat) (e: (νSetPack m (f (g X))).1 = (νSetPack m X).1)
-  (s: FgChainState m e):
-  { h: rew [νFillerType] e in this (νSetPack m (f (g X))).2
+(** The level step: the filler path of [fgThis] and the frame
+    identification one level up. *)
+
+Lemma fgStep (m: nat) (e: pshApprox (g X) m = (νSetPack m X).1)
+  (s: FgState m e):
+  { h: rew [νFillerType] e in this (pshFrom (g X) m)
        = this (νSetPack m X).2 &T
-    FgChainState m.+1 (extendCong (T := νSetTel) e h) }.
+    FgState m.+1 (extendCong (T := νSetTel) e h) }.
 Proof.
   destruct m as [|m]; cbn in s.
-  - subst e. now exact (νFillerEq fgPrefix0 fgThis0; (eq_refl; fgFrameStep0)).
-  - pose (st := fgStep m _ e s).
-    now exact (νFillerEq e st.1; st.2).
+  - subst e. now exact (νFillerEq fgPrefix0 fgThis0; fgFrameStep0).
+  - now exact
+      (νFillerEq e (fgThis e (pshTw (g X) m) ((νSetPack m.+1 X).2)
+         (descAt m.+1) s);
+       fgFrameStep e (pshTw (g X) m) (pshTwRp (g X) m)
+         ((νSetPack m.+1 X).2) (descAt m.+1) s).
 Defined.
 
 Definition fg: f (g X) = X :=
-  limitEqOfChain (f (g X)) X FgChainState eq_refl fgChainStep.
+  limitEqOfPositions (T := νSetTel)
+    (fun m => (pshApprox (g X) m; pshFrom (g X) m))
+    (fun _ => eq_refl) X FgState eq_refl fgStep.
 End FG.
 
 End νSetRoundtripOn.

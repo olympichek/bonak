@@ -337,9 +337,9 @@ Proof.
 Defined.
 
 (** Assemble the stagewise filler isomorphisms into a chain of prefix
-    paths between the reconstructed tower and its source. The state records
-    the frame identification and the agreement of the two finite
-    unfoldings. *)
+    paths between the reconstructed tower and its source, over the
+    presheaf positions, which unfold one level up to the next position by
+    conversion. The state records the frame identification. *)
 
 Fixpoint descAt (m: nat): Desc ((νStrictGpdPack m X).2) :=
   match m with
@@ -347,57 +347,33 @@ Fixpoint descAt (m: nat): Desc ((νStrictGpdPack m X).2) :=
   | S m => DescS (descAt m)
   end.
 
-Definition FgState (m: nat)
-  (P: {Xp: (νStrictGpdAt m.+1).(prefix) &T νStrictGpdFrom m.+1 Xp})
-  (e: P.1 = (νStrictGpdPack m.+1 X).1): Type :=
-  { HP: (pshApprox (g X) m.+1; pshFrom (g X) m.+1) = P &T
-    FrtInv (rew <- [fun Q: {Xp: (νStrictGpdAt m.+1).(prefix) &T νStrictGpdFrom m.+1 Xp}
-                      => Q.1 = (νStrictGpdPack m.+1 X).1] HP in e)
-      (pshTw (g X) m) ((νStrictGpdPack m.+1 X).2) (descAt m.+1) }.
-
-(** At each positive level, identify the two approximations before
-    constructing the filler isomorphism and the next frame square. *)
-
-Lemma fgStep (m: nat)
-  (P: {Xp: (νStrictGpdAt m.+1).(prefix) &T νStrictGpdFrom m.+1 Xp})
-  (e: P.1 = (νStrictGpdPack m.+1 X).1) (s: FgState m P e):
-  { E: νFillerEqvType e (this P.2) (this ((νStrictGpdPack m.+1 X).2)) &T
-    FgState m.+1 ((P.1; this P.2); next P.2)
-      (extendCong (T := νStrictGpdTel) e (νFillerEq e E)) }.
-Proof.
-  destruct s as (HP, s); revert e s; destruct HP; intros e s; cbn in s |- *.
-  now exact
-    (fgThis e (pshTw (g X) m) ((νStrictGpdPack m.+1 X).2) (descAt m.+1) s;
-     (eq_refl;
-      fgFrameStep e (pshTw (g X) m) (pshTwRp (g X) m)
-        ((νStrictGpdPack m.+1 X).2) (descAt m.+1) s)).
-Defined.
-
-(** The state at every level: at level [0] the prefix path is the
-    canonical one, above it the state of [fgStep]. *)
-
-Definition FgChainState (m: nat):
-  (νStrictGpdPack m (f (g X))).1 = (νStrictGpdPack m X).1 -> Type :=
+Definition FgState (m: nat):
+  pshApprox (g X) m = (νStrictGpdPack m X).1 -> Type :=
   match m with
   | 0 => fun e => e = fgPrefix0
-  | S m => FgState m (νStrictGpdPack m.+1 (f (g X)))
+  | S m => fun e =>
+      FrtInv e (pshTw (g X) m) ((νStrictGpdPack m.+1 X).2) (descAt m.+1)
   end.
 
-Lemma fgChainStep (m: nat)
-  (e: (νStrictGpdPack m (f (g X))).1 = (νStrictGpdPack m X).1)
-  (s: FgChainState m e):
-  { h: rew [νFillerType] e in this (νStrictGpdPack m (f (g X))).2
+Lemma fgStep (m: nat) (e: pshApprox (g X) m = (νStrictGpdPack m X).1)
+  (s: FgState m e):
+  { h: rew [νFillerType] e in this (pshFrom (g X) m)
        = this (νStrictGpdPack m X).2 &T
-    FgChainState m.+1 (extendCong (T := νStrictGpdTel) e h) }.
+    FgState m.+1 (extendCong (T := νStrictGpdTel) e h) }.
 Proof.
   destruct m as [|m]; cbn in s.
-  - subst e. now exact (νFillerEq fgPrefix0 fgThis0; (eq_refl; fgFrameStep0)).
-  - pose (st := fgStep m _ e s).
-    now exact (νFillerEq e st.1; st.2).
+  - subst e. now exact (νFillerEq fgPrefix0 fgThis0; fgFrameStep0).
+  - now exact
+      (νFillerEq e (fgThis e (pshTw (g X) m) ((νStrictGpdPack m.+1 X).2)
+         (descAt m.+1) s);
+       fgFrameStep e (pshTw (g X) m) (pshTwRp (g X) m)
+         ((νStrictGpdPack m.+1 X).2) (descAt m.+1) s).
 Defined.
 
 Definition fg: f (g X) = X :=
-  limitEqOfChain (f (g X)) X FgChainState eq_refl fgChainStep.
+  limitEqOfPositions (T := νStrictGpdTel)
+    (fun m => (pshApprox (g X) m; pshFrom (g X) m))
+    (fun _ => eq_refl) X FgState eq_refl fgStep.
 
 End FG.
 End νStrictGpdRoundtripOn.

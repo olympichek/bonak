@@ -31,7 +31,9 @@
     same stage are equal as soon as their families of stages are, coherently
     with the two fields. It assumes functional extensionality.
     [limitEqOfChain] derives it from a chain of paths between the finite
-    unfoldings, each extending the one below by a path between the data. *)
+    unfoldings, each extending the one below by a path between the data,
+    and [limitEqOfPositions] runs such a chain over a family of positions
+    standing in for the unfoldings of the first limit. *)
 
 Import Logic.EqNotations.
 
@@ -408,3 +410,50 @@ Definition limitEqOfChain: L1 = L2 :=
       (step m (limitChain m).1 (limitChain m).2).1).
 
 End Chain.
+
+(** Chains over positions
+
+    The unfoldings [limitPack m L] are a recursion on [m], so at a variable
+    level they are not convertible with a family of positions [Q] computed
+    by another recursion, even when the two agree at every numeral. If
+    [Q 0] is the limit itself and [QS] identifies each [Q m.+1] with the
+    one-step unfolding of [Q m] — by [eq_refl] when [Q m] is [ofChain] of a
+    family whose bonding coherence is [eq_refl] — the chain can be run over
+    [Q]. The state passed to [limitEqOfChain] pairs an identification of
+    the unfolding with [Q m] with a state [S] over [Q m]; each step
+    eliminates the identification, so that [step] sees [Q m] in place of
+    the unfolding, and carries [S] one level up along [QS]. *)
+
+Section Positions.
+Context {T: Telescope} (Q: forall m, {t: T.(stage) m &T Limit T m t})
+  (QS: forall m, Q m.+1 = (extend (Q m).1 (this (Q m).2); next (Q m).2))
+  (L: Limit T 0 (Q 0).1)
+  (S: forall m, (Q m).1 = (limitPack m L).1 -> Type)
+  (s0: S 0 eq_refl)
+  (step: forall m (e: (Q m).1 = (limitPack m L).1), S m e ->
+    { h: rew [T.(datum) m] e in this (Q m).2 = this (limitPack m L).2 &T
+      S m.+1 (rew <- [fun P: {t: T.(stage) m.+1 &T Limit T m.+1 t} =>
+                        P.1 = (limitPack m.+1 L).1] QS m in
+        (extendCong e h:
+          (extend (Q m).1 (this (Q m).2); next (Q m).2).1 = _)) }).
+
+Definition PositionState m (P: {t: T.(stage) m &T Limit T m t})
+  (e: P.1 = (limitPack m L).1): Type :=
+  { HP: Q m = P &T
+    S m (rew <- [fun P: {t: T.(stage) m &T Limit T m t} =>
+                   P.1 = (limitPack m L).1] HP in e) }.
+
+Definition positionStep m (P: {t: T.(stage) m &T Limit T m t})
+  (e: P.1 = (limitPack m L).1) (st: PositionState m P e):
+  { h: rew [T.(datum) m] e in this P.2 = this (limitPack m L).2 &T
+    PositionState m.+1 (extend P.1 (this P.2); next P.2) (extendCong e h) }.
+Proof.
+  destruct st as (HP, st); revert e st; destruct HP; intros e st.
+  now exact ((step m e st).1; (QS m; (step m e st).2)).
+Defined.
+
+Definition limitEqOfPositions: (Q 0).2 = L :=
+  limitEqOfChain (Q 0).2 L (fun m => PositionState m (limitPack m (Q 0).2))
+    (eq_refl; s0) (fun m => positionStep m (limitPack m (Q 0).2)).
+
+End Positions.
