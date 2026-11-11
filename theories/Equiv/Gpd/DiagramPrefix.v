@@ -6,7 +6,6 @@ From Bonak.Lib Require Import HSet HGpd SigT Equiv Funext Notation RewLemmas
   FinitePrefix Limit SequentialLimit TelescopeCompletion LeSProp NatLemmas PathSquares.
 From Bonak.νGpd Require Import Layer νGpd.
 From Bonak.Presheaf.Gpd Require Import Presentation Comparison.
-From Bonak.Reedy.Gpd Require Import Reedy Bounded.
 From Bonak.Equiv.Gpd Require Import Face Diagram Causality PositionExtraction.
 
 Import Logic.EqNotations.
@@ -18,17 +17,33 @@ Module IndexedDiagramPrefixOn (A: LayerGpdSig) (Core: νGpdSig A)
   (Faces: FaceSig A Core) (D: IndexedDiagramSig A Core Faces).
 Import A.
 Module Export Diagram := D.
-Module Readout := DiagramFacesOn A Core Faces D.
 Module Frame := FrameCausalityOn A Core Faces.
 Module Causality := Frame.Causality.
 Module Position := PositionExtractionOn A Core Faces D.Extraction.
 Module Comparisons := GpdComparison A.
 
+(** The chain carried by the packed position is lifted once per level.
+    Its length identifies it with the chain selected by the stored prefix. *)
+Fixpoint packedChain (Y: νGpds) (n: nat):
+  {dc: DepsCohs3 0 n &T DepsCohs3Chain (Extraction.νDepsCohs3At (νGpdPack n Y).2) dc} :=
+  match n with
+  | 0 => (Extraction.νDepsCohs3At Y; DepsCohs3ChainNil)
+  | S k => (_; chainUp1 (Extraction.νExt3At (νGpdPack k Y).2) (packedChain Y k).2)
+  end.
+
+Lemma packedChainLength (Y: νGpds) n: cohs3ChainLen (packedChain Y n).2 = n.
+Proof.
+  induction n as [|k IH].
+  - now reflexivity.
+  - now exact (f_equal S (Extraction.cohs3ChainUpLen (Extraction.νExt3At (νGpdPack k Y).2)
+      (packedChain Y k).2 • IH)).
+Defined.
+
 (** The relative descent uses transparent arithmetic at residual levels
     zero, one and two, while retaining the extraction's original chains. *)
 Definition packedState (Y: νGpds) n: Position.Partial.PartialState 0 n :=
   (n; ((νGpdPack n Y).1; ((νGpdPack n Y).2;
-    Readout.descChain Y (Readout.descPack Y n)))).
+    packedChain Y n))).
 
 Fixpoint selectedDescPack (Y: νGpds) (n: nat): Position.Relative.Desc Y n (packedState Y n) :=
   match n with
@@ -142,13 +157,13 @@ Proof.
 Defined.
 
 Lemma descChainNormalize (Y: νGpds) n:
-  Readout.descChain Y (Readout.descPack Y n)
+  packedChain Y n
     = completeChain3 (Extraction.νDepsCohs3At (νGpdPack n Y).2).
 Proof.
   now exact (completeChain3Unique
     (Extraction.νDepsCohs3At (νGpdPack n Y).2)
-    (Readout.descChain Y (Readout.descPack Y n))
-    (Readout.descChainLen Y (Readout.descPack Y n))).
+    (packedChain Y n)
+    (packedChainLength Y n)).
 Defined.
 
 (** Face and exchange data at a tower position are already stored in
@@ -233,7 +248,7 @@ Definition prefixLocalDataNormalize {n} (X: (νGpdAt n.+3).(prefix)):
 
 Lemma extractedChainedData (Y: νGpds) n:
   Causality.rawChainedFaceData (Extraction.νExt3At (νGpdPack n Y).2)
-    (Readout.descChain Y (Readout.descPack Y n)) =
+    (packedChain Y n) =
   normalizedPrefixChainedData (νGpdPack n.+3 Y).1.
 Proof.
   refine (Causality.chainedFaceDataNormalize _ _ • _).
@@ -250,7 +265,7 @@ Definition packedReadout (Y: νGpds) n:
 Definition packedRawData (Y: νGpds) n:
   Causality.ChainedFaceData (Extraction.νDepsCohs3At (νGpdPack n Y).2) :=
   Causality.rawChainedFaceData (Extraction.νExt3At (νGpdPack n Y).2)
-    (Readout.descChain Y (Readout.descPack Y n)).
+    (packedChain Y n).
 
 Definition packedRawFace (Y: νGpds) n q (Hq: q <= n) a
   (x: prefixCell (νGpdPack n.+2 Y).1): prefixCell (νGpdPack n.+1 Y).1 :=
@@ -372,35 +387,6 @@ Definition packedNormalizedComparison (Y: νGpds):
   @Comparisons.Build_FaceComparison _ _ _ _ _ _ (packedReadout Y)
     (packedNormalizedReadoutFace Y) (packedNormalizedReadoutExchange Y).
 
-Definition globalToPackedComparison (Y: νGpds) :=
-  Comparisons.inverseComparison (packedNormalizedComparison Y).
-
-Definition indexedPackedChain (Y: νGpds):
-  SequentialLimit νGpdTel.(stage) (fun n => @bond νGpdTel n) :=
-  ((fun n => (νGpdPack n Y).1); fun _ => eq_refl).
-
-Definition earlierPrefixPath {N} (Y Z: νGpds)
-  (e: (νGpdPack N Y).1 = (νGpdPack N Z).1) m (h: m <= N):
-  (νGpdPack m Y).1 = (νGpdPack m Z).1 :=
-  takeStageChainPath N νGpdTel (indexedPackedChain Y) (indexedPackedChain Z) e m h.
-
-Lemma earlierPrefixPathAt {N} (Y Z: νGpds)
-  (e: (νGpdPack N Y).1 = (νGpdPack N Z).1):
-  earlierPrefixPath Y Z e N leR_refl = e.
-Proof. now exact (takeStageChainPathAt N νGpdTel
-  (indexedPackedChain Y) (indexedPackedChain Z) e). Defined.
-
-Lemma earlierPrefixPathBond {N} (Y Z: νGpds)
-  (e: (νGpdPack N Y).1 = (νGpdPack N Z).1) m (h: m.+1 <= N):
-  projT1_eq (earlierPrefixPath Y Z e m.+1 h) = earlierPrefixPath Y Z e m (↓ h).
-Proof.
-  pose proof (takeStageChainPathBond N νGpdTel
-    (indexedPackedChain Y) (indexedPackedChain Z) e m h) as square.
-  change (projT1_eq (earlierPrefixPath Y Z e m.+1 h) • eq_refl =
-    eq_refl • earlierPrefixPath Y Z e m (↓ h)) in square.
-  now rewrite eq_trans_refl_l, eq_trans_refl_r in square.
-Defined.
-
 (** A path of stored prefixes acts coherently on their indexed generators. *)
 Definition prefixCellTransport {n} {X Y: (νGpdAt n.+1).(prefix)} (p: X = Y)
   (x: prefixCell X): prefixCell Y :=
@@ -442,30 +428,6 @@ Proof.
   destruct hm, hl, p.
   cbn [prefixFaceMap prefixFaceTransport prefixCellTransport].
   rewrite f_equal_id, eq_trans_refl_l, eq_trans_refl_r. now reflexivity.
-Defined.
-
-Definition coherentUnitCellEquiv {n} (X: (νGpdAt n).(prefix)):
-  Equiv (prefixCell (unitExtension X)) (Extraction.gF0 (completePrefix X) n) :=
-  compEquiv
-    (rewEquiv (fun Y: (νGpdAt n.+1).(prefix) => GDom (prefixCell Y))
-      (eq_sym (packedUnitPrefix X)))
-    (packedReadout (completePrefix X) n).
-
-Definition frameMatchingMap {n} (X: (νGpdAt n).(prefix)) (d: νFrame X):
-  MatchingObject (finiteDiagram X) :=
-  matchingMap (restrictDiagram (S n) (indexedDiagram (completePrefix X)))
-    (coherentUnitCellEquiv X (d; tt)).
-
-Lemma frameMatchingMapIsEquiv {n} (X: (νGpdAt n).(prefix))
-  (H: IsEquiv (matchingMap
-    (restrictDiagram (S n) (indexedDiagram (completePrefix X))))):
-  IsEquiv (frameMatchingMap X).
-Proof.
-  now exact (compEquiv (symEquiv (unitPrefixProjectionEquiv X))
-    (compEquiv (coherentUnitCellEquiv X)
-      {| eqvFun := matchingMap
-          (restrictDiagram (S n) (indexedDiagram (completePrefix X)));
-        eqvIsEquiv := H |})).(eqvIsEquiv).
 Defined.
 
 End IndexedDiagramPrefixOn.

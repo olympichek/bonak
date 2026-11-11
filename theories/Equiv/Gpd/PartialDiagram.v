@@ -57,11 +57,6 @@ Proof. now reflexivity. Defined.
 Definition stateFrame {p k} (z: PartialState p k): HGpd :=
   mkFrame (stateCohs z).(_depsCohs2).(_depsCohs).(_deps).
 
-Lemma stateUpFrame {p k} (z: PartialState p k):
-  stateFrame (stateUp z) =
-    mkFrame (mkDepsRestr (depsCohs := (stateCohs z).(_depsCohs2).(_depsCohs))).
-Proof. now reflexivity. Defined.
-
 Definition stateRestrict {p k} (z: PartialState p k)
   q (Hq: q <= k) a: stateFrame (stateNext z) -> stateFrame z :=
   mkRestrFrame (depsCohs := (stateCohs z).(_depsCohs2).(_depsCohs)) q Hq a.
@@ -118,35 +113,6 @@ Definition stateTotalHex {p k} (z: PartialState p k)
       (stateTotalFace (stateNext (stateNext z)) q.+2 (⇑ (⇑ Hq)) a x)) :=
   gFaceCoh2C z.2.2.1 z.2.2.2.2 0 q Hq r Hr s Hs a b c x.
 
-Definition stateProjection {p k} (z: PartialState p k) (t: stateTotal z): stateFrame z :=
-  getFrame (cohsChainDeps (cohs2ChainDepsCohs (cohs3ChainDepsCohs2 z.2.2.2.2))) t.1.
-
-Local Lemma extChainDepsCohs {P K} {dcTop: DepsCohs P K}
-  {p k} {dc: DepsCohs p k} (c: DepsCohsChain dcTop dc):
-  extChainDeps (cohsChainExt c) = cohsChainDeps c.
-Proof. induction c; cbn; [now reflexivity|now rewrite IHc]. Defined.
-
-Local Lemma nextProjectionChain {P K} {dcTop: DepsCohs3 P K}
-  (e: DepsCohs3Extension P K dcTop) {p k} {dc: DepsCohs3 p k}
-  (c: DepsCohs3Chain dcTop dc):
-  cohsChainDeps (cohs2ChainDepsCohs (cohs3ChainDepsCohs2 (chainUp1 e c))) =
-    DepsChainCons (cohsChainNext (cohs2ChainDepsCohs (cohs3ChainDepsCohs2 c))).
-Proof. induction c; cbn; [now reflexivity|now exact (f_equal (fun c => DepsChainCons c) IHc)]. Defined.
-
-Lemma stateProjectionFace {p k} (z: PartialState p k)
-  q (Hq: q <= k) a (t: stateTotal (stateNext z)):
-  stateProjection z (stateTotalFace z q Hq a t) =
-    stateRestrict z q Hq a (stateProjection (stateNext z) t).
-Proof.
-  unfold stateProjection, stateTotalFace, stateRestrict.
-  cbn [gFaceC]. unfold faceDeep, faceAt, restrCell.
-  rewrite <- extChainDepsCohs, getFrameGetPainting.
-  unfold stateNext; cbn [projT1 projT2].
-  apply f_equal.
-  now exact (eq_sym (f_equal (fun c => getFrame c t.1)
-    (nextProjectionChain (νExt3At z.2.2.1) z.2.2.2.2))).
-Defined.
-
 (** Whole cells decoded at the endpoint of the indexed projection chain. *)
 Definition stateLocalCell {p k} (z: PartialState p k): HGpd :=
   {d: stateFrame z & mkPainting (stateCohs z).(_depsCohs2).(_depsCohs).(_extraDeps) d}.
@@ -179,34 +145,15 @@ Definition stateLocalHex {p k} (z: PartialState p k)
   restrCellCoh2 (stateCohs z) (chain3Ext (νExt3At z.2.2.1) z.2.2.2.2)
     q Hq r Hr s Hs a b c x.1 x.2.
 
-Local Lemma pairPathBase {T: Type} {P: T -> Type} {x y: T}
-  {u: P x} {v: P y} (p: x = y) (q: rew [P] p in u = v):
-  projT1_eq (= p; q) = p.
-Proof. now destruct q, p. Defined.
-
 Lemma stateLocalProjectionFace {p k} (z: PartialState p k)
   q (Hq: q <= k) a (t: stateLocalCell (stateNext z)):
   (stateLocalFace z q Hq a t).1 = stateRestrict z q Hq a t.1.
 Proof. now reflexivity. Defined.
 
-Lemma stateLocalProjectionCoh {p k} (z: PartialState p k)
-  q (Hq: q <= k) r (Hr: r <= q) a b (t: stateLocalCell (stateNext (stateNext z))):
-  f_equal (fun t: stateLocalCell z => t.1) (stateLocalCoh z q Hq r Hr a b t) =
-    stateRestrictCoh z q Hq r Hr a b t.1.
-Proof. unfold stateLocalCoh, restrCellCoh, stateRestrictCoh. now apply pairPathBase. Defined.
-
 Definition stateCellEquiv {p k} (z: PartialState p k):
   Equiv (stateLocalCell z) (stateTotal z) :=
   Paths.paintingChainEquiv
     (cohsChainExt (cohs2ChainDepsCohs (cohs3ChainDepsCohs2 z.2.2.2.2))).
-
-Lemma stateCellProjection {p k} (z: PartialState p k) (t: stateLocalCell z):
-  stateProjection z (stateCellEquiv z t) = t.1.
-Proof.
-  unfold stateProjection.
-  rewrite <- extChainDepsCohs.
-  now apply getFrameGetPainting.
-Defined.
 
 Definition stateCellFace {p k} (z: PartialState p k)
   q (Hq: q <= k) a (t: stateLocalCell (stateNext z)):
@@ -287,10 +234,6 @@ Definition partialLocalCellPresentation: νGpdPresentation arity := {|
   GFaceCoh2 k q Hq r Hr s Hs a b c := stateLocalHex (partialState k) q Hq r Hr s Hs a b c;
 |}.
 
-Definition partialFrameDiagram := toPsfTot arity partialFramePresentation.
-Definition partialCellDiagram := toPsfTot arity partialCellPresentation.
-Definition partialLocalCellDiagram := toPsfTot arity partialLocalCellPresentation.
-
 End Start.
 
 Lemma partialStateDrop {p} {X: (νGpdAt p).(prefix)} (L: νGpdFrom p X) (k: nat):
@@ -309,22 +252,6 @@ Proof.
   - now reflexivity.
   - change (stateNext (partialState (next L) k) = stateUp (stateNext (partialState L k))).
     rewrite <- stateNextUp. now exact (f_equal (@stateNext p.+1 k) IH).
-Defined.
-
-(** The two ways of moving the newly retained layer agree with the
-    original successor state, including the chosen endpoint paths. *)
-Lemma partialStateDropUp {p} {X: (νGpdAt p).(prefix)} (L: νGpdFrom p X) (k: nat):
-  partialStateDrop L k • f_equal (@stateDrop p k) (partialStateUp L k) = eq_refl.
-Proof.
-  induction k as [|k IH]; [now reflexivity|].
-  change (f_equal (@stateNext p k.+1) (partialStateDrop L k)
-    • f_equal (@stateDrop p k.+1)
-      (f_equal (@stateNext p.+1 k) (partialStateUp L k)) = eq_refl).
-  rewrite (f_equal_compose (@stateNext p.+1 k) (@stateDrop p k.+1) (partialStateUp L k)).
-  change (f_equal (@stateNext p k.+1) (partialStateDrop L k)
-    • f_equal (fun z => stateNext (stateDrop z)) (partialStateUp L k) = eq_refl).
-  rewrite <- (f_equal_compose (@stateDrop p k) (@stateNext p k.+1) (partialStateUp L k)).
-  rewrite <- eq_trans_map_distr, IH. now reflexivity.
 Defined.
 
 End Partial.
@@ -350,96 +277,6 @@ Proof.
     ((mkDepsCohs (proj1DepsCohs2 dc3.(_depsCohs2))).(_cohs).2 Q.+1 (⇑ HQ) R.+1 (⇑ HR) ε ω D)
     (mkCohLayer dc3.(_depsCohs2).(_cohPaintings).2 dc3.(_depsCohs2).(_coh2Frames).2 Q HQ R HR ε ω D C.1)
     (mkCohPainting dc3.(_extraDepsCohs2) Q HQ R HR ε ω (D; C.1) C.2))).
-Defined.
-
-(** The cell a stage sees, one stage below its extension. *)
-Definition CellBelow {p k} (dc3: DepsCohs3 p k): Type :=
-  { D: mkFrame (mkDepsRestr (depsCohs :=
-        (proj1DepsCohs2 (mkDepsCohs2 dc3)).(_depsCohs))).(1) &T
-    (mkPaintings (mkDepsRestr (depsCohs :=
-        (proj1DepsCohs2 (mkDepsCohs2 dc3)).(_depsCohs));
-        mkExtraDeps (proj1DepsCohs2 (mkDepsCohs2 dc3)).(_extraDepsCohs))).2 D }.
-
-Definition assocC {p k} {dc3: DepsCohs3 p.+1 k}
-  (w: CellBelow (proj1DepsCohs3 dc3)): CellBelow dc3 :=
-  ((w.1; w.2.1); w.2.2).
-
-Lemma faceAtCohUpShift {P K} {dc3Top: DepsCohs3 P K}
-  (e0: DepsCohs3Extension P K dc3Top) {p k} {dc3: DepsCohs3 p.+1 k}
-  (a: DepsCohs3Chain dc3Top dc3)
-  (Q: nat) (HQ: Q <= k) (R: nat) (HR: R <= Q) (ε ω: arity)
-  (w: CellBelow (proj1DepsCohs3 dc3)):
-  faceAtCohUp e0 (DepsCohs3ChainCons a) Q.+1 (⇑ HQ) R.+1 (⇑ HR) ε ω w.1 w.2
-  = faceAtCohUp e0 a Q HQ R HR ε ω (assocC w).1 (assocC w).2.
-Proof.
-  rewrite 2 faceAtCohUpConj.
-  apply conjShiftM.
-  - now exact (f_equal_compose unassoc
-      (fun w0 => faceAt (cohs3ChainDepsCohs2 (DepsCohs3ChainCons a)) Q.+1 (⇑ HQ) ε w0.1 w0.2)
-      (deepCellFaceAtUp e0 a R (HR ↕ ↑ HQ) ω (assocC w).1 (assocC w).2)).
-  - refine (eq_trans (f_equal (fun z => f_equal (faceRebuild (DepsCohs3ChainCons a)) z)
-      (restrCellCohShift dc3 Q HQ R HR ε ω w.1 w.2)) _).
-    now exact (f_equal_compose unassoc (faceRebuild (DepsCohs3ChainCons a))
-      (restrCellCoh dc3 Q HQ R HR ε ω (assocC w).1 (assocC w).2)).
-  - now exact (f_equal_compose unassoc
-      (fun w0 => faceAt (cohs3ChainDepsCohs2 (DepsCohs3ChainCons a)) R.+1 (⇑ HR ↕ ⇑ HQ) ω w0.1 w0.2)
-      (deepCellFaceAtUp e0 a Q.+1 (⇑ HQ) ε (assocC w).1 (assocC w).2)).
-Defined.
-
-
-(** Cancelling a descent step shifts the residual face index by one. *)
-Lemma gFaceCCons (n: nat):
-  forall {m} {X: (νGpdAt m).(prefix)} (L: νGpdFrom m X)
-    {p k} {dc: DepsCohs3 p.+1 k} (c: DepsCohs3Chain (νDepsCohs3At L) dc)
-    q (Hq: q <= n + k) (HqFull: q.+1 <= n + k.+1) a (t: gF0 L n.+1),
-  gFaceC L (DepsCohs3ChainCons c) n q.+1 HqFull a t =
-    gFaceC L c n q Hq a t.
-Proof.
-  induction n as [|n IH]; intros m X L p k dc c q Hq HqFull a t.
-  - now reflexivity.
-  - cbn [gFaceC]. now apply IH.
-Defined.
-
-Lemma gFaceCohCCons (n: nat):
-  forall {m} {X: (νGpdAt m).(prefix)} (L: νGpdFrom m X)
-    {p k} {dc: DepsCohs3 p.+1 k} (c: DepsCohs3Chain (νDepsCohs3At L) dc)
-    q (Hq: q <= n + k) (HqFull: q.+1 <= n + k.+1)
-    r (Hr: r <= q) a b (t: gF0 L n.+2),
-  gFaceCohC L (DepsCohs3ChainCons c) n q.+1 HqFull r.+1 (⇑ Hr) a b t
-    • (gFaceCCons n L c r (Hr ↕ Hq) (⇑ Hr ↕ HqFull) b
-        (gFaceC L (DepsCohs3ChainCons c) n.+1 q.+2 (⇑ HqFull) a t)
-      • f_equal (gFaceC L c n r (Hr ↕ Hq) b)
-        (gFaceCCons n.+1 L c q.+1 (⇑ Hq) (⇑ HqFull) a t)) =
-  (gFaceCCons n L c q Hq HqFull a
-      (gFaceC L (DepsCohs3ChainCons c) n.+1 r.+1 (⇑ Hr ↕ ↑ HqFull) b t)
-    • f_equal (gFaceC L c n q Hq a)
-      (gFaceCCons n.+1 L c r (Hr ↕ ↑ Hq) (⇑ Hr ↕ ↑ HqFull) b t))
-    • gFaceCohC L c n q Hq r Hr a b t.
-Proof.
-  induction n as [|n IH]; intros m X L p k dc c q Hq HqFull r Hr a b t.
-  - cbn [gFaceCohC gFaceCCons f_equal].
-    rewrite (faceAtCohUpShift (νExt3At L) c q Hq r Hr a b
-      (deepCell (cohs3ChainDepsCohs2
-        (chainUp1 (νExt3At L) (DepsCohs3ChainCons c))) t)).
-    now rewrite 2 eq_trans_refl_l, eq_trans_refl_r.
-  - now exact (IH _ _ (next L) p k.+1 _ (chainUp1 (νExt3At L) c) q
-      (leR_eq_r (plus_n_Sm n k) Hq)
-      (leR_eq_r (plus_n_Sm n k.+1) HqFull) r Hr a b t).
-Defined.
-
-Lemma stateTotalFaceDrop {p k} (z: PartialState p.+1 k)
-  q (Hq: q <= k) a (t: stateTotal (stateNext z)):
-  stateTotalFace (stateDrop z) q.+1 (⇑ Hq) a t = stateTotalFace z q Hq a t.
-Proof. now reflexivity. Defined.
-
-Lemma stateTotalCohDrop {p k} (z: PartialState p.+1 k)
-  q (Hq: q <= k) r (Hr: r <= q) a b (t: stateTotal (stateNext (stateNext z))):
-  stateTotalCoh (stateDrop z) q.+1 (⇑ Hq) r.+1 (⇑ Hr) a b t =
-    stateTotalCoh z q Hq r Hr a b t.
-Proof.
-  now exact (faceAtCohUpShift (νExt3At z.2.2.1) z.2.2.2.2 q Hq r Hr a b
-    (deepCell (cohs3ChainDepsCohs2
-      (chainUp1 (νExt3At z.2.2.1) (DepsCohs3ChainCons z.2.2.2.2))) t)).
 Defined.
 
 End Shift.

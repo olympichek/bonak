@@ -48,6 +48,7 @@ theories/Category/SequentialFunctor.v
 theories/Category/WeakEquivalence.v
 theories/Category/Yoneda.v
 theories/Equiv/Boundary.v
+theories/Equiv/ChainDepth.v
 theories/Equiv/Correspondence.v
 theories/Equiv/Dgn/Correspondence.v
 theories/Equiv/Dgn/Latching.v
@@ -80,6 +81,7 @@ theories/Equiv/Gpd/PresheafEquiv.v
 theories/Equiv/Gpd/PresheafOfνGpd.v
 theories/Equiv/Gpd/PresheafRoundtrip.v
 theories/Equiv/Gpd/ReedyCorrespondence.v
+theories/Equiv/Gpd/StoredDiagram.v
 theories/Equiv/Gpd/Tower.v
 theories/Equiv/Gpd/νGpdEquiv.v
 theories/Equiv/Gpd/νGpdOfPresheaf.v
@@ -135,7 +137,6 @@ theories/Lib/TelescopeCompletion.v
 theories/Lib/TelescopeLimit.v
 theories/Lib/Truncation.v
 theories/Lib/Univalence.v
-theories/Presheaf/BoundedMap.v
 theories/Presheaf/CategoryAction.v
 theories/Presheaf/Correspondence.v
 theories/Presheaf/Dgn/Correspondence.v
@@ -149,7 +150,6 @@ theories/Presheaf/FaceStructure.v
 theories/Presheaf/Functor.v
 theories/Presheaf/GeneratingFaces.v
 theories/Presheaf/GeneratorCoherence.v
-theories/Presheaf/Gpd/Bounded.v
 theories/Presheaf/Gpd/Comparison.v
 theories/Presheaf/Gpd/Cone.v
 theories/Presheaf/Gpd/Correspondence.v

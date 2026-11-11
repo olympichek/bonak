@@ -9,6 +9,8 @@ From Bonak.νSet Require Import Layer νSet.
 From Bonak.Equiv Require Import Face.
 From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
 
+From Bonak.Equiv Require ChainDepth.
+
 Set Primitive Projections.
 Set Printing Projections.
 Set Keyed Unification.
@@ -505,63 +507,28 @@ End ReconstructFrame.
 
 Module ChainPairs (A: LayerSig) (V: νSetSig A).
 Module Export Frames := ReconstructFrame A V.
-Definition IndexedChainPack {P K} (dc: DepsCohs2 P K): Type :=
-  {p: nat &T {k: nat &T {d: DepsCohs2 p k &T DepsCohs2Chain dc d}}}.
-Definition indexedChainLength {P K} {dc: DepsCohs2 P K} (c: IndexedChainPack dc): nat :=
-  cohsChainLen (cohs2ChainDepsCohs c.2.2.2).
-Definition prependIndexedChain {P K} (dc: DepsCohs2 P.+1 K)
-  (c: IndexedChainPack (proj1DepsCohs2 dc)): IndexedChainPack dc :=
-  (c.1; (c.2.1; (c.2.2.1; cohs2ChainCompose (DepsCohs2ChainCons DepsCohs2ChainNil) c.2.2.2))).
-Lemma prependIndexedChainLength {P K} (dc: DepsCohs2 P.+1 K) c:
-  indexedChainLength (prependIndexedChain dc c) = (indexedChainLength c).+1.
+Local Lemma lengthJoin {P K} {x: DepsCohs2 P K} {p k} {y: DepsCohs2 p k}
+  {l m} {z: DepsCohs2 l m} (a: DepsCohs2Chain x y) (b: DepsCohs2Chain y z):
+  cohsChainLen (cohs2ChainDepsCohs (cohs2ChainCompose a b)) =
+    cohsChainLen (cohs2ChainDepsCohs a) + cohsChainLen (cohs2ChainDepsCohs b).
 Proof.
-  unfold indexedChainLength, prependIndexedChain; cbn.
-  rewrite cohs2ChainDepsCohsCompose. now apply prefixChainLength.
+  induction b; cbn.
+  - now apply plus_n_O.
+  - rewrite IHb. now apply plus_n_Sm.
 Qed.
-Fixpoint indexedChainAtDepth P: forall K (dc: DepsCohs2 P K) (i: FaceDepth P),
-  {c: IndexedChainPack dc &T indexedChainLength c = depth i}.
-Proof.
-  destruct P as [|P]; intros K dc [[|i] hi].
-  - now exact ((0; (K; (dc; DepsCohs2ChainNil))); eq_refl).
-  - destruct (leR_O_contra hi).
-  - now exact ((P.+1; (K; (dc; DepsCohs2ChainNil))); eq_refl).
-  - pose (c := indexedChainAtDepth P K.+1 (proj1DepsCohs2 dc)
-      {| depth := i; depthBound := ⇓ hi |}).
-    now exact (prependIndexedChain dc c.1; prependIndexedChainLength dc c.1 • f_equal S c.2).
-Defined.
-Definition IndexedChainPair {P K} (dc: DepsCohs2 P K): Type :=
-  {c: IndexedChainPack dc &T IndexedChainPack c.2.2.1}.
-Definition joinIndexedChains {P K} {dc: DepsCohs2 P K} (c: IndexedChainPair dc): IndexedChainPack dc :=
-  (c.2.1; (c.2.2.1; (c.2.2.2.1; cohs2ChainCompose c.1.2.2.2 c.2.2.2.2))).
-Definition prependIndexedPair {P K} (dc: DepsCohs2 P.+1 K)
-  (c: IndexedChainPair (proj1DepsCohs2 dc)): IndexedChainPair dc :=
-  (prependIndexedChain dc c.1; c.2).
-Lemma prependIndexedPairJoin {P K} (dc: DepsCohs2 P.+1 K) c:
-  joinIndexedChains (prependIndexedPair dc c) = prependIndexedChain dc (joinIndexedChains c).
-Proof.
-  unfold joinIndexedChains, prependIndexedPair, prependIndexedChain; cbn.
-  now rewrite cohs2ComposeAssoc.
-Qed.
-Fixpoint indexedPairAtDepth P: forall K (dc: DepsCohs2 P K)
-  (i j: FaceDepth P), depth i <= depth j ->
-  {c: IndexedChainPair dc &T ((indexedChainLength c.1 = depth i) *
-    (indexedChainLength (joinIndexedChains c) = depth j))%type}.
-Proof.
-  destruct P as [|P]; intros K dc [[|i] hi] [[|j] hj] hij;
-    try (destruct (leR_O_contra hi)); try (destruct (leR_O_contra hj));
-    try (destruct (leR_O_contra hij)).
-  - now exact (((0; (K; (dc; DepsCohs2ChainNil))); (0; (K; (dc; DepsCohs2ChainNil)))); (eq_refl, eq_refl)).
-  - now exact (((P.+1; (K; (dc; DepsCohs2ChainNil))); (P.+1; (K; (dc; DepsCohs2ChainNil)))); (eq_refl, eq_refl)).
-  - pose (c := indexedChainAtDepth P.+1 K dc {| depth := j.+1; depthBound := hj |}).
-    refine (((P.+1; (K; (dc; DepsCohs2ChainNil))); c.1); (eq_refl, _)).
-    unfold joinIndexedChains, indexedChainLength; cbn. rewrite cohs2ComposeNil. now exact c.2.
-  - pose (c := indexedPairAtDepth P K.+1 (proj1DepsCohs2 dc)
-      {| depth := i; depthBound := ⇓ hi |} {| depth := j; depthBound := ⇓ hj |} (⇓ hij)).
-    refine (prependIndexedPair dc c.1; (_, _)).
-    + now exact (prependIndexedChainLength dc c.1.1 • f_equal S (fst c.2)).
-    + rewrite prependIndexedPairJoin, prependIndexedChainLength.
-      now exact (f_equal S (snd c.2)).
-Defined.
+Definition depthChains: ChainDepth.ChainSystem := {|
+  ChainDepth.stage := DepsCohs2;
+  ChainDepth.drop := @proj1DepsCohs2;
+  ChainDepth.chain := @DepsCohs2Chain;
+  ChainDepth.nil := @DepsCohs2ChainNil;
+  ChainDepth.step P K x := DepsCohs2ChainCons DepsCohs2ChainNil;
+  ChainDepth.join := @cohs2ChainCompose;
+  ChainDepth.len P K x p k y c := cohsChainLen (cohs2ChainDepsCohs c);
+  ChainDepth.lenNil P K x := eq_refl;
+  ChainDepth.lenStep P K x := eq_refl;
+  ChainDepth.lenJoin := @lengthJoin;
+|}.
+
 Lemma indexedChainComposeLe {P K} {dc: DepsCohs2 P K}
   {p k} {d: DepsCohs2 p k} {p' k'} {d': DepsCohs2 p' k'}
   (c: DepsCohs2Chain dc d) (c': DepsCohs2Chain d d'):

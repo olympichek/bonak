@@ -14,7 +14,7 @@ From Bonak.Presheaf Require Import νSemiShape.
 From Bonak.Presheaf.Gpd Require Import Presentation Correspondence.
 From Bonak.Reedy.Gpd Require Import Reedy Extension Bounded Correspondence
   Target.
-From Bonak.Equiv.Gpd Require Import Face Diagram DiagramCausality Matching.
+From Bonak.Equiv.Gpd Require Import Face Diagram StoredDiagram Matching.
 From Bonak.Equiv.Gpd Require Tower.
 
 Set Primitive Projections.
@@ -44,14 +44,8 @@ Local Definition replaceForward {S T: Type} (e: Equiv S T)
 
 (** Changing the base of a map along an equivalence keeps its total space. *)
 Local Definition baseChangeEquiv {M N: HGpd} (e: Equiv M N):
-  Equiv {T: HGpd &T T -> M} {T: HGpd &T T -> N}.
-Proof.
-  refine (qinvEquiv (fun p => (p.1; fun x => e (p.2 x)))
-    (fun p => (p.1; fun x => invEq e (p.2 x))) _ _);
-    intros [T f]; apply f_equal; apply functional_extensionality_dep; intro x.
-  - now apply retEq.
-  - now apply secEq.
-Defined.
+  Equiv {T: HGpd &T T -> M} {T: HGpd &T T -> N} :=
+  sigTEquivSnd (fun T: HGpd => @piEquiv T (fun _ => M) (fun _ => N) (fun _ => e)).
 
 Section Readout.
 Context (readout: forall n, (νGpdAt n).(prefix) -> Diagram arity n).
@@ -106,10 +100,10 @@ End ReadoutClassifierOn.
 Module ReedyCorrespondenceOn (A: LayerGpdSig) (Core: νGpdSig A).
 Module Faces := FaceOn A Core.
 Module Diagrams := IndexedDiagramOn A Core Faces.
-Module Causality := IndexedDiagramCausalityOn A Core Faces Diagrams.
+Module Stored := StoredDiagramOn A Core Faces Diagrams.
 Module IndexedModel := IndexedMatchingEquivOn A Core Faces Diagrams.Extraction.
 Module Classifier := ReadoutClassifierOn A Core.
-Import A Causality.Prefix.
+Import A Stored.Prefix.
 
 Definition completedMatchingMapIsEquiv {n} (X: (νGpdAt n).(prefix)):
   IsEquiv (matchingMap
@@ -119,18 +113,18 @@ Definition completedMatchingMapIsEquiv {n} (X: (νGpdAt n).(prefix)):
     (packedCellProjectionEquiv X) (fun t => eq_refl).
 
 Definition indexedMatchingMapIsEquiv n (X: (νGpdAt n).(prefix)):
-  IsEquiv (frameMatchingMap X) :=
-  frameMatchingMapIsEquiv X (completedMatchingMapIsEquiv X).
+  IsEquiv (Stored.storedBoundary X) :=
+  Stored.boundaryIsEquiv X (completedMatchingMapIsEquiv X).
 
 Definition indexedReadout n (X: (νGpdAt n).(prefix)): Diagram arity n :=
-  finiteDiagram X.
+  Stored.storedDiagram X.
 Definition indexedMatchingMap n (X: (νGpdAt n).(prefix)):
-  νFrame X -> MatchingObject (indexedReadout n X) := frameMatchingMap X.
+  νFrame X -> MatchingObject (indexedReadout n X) := Stored.storedBoundary X.
 
 Definition indexedExtension n (X: (νGpdAt (S n)).(prefix)):
   extendByMatchingMap arity (indexedReadout n X.1) {d: νFrame X.1 & X.2 d}
     (fun t => indexedMatchingMap n X.1 t.1) = indexedReadout (S n) X :=
-  Causality.finiteDiagramExtension X.1 X.2.
+  Stored.storedDiagramExtension X.1 X.2.
 
 Definition indexedPrefixDiagramEquiv n:
   Equiv (νGpdAt n).(prefix) (Diagram arity n) :=

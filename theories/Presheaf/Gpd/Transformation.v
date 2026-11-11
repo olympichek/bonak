@@ -2,7 +2,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet HGpd SigT Funext Notation RewLemmas LeSProp.
 From Bonak.Presheaf Require Import νSemiShape WordAction WordMap.
-From Bonak.Presheaf.Gpd Require Import Pseudofunctor Icon Bounded.
+From Bonak.Presheaf.Gpd Require Import Pseudofunctor Icon.
 From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import PathDiagramLemmas
   LocallyDiscretePseudofunctor Pseudonatural IconPath PathDiagramTransformation.
@@ -75,79 +75,3 @@ Definition generatedTransformation:
     (fun p m n g f x => mapWordComp g f x).
 
 End Generated.
-
-(** Maps need only be supplied at the ranks retained by the bound. *)
-Section BoundedMaps.
-Context {A: HSet} (B: nat -> SProp) (down: forall n, B n.+1 -> B n)
-  (P Q: νGpdPresentation A)
-  (T: forall n, B n -> P.(G0) n -> Q.(G0) n)
-  (Hface: forall n q (Hq: q <= n) a (h: B n.+1) (x: P.(G0) n.+1),
-    Q.(GFace) n q Hq a (T n.+1 h x) = T n (down n h) (P.(GFace) n q Hq a x))
-  (Hcoh: forall n q (Hq: q <= n) r (Hr: r <= q) a b
-    (h: B n.+2) (x: P.(G0) n.+2),
-    (f_equal (Q.(GFace) n q Hq a) (Hface n.+1 r (Hr ↕ ↑ Hq) b h x)
-      • Hface n q Hq a (down n.+1 h) (P.(GFace) n.+1 r (Hr ↕ ↑ Hq) b x))
-      • f_equal (T n (down n (down n.+1 h))) (P.(GFaceCoh) n q Hq r Hr a b x) =
-    Q.(GFaceCoh) n q Hq r Hr a b (T n.+2 h x)
-      • (f_equal (Q.(GFace) n r (Hr ↕ Hq) b) (Hface n.+1 q.+1 (⇑ Hq) a h x)
-        • Hface n r (Hr ↕ Hq) b (down n.+1 h) (P.(GFace) n.+1 q.+1 (⇑ Hq) a x))).
-
-Definition boundMapCell n (z: boundCell B P n): boundCell B Q n :=
-  (z.1; T n (unbox z.1) z.2).
-
-Lemma boundMapPathProject {n} {x y: boundCell B P n} (p: x = y):
-  f_equal (fun z: boundCell B Q n => z.2) (f_equal (boundMapCell n) p) =
-    f_equal (T n (unbox x.1)) (f_equal (fun z: boundCell B P n => z.2) p).
-Proof. now destruct p. Defined.
-
-Definition boundMapFace n q (Hq: q <= n) a (z: boundCell B P n.+1):
-  boundFace B down Q n q Hq a (boundMapCell n.+1 z) =
-    boundMapCell n (boundFace B down P n q Hq a z) :=
-  f_equal (boundInclude B Q n (down n (unbox z.1)))
-    (Hface n q Hq a (unbox z.1) z.2).
-
-Lemma boundMapFaceProject n q (Hq: q <= n) a (z: boundCell B P n.+1):
-  f_equal (fun z: boundCell B Q n => z.2) (boundMapFace n q Hq a z) =
-    Hface n q Hq a (unbox z.1) z.2.
-Proof.
-  exact (f_equal_compose (boundInclude B Q n (down n (unbox z.1)))
-    (fun z: boundCell B Q n => z.2) (Hface n q Hq a (unbox z.1) z.2)
-    • f_equal_id (Hface n q Hq a (unbox z.1) z.2)).
-Defined.
-
-Lemma boundMapCoh n q (Hq: q <= n) r (Hr: r <= q) a b
-  (z: boundCell B P n.+2):
-  (f_equal (boundFace B down Q n q Hq a) (boundMapFace n.+1 r (Hr ↕ ↑ Hq) b z)
-    • boundMapFace n q Hq a (boundFace B down P n.+1 r (Hr ↕ ↑ Hq) b z))
-    • f_equal (boundMapCell n) (boundFaceCoh B down P n q Hq r Hr a b z) =
-  boundFaceCoh B down Q n q Hq r Hr a b (boundMapCell n.+2 z)
-    • (f_equal (boundFace B down Q n r (Hr ↕ Hq) b)
-        (boundMapFace n.+1 q.+1 (⇑ Hq) a z)
-      • boundMapFace n r (Hr ↕ Hq) b (boundFace B down P n.+1 q.+1 (⇑ Hq) a z)).
-Proof.
-  apply (boundPathInjective B Q (k := n)).
-  rewrite 4 eq_trans_map_distr, 2 boundFacePathProject.
-  refine (f_equal2 (fun p q => p • q)
-    (f_equal2 (fun p q => p • q)
-      (f_equal (fun p => f_equal (Q.(GFace) n q Hq a) p)
-        (boundMapFaceProject n.+1 r (Hr ↕ ↑ Hq) b z))
-      (boundMapFaceProject n q Hq a (boundFace B down P n.+1 r (Hr ↕ ↑ Hq) b z)))
-    (boundMapPathProject (boundFaceCoh B down P n q Hq r Hr a b z)
-      • f_equal (fun p => f_equal (T n (down n (down n.+1 (unbox z.1)))) p)
-        (boundFaceCohProject B down P n q Hq r Hr a b z)) • _).
-  refine (Hcoh n q Hq r Hr a b (unbox z.1) z.2 • _).
-  exact (eq_sym (f_equal2 (fun p q => p • q)
-    (boundFaceCohProject B down Q n q Hq r Hr a b (boundMapCell n.+2 z))
-    (f_equal2 (fun p q => p • q)
-      (f_equal (fun p => f_equal (Q.(GFace) n r (Hr ↕ Hq) b) p)
-        (boundMapFaceProject n.+1 q.+1 (⇑ Hq) a z))
-      (boundMapFaceProject n r (Hr ↕ Hq) b (boundFace B down P n.+1 q.+1 (⇑ Hq) a z))))).
-Defined.
-
-Definition boundPresentationMap:
-  PresentationMap (boundPresentation B down P) (boundPresentation B down Q) :=
-  @Build_PresentationMap A (boundPresentation B down P) (boundPresentation B down Q)
-    boundMapCell boundMapFace boundMapCoh.
-
-End BoundedMaps.
-

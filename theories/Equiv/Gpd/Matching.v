@@ -3,7 +3,7 @@
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality Arith.PeanoNat.
 From Bonak.Lib Require Import HSet HGpd SigT Equiv Contractible Notation LeSProp FinitePrefix
-  RewLemmas Funext Limit PathSquares.
+  RewLemmas Funext Limit PathSquares HomotopyPullback.
 From Bonak.νGpd Require Import Layer νGpd.
 From Bonak.Presheaf.Gpd Require Import Presentation Cone Model.
 From Bonak.Equiv.Gpd Require Import Face Boundary PresheafOfνGpd PartialDiagram
@@ -35,11 +35,6 @@ Definition Model: Type :=
   PartialDiagramModel (partialFramePresentation L) Q (partialLocalCellPresentation L)
     (fun k (x: stateLocalCell (partialState L k)) => x.1) b
     (fun k => stateLocalProjectionFace (partialState L k)) bFace.
-
-Definition modelRestriction (M: Model) k a (w: stateFrame (partialState L (S k))):
-  Q.(GFace) k 0 leR_O a (M.(modelEquiv) (S k) w)
-    = M.(modelEquiv) k (stateRestrict (partialState L k) 0 leR_O a w) :=
-  eq_sym (M.(modelFace) k 0 leR_O a w).
 
 End SourceModel.
 
@@ -89,20 +84,8 @@ Definition Model (e: CellComparison): Type :=
 
 (** The attachment is normalized to the residual presentation. In this
     form its new coordinate is face zero, and all old coordinates shift. *)
-Definition StepCone (k: nat): Type :=
-  {w: Q.(G0) (S k) &T
-    forall a: arity,
-      {t: C.(G0) k &T
-        Q.(GFace) k 0 leR_O a w
-          = boundary k t}}.
-
-Definition stepConeFace k q (Hq: q <= k) a (u: StepCone (S k)): StepCone k :=
-  (Q.(GFace) (S k) (S q) (⇑ Hq) a u.1;
-    fun c =>
-      (C.(GFace) k q Hq a (u.2 c).1;
-        eq_sym (Q.(GFaceCoh) k q Hq 0 leR_O a c u.1)
-          • (f_equal (Q.(GFace) k q Hq a) (u.2 c).2
-            • boundaryFace k q Hq a (u.2 c).1))).
+Local Abbreviation StepCone := (coneObject Q C boundary).
+Local Abbreviation stepConeFace := (coneFace Q C boundary boundaryFace).
 
 Definition stepConeEquiv (e: CellComparison) (M: Model e) k:
   Equiv (stateFrame (stateUp (partialState L k))) (StepCone k) :=
@@ -116,47 +99,12 @@ Definition stepConeEquiv (e: CellComparison) (M: Model e) k:
     (fun a w => eq_sym (M.(modelFace) k 0 leR_O a w))
     (M.(modelBoundary) k).
 
-Lemma stepConeBase (e: CellComparison) (M: Model e) k
-  (d: stateFrame (stateUp (partialState L k))):
-  (stepConeEquiv e M k d).1 = M.(modelEquiv) (S k) d.1.
-Proof. now exact (@Attach.frameConeStepBase p k
-    (stateCohs (partialState L k)).(_depsCohs2).(_depsCohs)
-    (Q.(G0) (S k))
-    (Q.(G0) k)
-    (C.(G0) k)
-    (fun a => Q.(GFace) k 0 leR_O a)
-    (boundary k)
-    (M.(modelEquiv) (S k)) (M.(modelEquiv) k) (e.(presentationCell) k)
-    (fun a w => eq_sym (M.(modelFace) k 0 leR_O a w)) (M.(modelBoundary) k) d). Defined.
-
-Lemma stepConeCell (e: CellComparison) (M: Model e) k
-  (d: stateFrame (stateUp (partialState L k))) a:
-  ((stepConeEquiv e M k d).2 a).1 =
-    e.(presentationCell) k (νFace DepsCohsChainNil a d).
-Proof. now exact (@Attach.frameConeStepFace p k
-    (stateCohs (partialState L k)).(_depsCohs2).(_depsCohs)
-    (Q.(G0) (S k))
-    (Q.(G0) k)
-    (C.(G0) k)
-    (fun a => Q.(GFace) k 0 leR_O a)
-    (boundary k)
-    (M.(modelEquiv) (S k)) (M.(modelEquiv) k) (e.(presentationCell) k)
-    (fun a w => eq_sym (M.(modelFace) k 0 leR_O a w)) (M.(modelBoundary) k) d a). Defined.
-
 Lemma stepConePath (e: CellComparison) (M: Model e) k
   (d: stateFrame (stateUp (partialState L k))) a:
   ((stepConeEquiv e M k d).2 a).2 =
     eq_sym (M.(modelFace) k 0 leR_O a d.1)
       • M.(modelBoundary) k (νFace DepsCohsChainNil a d).
-Proof. now exact (@Attach.frameConeStepPath p k
-    (stateCohs (partialState L k)).(_depsCohs2).(_depsCohs)
-    (Q.(G0) (S k))
-    (Q.(G0) k)
-    (C.(G0) k)
-    (fun a => Q.(GFace) k 0 leR_O a)
-    (boundary k)
-    (M.(modelEquiv) (S k)) (M.(modelEquiv) k) (e.(presentationCell) k)
-    (fun a w => eq_sym (M.(modelFace) k 0 leR_O a w)) (M.(modelBoundary) k) d a). Defined.
+Proof. now apply Attach.frameConeStepPath. Defined.
 
 Definition stepSourceCellFace k q (Hq: q <= k) a c
   (d: stateFrame (stateUp (partialState L (S k)))):
@@ -291,7 +239,7 @@ Definition stepConeNaturality (e: CellComparison) (M: Model e)
   (d: stateFrame (stateUp (partialState L (S k)))):
   stepConeEquiv e M k (stateRestrict (stateUp (partialState L k)) q Hq a d)
     = stepConeFace k q Hq a (stepConeEquiv e M (S k) d) :=
-  Attach.conePath
+  attachmentEq
     (fun c => Q.(GFace) k 0 leR_O c)
     (boundary k)
     (stepConeEquiv e M k (stateRestrict (stateUp (partialState L k)) q Hq a d))
@@ -305,7 +253,7 @@ Lemma stepConeNaturalityBase (e: CellComparison) (M: Model e)
   (d: stateFrame (stateUp (partialState L (S k)))):
   f_equal (fun z: StepCone k => z.1) (stepConeNaturality e M k q Hq a d) =
     M.(modelFace) (S k) (S q) (⇑ Hq) a d.1.
-Proof. now apply Attach.conePathBase. Defined.
+Proof. now apply attachmentEqBase. Defined.
 
 Lemma stepConeNaturalityCell (e: CellComparison) (M: Model e)
   k q (Hq: q <= k) a c
@@ -314,7 +262,7 @@ Lemma stepConeNaturalityCell (e: CellComparison) (M: Model e)
       (stepConeNaturality e M k q Hq a d)
     = stepCellFace e k q Hq a c d.
 Proof.
-  now exact (Attach.conePathCell
+  now exact (attachmentEqTop
     (fun c => Q.(GFace) k 0 leR_O c) (boundary k)
     (stepConeEquiv e M k (stateRestrict (stateUp (partialState L k)) q Hq a d))
     (stepConeFace k q Hq a (stepConeEquiv e M (S k) d))
@@ -361,7 +309,7 @@ Definition stepConeBoundaryPath (e: CellComparison) (M: Model e) k
   (t: stateLocalCell (stateUp (partialState L k))):
   stepConeEquiv e M k t.1 =
     stepConeBoundary k (e.(presentationCell) (S k) (stepCellBelow k t)) :=
-  Attach.conePath
+  attachmentEq
     (fun a => Q.(GFace) k 0 leR_O a)
     (boundary k)
     (stepConeEquiv e M k t.1)
@@ -447,14 +395,14 @@ Lemma stepConeBoundaryPathBase (e: CellComparison) (M: Model e) k
   (t: stateLocalCell (stateUp (partialState L k))):
   f_equal (fun z: StepCone k => z.1) (stepConeBoundaryPath e M k t)
     = M.(modelBoundary) (S k) (stepCellBelow k t).
-Proof. now apply Attach.conePathBase. Defined.
+Proof. now apply attachmentEqBase. Defined.
 
 Lemma stepConeBoundaryPathCell (e: CellComparison) (M: Model e) k
   (t: stateLocalCell (stateUp (partialState L k))) c:
   f_equal (fun z: StepCone k => (z.2 c).1) (stepConeBoundaryPath e M k t)
     = stepBoundaryCell e k c t.
 Proof.
-  now exact (Attach.conePathCell
+  now exact (attachmentEqTop
     (fun a => Q.(GFace) k 0 leR_O a) (boundary k)
     (stepConeEquiv e M k t.1)
     (stepConeBoundary k (e.(presentationCell) (S k) (stepCellBelow k t)))

@@ -8,6 +8,7 @@ From Bonak.νSet Require Import Layer νSet.
 From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
 From Bonak.Reedy Require Import Reedy GeneratorBoundary.
 From Bonak.Equiv Require Import Boundary.
+From Bonak.Equiv Require ChainDepth.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -79,20 +80,20 @@ Definition IndexedDepthLaw {P K} (dc: DepsCohs2 P K) (f: FaceTuple (mkDepsCohs d
 Lemma indexedCompatibleDepth {P K} (dc: DepsCohs2 P K) f (H: FaceCompatible dc f): IndexedDepthLaw dc f.
 Proof.
   intros i j hij a c.
-  pose (p := indexedPairAtDepth P K dc i j hij).
-  pose proof (H p.1.1.1 p.1.1.2.1 p.1.1.2.2.1 p.1.1.2.2.2
-    p.1.2.1 p.1.2.2.1 p.1.2.2.2.1 p.1.2.2.2.2 a c) as h.
+  destruct (ChainDepth.pairAtDepth depthChains P K dc i j hij)
+    as [[[p [k [d c1]]] [p' [k' [d' c2]]]] [hi hj]].
+  pose proof (H p k d c1 p' k' d' c2 a c) as h.
   rewrite earlierChainDepth, upperChainDepth, <- 2 faceAtChain in h.
-  assert (ei: chainDepth (cohs2ChainDepsCohs p.1.1.2.2.2) = i).
-  { apply depthEq. now exact (fst p.2). }
-  assert (ej: chainDepth (cohs2ChainDepsCohs (cohs2ChainCompose p.1.1.2.2.2 p.1.2.2.2.2)) = j).
-  { apply depthEq. now exact (snd p.2). }
-  change (faceAtDepth dc.(_depsCohs) (depth (chainDepth (cohs2ChainDepsCohs p.1.1.2.2.2))) a
-    (f (nextDepth (chainDepth (cohs2ChainDepsCohs (cohs2ChainCompose p.1.1.2.2.2 p.1.2.2.2.2)))) c).1
+  assert (ei: chainDepth (cohs2ChainDepsCohs c1) = i).
+  { apply depthEq. now exact hi. }
+  assert (ej: chainDepth (cohs2ChainDepsCohs (cohs2ChainCompose c1 c2)) = j).
+  { apply depthEq. now exact hj. }
+  change (faceAtDepth dc.(_depsCohs) (depth (chainDepth (cohs2ChainDepsCohs c1))) a
+    (f (nextDepth (chainDepth (cohs2ChainDepsCohs (cohs2ChainCompose c1 c2)))) c).1
     = faceAtDepth dc.(_depsCohs)
-      (depth (chainDepth (cohs2ChainDepsCohs (cohs2ChainCompose p.1.1.2.2.2 p.1.2.2.2.2)))) c
-      (f (weakenDepth (chainDepth (cohs2ChainDepsCohs p.1.1.2.2.2))) a).1) in h.
-  now rewrite ei,ej in h.
+      (depth (chainDepth (cohs2ChainDepsCohs (cohs2ChainCompose c1 c2)))) c
+      (f (weakenDepth (chainDepth (cohs2ChainDepsCohs c1))) a).1) in h.
+  now rewrite ei, ej in h.
 Qed.
 Lemma indexedDepthCompatible {P K} (dc: DepsCohs2 P K) f (H: IndexedDepthLaw dc f): FaceCompatible dc f.
 Proof.

@@ -123,48 +123,9 @@ Proof.
       (stateCellEquiv (partialState L k.+2) t))).
 Defined.
 
-(** Advancing the indexed tower removes the first residual coordinate. *)
-Definition positionNextFace {p} {X: (νGpdAt p).(prefix)}
-  (L: νGpdFrom p X) k q (Hq: q <= k) a
-  (t: (Relative.positionPresentation (next L)).(G0) k.+1):
-  (Relative.positionPresentation L).(GFace) k.+1 q.+1 (⇑ Hq) a t =
-    (Relative.positionPresentation (next L)).(GFace) k q Hq a t :=
-  Shift.gFaceCCons k (next L) DepsCohs3ChainNil q
-    (leR_eq_r (plus_n_O k) Hq)
-    (leR_eq_r (plus_n_O k.+1 • plus_n_Sm k 0) (⇑ Hq)) a t.
-
-Lemma positionNextFaceCoh {p} {X: (νGpdAt p).(prefix)}
-  (L: νGpdFrom p X) k q (Hq: q <= k) r (Hr: r <= q) a b
-  (t: (Relative.positionPresentation (next L)).(G0) k.+2):
-  (Relative.positionPresentation L).(GFaceCoh) k.+1 q.+1 (⇑ Hq) r.+1 (⇑ Hr) a b t
-    • (positionNextFace L k r (Hr ↕ Hq) b
-        ((Relative.positionPresentation L).(GFace) k.+2 q.+2 (⇑ (⇑ Hq)) a t)
-      • f_equal ((Relative.positionPresentation (next L)).(GFace) k r (Hr ↕ Hq) b)
-        (positionNextFace L k.+1 q.+1 (⇑ Hq) a t)) =
-  (positionNextFace L k q Hq a
-      ((Relative.positionPresentation L).(GFace) k.+2 r.+1 (⇑ Hr ↕ ↑ (⇑ Hq)) b t)
-    • f_equal ((Relative.positionPresentation (next L)).(GFace) k q Hq a)
-      (positionNextFace L k.+1 r (Hr ↕ ↑ Hq) b t))
-    • (Relative.positionPresentation (next L)).(GFaceCoh) k q Hq r Hr a b t.
-Proof.
-  now exact (Shift.gFaceCohCCons k (next L) DepsCohs3ChainNil q
-    (leR_eq_r (plus_n_O k) Hq)
-    (leR_eq_r (plus_n_O k.+1 • plus_n_Sm k 0) (⇑ Hq)) r Hr a b t).
-Defined.
-
 Definition localCellDrop {p k} (z: PartialState p.+1 k)
   (t: stateLocalCell z): stateLocalCell (stateDrop z) :=
   (t.1.1; (t.1.2; t.2)).
-
-Lemma localCellDropRead {p k} (z: PartialState p.+1 k) (t: stateLocalCell z):
-  stateCellEquiv (stateDrop z) (localCellDrop z t) = stateCellEquiv z t.
-Proof. now reflexivity. Defined.
-
-Definition localCellNext {p} {Xpre: (νGpdAt p).(prefix)} (L: νGpdFrom p Xpre)
-  k (t: stateLocalCell (partialState (next L) k)):
-  stateLocalCell (partialState L k.+1) :=
-  rew [fun z => stateLocalCell z] eq_sym (partialStateDrop L k)
-    in localCellDrop (partialState (next L) k) t.
 
 End Cells.
 
@@ -323,16 +284,6 @@ Definition localPositionComparison {p} {X: (νGpdAt p).(prefix)} (L: νGpdFrom p
   @Build_FaceComparison _ _ _ _ _ _ (localCellPositionEquiv L)
     (localCellPositionFace L) (localCellPositionFaceCoh L).
 
-Definition positionSuccessorComparison {p} {X: (νGpdAt p).(prefix)} (L: νGpdFrom p X):
-  FaceComparison (Relative.positionPresentation (next L)).(G0)
-    (fun k => (Relative.positionPresentation L).(G0) k.+1)
-    (Relative.positionPresentation (next L)).(GFace)
-    (fun k q Hq a => (Relative.positionPresentation L).(GFace) k.+1 q.+1 (⇑ Hq) a)
-    (Relative.positionPresentation (next L)).(GFaceCoh)
-    (fun k q Hq r Hr a b => (Relative.positionPresentation L).(GFaceCoh)
-      k.+1 q.+1 (⇑ Hq) r.+1 (⇑ Hr) a b) :=
-  pointwiseComparison (positionNextFace L) (positionNextFaceCoh L).
-
 Definition presentationComparison {P Q: νGpdPresentation arity}
   (e: PresentationEquiv P Q):
   FaceComparison P.(G0) Q.(G0) P.(GFace) Q.(GFace) P.(GFaceCoh) Q.(GFaceCoh) :=
@@ -411,11 +362,6 @@ Definition localSuccessorEquiv {p} {X: (νGpdAt p).(prefix)} (L: νGpdFrom p X) 
     ((partialLocalCellPresentation L).(G0) (S k)) :=
   compEquiv (localCellDropEquiv (partialState (next L) k))
     (rewEquiv (fun w => stateLocalCell w) (eq_sym (partialStateDrop L k))).
-
-Lemma localSuccessorMap {p} {X: (νGpdAt p).(prefix)} (L: νGpdFrom p X) k
-  (t: (partialLocalCellPresentation (next L)).(G0) k):
-  localSuccessorEquiv L k t = localCellNext L k t.
-Proof. now reflexivity. Defined.
 
 Definition localSuccessorFace {p} {X: (νGpdAt p).(prefix)} (L: νGpdFrom p X)
   k q (Hq: q <= k) a (t: (partialLocalCellPresentation (next L)).(G0) (S k)):
