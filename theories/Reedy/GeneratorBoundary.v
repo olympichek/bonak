@@ -4,9 +4,8 @@ Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import SigT HSet Notation LeSProp Equiv Funext FinitePrefix.
 From Bonak.Category Require Import Category HSetCat.
-From Bonak.Presheaf Require Import νSemiShape.
+From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
 From Bonak.Reedy Require Import Reedy Coskeleton.
-From Bonak.Equiv Require Import Boundary.
 
 Set Primitive Projections.
 Set Printing Projections.

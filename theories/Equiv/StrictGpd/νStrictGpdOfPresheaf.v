@@ -19,16 +19,6 @@ Import Tower.
 Module Export Faces := F.
 Module Export Extensionality := FaceExtensionalityOn A S F.
 
-Local Lemma sectionLamTotal {G H: StrictGroupoid} {E: arity -> Family H}
-  {F: Functor G H} (s: forall ε, Section (E ε) F) ε:
-  sectionTotal (lam s) ⨟ᶠ totalMap (nth E ε) ≐ sectionTotal (s ε).
-Proof.
-  refine (feqWhiskerR (sectionTotalMap _) _ •ᶠ _).
-  refine (feqAssoc _ _ _ •ᶠ _).
-  refine (feqWhiskerL _ (nth_lam s ε) •ᶠ _).
-  now apply feqSym, sectionTotalMap.
-Defined.
-
 Local Lemma sectionSigmaHead {C G H: StrictGroupoid} (E: Family H)
   (U: arity -> Functor G H) {F: Functor C G}
   (s: Section (layer E U) F) {P: Family (total (layer E U))}

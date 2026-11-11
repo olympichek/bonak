@@ -6,9 +6,11 @@ From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import SigT HSet LeSProp NatLemmas Notation RewLemmas
   Equiv Funext FinitePrefix.
 From Bonak.νSet Require Import Layer νDgnSet.
+From Bonak.Presheaf Require Import GeneratingFaces.
 From Bonak.Presheaf.Dgn Require Import Generators.
+From Bonak.Reedy Require Import GeneratorBoundary.
 From Bonak.Reedy.Dgn Require Import Reedy Matching.
-From Bonak.Equiv Require Import Boundary Matching GeneratorBoundary.
+From Bonak.Equiv Require Import Boundary Matching.
 From Bonak.Equiv.Dgn Require Import Latching.
 
 Set Primitive Projections.

@@ -106,7 +106,7 @@ Proof.
     rewrite (wordEndId n f). now symmetry; apply X.(restrictId).
 Defined.
 
-Local Lemma matchingFunctorEq {n} {X: Diagram A n} {G: StrictGroupoid}
+Lemma matchingFunctorEq {n} {X: Diagram A n} {G: StrictGroupoid}
   (p q: Functor G (MatchingObject A X))
   (h: forall i f, p ⨟ᶠ matchingProjection A X i f = q ⨟ᶠ matchingProjection A X i f):
   p = q.

@@ -3,6 +3,7 @@
     combines two displayed families over their common base. *)
 Set Warnings "-notation-overridden".
 From Bonak.Category.Groupoid Require Export Product.
+From Bonak.Category.Groupoid Require Import Section.
 From Bonak.Lib Require Import HSet SigT Notation.
 Set Primitive Projections.
 Set Printing Projections.
@@ -163,6 +164,44 @@ Proof.
   refine (feqWhiskerL _ (layerFace m S T F c ε) •ᶠ _).
   refine (feqSym (feqAssoc _ _ _) •ᶠ _).
   now exact (feqWhiskerR (feqSym (layerHeadTotal E S Q ε)) _).
+Defined.
+
+Lemma sectionLamTotal {G H: StrictGroupoid} {E: arity -> Family H}
+  {F: Functor G H} (s: forall ε, Section (E ε) F) ε:
+  sectionTotal (lam s) ⨟ᶠ totalMap (nth E ε) ≐ sectionTotal (s ε).
+Proof.
+  refine (feqWhiskerR (sectionTotalMap _) _ •ᶠ _).
+  refine (feqAssoc _ _ _ •ᶠ _).
+  refine (feqWhiskerL _ (nth_lam s ε) •ᶠ _).
+  now apply feqSym, sectionTotalMap.
+Defined.
+
+(** A functor into the total groupoid of a layer, given by a functor [W]
+    into its base and functors [t ε] into the family whose projections
+    agree with [W] followed by the reindexing functors. *)
+Definition layerPair {X G H: StrictGroupoid} (E: Family H)
+  (S: arity -> Functor G H) (W: Functor X G) (t: arity -> Functor X (total E))
+  (hb: forall ε, W ⨟ᶠ S ε ≐ t ε ⨟ᶠ proj E): Functor X (total (layer E S)) :=
+  sectionTotal (lam (E := fun ω => reindex E (S ω))
+    (fun ε => intoPull W (S ε) (castBase (feqSym (hb ε)) (functorSection (t ε))))).
+
+Lemma layerPairProj {X G H: StrictGroupoid} (E: Family H)
+  (S: arity -> Functor G H) (W: Functor X G) (t: arity -> Functor X (total E))
+  (hb: forall ε, W ⨟ᶠ S ε ≐ t ε ⨟ᶠ proj E):
+  layerPair E S W t hb ⨟ᶠ proj _ ≐ W.
+Proof. now apply sectionProj. Defined.
+
+Lemma layerPairHead {X G H: StrictGroupoid} (E: Family H)
+  (S: arity -> Functor G H) (W: Functor X G) (t: arity -> Functor X (total E))
+  (hb: forall ε, W ⨟ᶠ S ε ≐ t ε ⨟ᶠ proj E) ε:
+  layerPair E S W t hb ⨟ᶠ layerProj E S ε ≐ t ε.
+Proof.
+  unfold layerPair, layerProj.
+  refine (feqSym (feqAssoc _ _ _) •ᶠ _).
+  refine (feqWhiskerR (sectionLamTotal _ ε) _ •ᶠ _).
+  refine (sectionIntoPullTotal _ _ _ •ᶠ _).
+  refine (sectionCastTotal _ _ •ᶠ _).
+  now apply functorSectionTotal.
 Defined.
 
 End LayerTheory.

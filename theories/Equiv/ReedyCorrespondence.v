@@ -1,5 +1,6 @@
 (** Indexed ν-sets are matching sequences of h-set diagrams on the
-    semi-shape category, and hence functors into h-sets. *)
+    semi-shape category, and hence functors into h-sets and face
+    presentations. *)
 
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
@@ -7,7 +8,8 @@ From Bonak.Lib Require Import HSet SigT Equiv HSetFamily Notation FinitePrefix
   Univalence SequentialLimit TelescopeLimit.
 From Bonak.νSet Require Import Layer νSet.
 From Bonak.Category Require Import Category HSetCat.
-From Bonak.Presheaf Require Import νSemiShape.
+From Bonak.Presheaf Require Import νSemiShape GeneratingFaces Presentation
+  Correspondence.
 From Bonak.Reedy Require Import Reedy Extension Correspondence.
 From Bonak.Equiv Require Import Boundary Matching.
 
@@ -140,8 +142,9 @@ Module IndexedReedyCubical := IndexedReedyOn CubicalLayer νSetCubical.
 
 
 (** Indexed ν-sets are matching sequences of h-set diagrams on the
-    semi-shape category, and hence functors into h-sets. Each indexed prefix
-    is identified with a finite diagram, compatibly with truncation. *)
+    semi-shape category, and hence functors into h-sets and face
+    presentations. Each indexed prefix is identified with a finite diagram,
+    compatibly with truncation. *)
 
 Module ReedyCorrespondenceOn (A: LayerSig) (V: νSetSig A).
 Import A.
@@ -166,6 +169,12 @@ Definition νSetsEquivFunctor: Equiv νSets (Functor (Op (νSemiShape arity)) HS
 
 Definition νSetsEqFunctor: νSets = Functor (Op (νSemiShape arity)) HSetCat :=
   ua νSetsEquivFunctor.
+
+Definition νSetsEquivPresentation: Equiv νSets (νSetPresentation arity) :=
+  compEquiv νSetsEquivFunctor (symEquiv (pshEquivFunctor arity)).
+
+Definition νSetsEqPresentation: νSets = νSetPresentation arity :=
+  ua νSetsEquivPresentation.
 
 End ReedyCorrespondenceOn.
 

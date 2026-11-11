@@ -60,7 +60,6 @@ theories/Equiv/Dgn/νDgnSetEquiv.v
 theories/Equiv/Dgn/νDgnSetOfPresheaf.v
 theories/Equiv/Dgn/νDgnSetRoundtrip.v
 theories/Equiv/Face.v
-theories/Equiv/GeneratorBoundary.v
 theories/Equiv/Gpd/Boundary.v
 theories/Equiv/Gpd/Causality.v
 theories/Equiv/Gpd/CellComparison.v
@@ -98,12 +97,15 @@ theories/Equiv/PresheafEquiv.v
 theories/Equiv/PresheafOfνSet.v
 theories/Equiv/PresheafRoundtrip.v
 theories/Equiv/ReedyCorrespondence.v
+theories/Equiv/StrictGpd/Boundary.v
 theories/Equiv/StrictGpd/Constructions.v
 theories/Equiv/StrictGpd/Correspondence.v
 theories/Equiv/StrictGpd/Face.v
+theories/Equiv/StrictGpd/Matching.v
 theories/Equiv/StrictGpd/PresheafEquiv.v
 theories/Equiv/StrictGpd/PresheafOfνStrictGpd.v
 theories/Equiv/StrictGpd/PresheafRoundtrip.v
+theories/Equiv/StrictGpd/ReedyCorrespondence.v
 theories/Equiv/StrictGpd/Tower.v
 theories/Equiv/StrictGpd/νStrictGpdEquiv.v
 theories/Equiv/StrictGpd/νStrictGpdOfPresheaf.v
@@ -145,6 +147,7 @@ theories/Presheaf/Dgn/Roundtrip.v
 theories/Presheaf/Dgn/νShape.v
 theories/Presheaf/FaceStructure.v
 theories/Presheaf/Functor.v
+theories/Presheaf/GeneratingFaces.v
 theories/Presheaf/GeneratorCoherence.v
 theories/Presheaf/Gpd/Bounded.v
 theories/Presheaf/Gpd/Comparison.v
@@ -176,6 +179,7 @@ theories/Reedy/Dgn/Matching.v
 theories/Reedy/Dgn/Reedy.v
 theories/Reedy/Dgn/ShapeAction.v
 theories/Reedy/Extension.v
+theories/Reedy/GeneratorBoundary.v
 theories/Reedy/Gpd/Bounded.v
 theories/Reedy/Gpd/Correspondence.v
 theories/Reedy/Gpd/Extension.v

@@ -140,3 +140,35 @@ Proof.
     (fun p => graphFiber p.2) graphFiberProj _).
   intros [C p]. now apply graphFiberTotal.
 Defined.
+
+(** Families over a groupoid, seen as groupoids over an isomorphic one. *)
+
+Lemma strictGroupoidIsoInverseR {G H: StrictGroupoid}
+  (e: Iso StrictGroupoidCat G H):
+  e.(isoHom) ⨟ᶠ inverse e.(isoInvertible) = idFunctor G.
+Proof. now exact (inverseR e.(isoInvertible)). Defined.
+
+Lemma strictGroupoidIsoInverseL {G H: StrictGroupoid}
+  (e: Iso StrictGroupoidCat G H):
+  inverse e.(isoInvertible) ⨟ᶠ e.(isoHom) = idFunctor H.
+Proof. now exact (inverseL e.(isoInvertible)). Defined.
+
+(** Postcomposition with an isomorphism changes the codomain of a functor
+    and keeps its domain. *)
+Definition functorBaseChange {G H: StrictGroupoid}
+  (e: Iso StrictGroupoidCat G H):
+  Equiv {T: StrictGroupoid &T Functor T G} {T: StrictGroupoid &T Functor T H}.
+Proof.
+  refine (qinvEquiv (fun p => (p.1; p.2 ⨟ᶠ e.(isoHom)))
+    (fun p => (p.1; p.2 ⨟ᶠ inverse e.(isoInvertible))) _ _);
+    intros [T f]; apply f_equal.
+  - now exact (functorAssocEq f e.(isoHom) (inverse e.(isoInvertible))
+      • f_equal (compFunctor f) (strictGroupoidIsoInverseR e) • functorIdR f).
+  - now exact (functorAssocEq f (inverse e.(isoInvertible)) e.(isoHom)
+      • f_equal (compFunctor f) (strictGroupoidIsoInverseL e) • functorIdR f).
+Defined.
+
+Definition familyMapEquivAlong {G H: StrictGroupoid}
+  (e: Iso StrictGroupoidCat G H):
+  Equiv (Family G) {T: StrictGroupoid &T Functor T H} :=
+  compEquiv (familyEquivFunctor G) (functorBaseChange e).

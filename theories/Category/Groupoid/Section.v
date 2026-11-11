@@ -117,3 +117,15 @@ Lemma sectionSigmaAssoc {G H: StrictGroupoid} {E: Family H} {F: Functor G H}
   (s: Section E F) {P: Family (total E)} (t: Section P (sectionTotal s)):
   sectionTotal (sectionSigma s t) ⨟ᶠ totalAssoc E P ≐ sectionTotal t.
 Proof. unshelve econstructor; now intros. Defined.
+
+(** A functor into a total groupoid is a section of the family over its
+    composite with the projection. *)
+Definition functorSection {G H: StrictGroupoid} {E: Family H}
+  (t: Functor G (total E)): Section E (t ⨟ᶠ proj E) :=
+  Build_Map (fun x _ => (t.(fobj) x).2)
+    (fun x y a b f => t.(fhom) f) (fun x a => t.(fid) x)
+    (fun x y z a b c f g => t.(fcomp) f g) (fun x y a b f => eq_refl).
+
+Lemma functorSectionTotal {G H: StrictGroupoid} {E: Family H}
+  (t: Functor G (total E)): sectionTotal (functorSection t) ≐ t.
+Proof. unshelve econstructor; now intros. Defined.

@@ -5,9 +5,10 @@ Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import HSet SigT Notation LeSProp Equiv Funext
   FinitePrefix.
+From Bonak.Presheaf Require Import GeneratingFaces.
 From Bonak.Presheaf.Dgn Require Import Generators.
+From Bonak.Reedy Require Import GeneratorBoundary.
 From Bonak.Reedy.Dgn Require Import Reedy Latching.
-From Bonak.Equiv Require Import Boundary GeneratorBoundary.
 From Bonak.Reedy Require Reedy.
 
 Set Primitive Projections.

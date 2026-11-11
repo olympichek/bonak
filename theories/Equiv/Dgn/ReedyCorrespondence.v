@@ -1,5 +1,6 @@
 (** Indexed ν-sets with degeneracies are matching sequences of diagrams on
-    the ν-shape category, and hence functors into h-sets. *)
+    the ν-shape category, and hence functors into h-sets and face
+    presentations with degeneracies. *)
 
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
@@ -7,8 +8,9 @@ From Bonak.Lib Require Import SigT HSet Equiv Notation FinitePrefix HSetFamily
   Univalence Contractible SequentialLimit TelescopeLimit.
 From Bonak.νSet Require Import Layer νDgnSet νSet.
 From Bonak.Category Require Import Category HSetCat.
-From Bonak.Presheaf Require Import νSemiShape.
+From Bonak.Presheaf Require Import νSemiShape GeneratingFaces Presentation.
 From Bonak.Presheaf.Dgn Require Import Generators νShape.
+From Bonak.Presheaf.Dgn Require Correspondence.
 From Bonak.Reedy.Dgn Require Import Reedy Matching Extension Correspondence.
 From Bonak.Equiv Require Import Boundary Matching.
 From Bonak.Equiv.Dgn Require Import Layer.
@@ -374,6 +376,14 @@ Definition νDgnSetsEquivFunctor: Equiv νDgnSets (Functor (Op (νShape arity)) 
 
 Definition νDgnSetsEqFunctor: νDgnSets = Functor (Op (νShape arity)) HSetCat :=
   ua νDgnSetsEquivFunctor.
+
+Definition νDgnSetsEquivPresentation:
+  Equiv νDgnSets (νDgnSetPresentation arity) :=
+  compEquiv νDgnSetsEquivFunctor
+    (symEquiv (Presheaf.Dgn.Correspondence.pshDgnEquivFunctor arity)).
+
+Definition νDgnSetsEqPresentation: νDgnSets = νDgnSetPresentation arity :=
+  ua νDgnSetsEquivPresentation.
 
 End ReedyCorrespondenceOn.
 
