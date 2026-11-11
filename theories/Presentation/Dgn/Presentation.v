@@ -7,6 +7,31 @@ From Bonak.Presentation.Set Require Export Presentation.
 Set Primitive Projections.
 Set Printing Projections.
 
+Record νDgnStructure {arity: HSet} (psh: νSetPresentation arity): Type := {
+  Dgn n q (Hq: q <= n): psh.(F0) n -> psh.(F0) n.+1;
+  FaceDgnInf n r q (Hr: r <= q) (Hq: q <= n) (ε: arity) (X: psh.(F0) n.+1):
+    psh.(Face) n.+1 r (Hr ↕ (↑ Hq)) ε (Dgn n.+1 q.+1 (⇑ Hq) X) =
+    Dgn n q Hq (psh.(Face) n r (Hr ↕ Hq) ε X);
+  FaceDgnId n q (Hq: q <= n) (ε: arity) (X: psh.(F0) n):
+    psh.(Face) n q Hq ε (Dgn n q Hq X) = X;
+  FaceDgnSup n q (Hq: q <= n) r (Hr: r <= q) (ε: arity) (X: psh.(F0) n.+1):
+    psh.(Face) n.+1 q.+1 (⇑ Hq) ε (Dgn n.+1 r (Hr ↕ (↑ Hq)) X) =
+    Dgn n r (Hr ↕ Hq) (psh.(Face) n q Hq ε X);
+  DgnDgn n r q (Hr: r <= q) (Hq: q <= n) (X: psh.(F0) n):
+    Dgn n.+1 r (Hr ↕ (↑ Hq)) (Dgn n q Hq X) =
+    Dgn n.+1 q.+1 (⇑ Hq) (Dgn n r (Hr ↕ Hq) X)
+}.
+
+Arguments Build_νDgnStructure {arity} _ _ _ _ _ _.
+Arguments Dgn {arity} _ _ _ _ _.
+Arguments FaceDgnInf {arity} _ _ _ _ _ _ _ _ _.
+Arguments FaceDgnId {arity} _ _ _ _ _ _ _.
+Arguments FaceDgnSup {arity} _ _ _ _ _ _ _ _ _.
+Arguments DgnDgn {arity} _ _ _ _ _ _ _ _.
+
+Definition νDgnSetPresentation (arity: HSet): Type :=
+  { P: νSetPresentation arity &T νDgnStructure P }.
+
 Definition shiftPresheaf {A: HSet} (P: νSetPresentation A): νSetPresentation A := {|
   F0 n := P.(F0) (S n);
   Face n q Hq a := P.(Face) (S n) q (↑ Hq) a;
