@@ -11,14 +11,10 @@ From Bonak.Presheaf.Strictification Require Import ChartDiagram
 From Bonak.Category.Groupoid Require Import Strict WeakEquivalence.
 From Bonak.Category.Bicategory Require Import HGpdBicat LocallyDiscrete Pseudofunctor
   LocallyDiscretePseudofunctor.
-From Bonak.Presentation.Gpd Require Import Presentation.
-From Bonak.Presentation.PresheafEquiv.Gpd Require Import Pseudofunctor.
 Set Primitive Projections.
 Set Printing Projections.
 Set Universe Polymorphism.
 Unset Universe Minimization ToSet.
-
-Module GpdPseudofunctor := Gpd.Pseudofunctor.
 
 Module PresheafStrictification (Tr: PropositionalTruncation)
   (Complete: CompletionDiagramsSig Tr).
@@ -73,14 +69,6 @@ Module PresheafStrictification (Tr: PropositionalTruncation)
       (Complete.P.pathCompletionUnitWeak (F.(fobj) n))).
   Defined.
 
-  Local Definition constantPresentation (arity: HSet) (X: HGpd): νGpdPresentation arity.
-  Proof.
-    refine {| G0 := fun _ => X;
-      GFace := fun _ _ _ _ x => x;
-      GFaceCoh := fun _ _ _ _ _ _ _ _ => eq_refl |}.
-    now intros.
-  Defined.
-
   (** Strictification of constant presheaves already implies the covering
       principle for all 1-types. Any fixed arity suffices. *)
   Definition completeDiagramSurjectiveCovers {arity: HSet}
@@ -90,7 +78,7 @@ Module PresheafStrictification (Tr: PropositionalTruncation)
     Covers.SetsCover1Types.
   Proof.
     intro X. refine (TF.trMap _
-      (surjective (GpdPseudofunctor.toPseudofunctor arity (constantPresentation arity X)))).
+      (surjective (constantPseudofunctor (Op (νSemiShape arity)) X))).
     intros [F e].
     now exact (rew [fun Q: Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat =>
       Covers.SetCover (Q.(psObj) 0)] e in

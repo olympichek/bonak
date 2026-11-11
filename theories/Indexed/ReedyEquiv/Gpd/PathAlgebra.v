@@ -20,12 +20,6 @@ Proof.
   now rewrite f_equal_id in H.
 Defined.
 
-
-
-
-
-
-
 Definition f_equal_dep_sigT {A B: Type} {Q: B -> Type}
   (f: A -> B) (g: forall a, Q (f a)) {x y: A} (e: x = y):
   rew [Q] f_equal f e in g x = g y.

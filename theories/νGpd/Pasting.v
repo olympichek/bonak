@@ -17,11 +17,6 @@ Definition whisker_r {X: Type} {x y z: X}
   {p p': x = y} (H: p = p') (q: y = z): p • q = p' • q :=
   f_equal (fun p => p • q) H.
 
-(** Change a path's endpoints along comparisons pointing to its old vertices. *)
-Definition path_change {X: Type} {x y x' y': X}
-  (s: x' = x) (p: x = y) (t: y' = y): x' = y' :=
-  s • (p • eq_sym t).
-
 (** Reindex a path at its source. An identity correction returns the
     supplied path by computation, even when that path is a variable. *)
 Definition path_reindex_source {A: Type} {x x' y: A}
@@ -43,16 +38,6 @@ Defined.
 (** Compare two paths with a common target using their given witnesses. *)
 Definition path_compare_target {A: Type} {x y z: A} (s: x = z) (t: y = z):
   x = y := s • eq_sym t.
-
-(** Matching endpoint comparisons cancel when paths are pasted. *)
-Lemma path_change_comp {X: Type} {x y z x' y' z': X}
-  (s: x' = x) (t: y' = y) (u: z' = z) (p: x = y) (q: y = z):
-  path_change s p t • path_change t q u = path_change s (p • q) u.
-Proof.
-  unfold path_change.
-  rewrite <- 3 eq_trans_assoc.
-  now rewrite eq_trans_sym_cancel_l.
-Defined.
 
 Lemma path_change_sym {X: Type} {x y x' y': X}
   (s: x' = x) (p: x = y) (t: y' = y):

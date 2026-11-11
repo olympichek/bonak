@@ -86,6 +86,7 @@ theories/Indexed/ReedyEquiv/StrictGpd/Face.v
 theories/Indexed/ReedyEquiv/StrictGpd/Matching.v
 theories/Indexed/ReedyEquiv/StrictGpd/ReedyCorrespondence.v
 theories/Indexed/ReedyEquiv/StrictGpd/Tower.v
+theories/Indexed/Strictification.v
 theories/Lib/BoolLemmas.v
 theories/Lib/CohShapes.v
 theories/Lib/Contractible.v
@@ -130,6 +131,7 @@ theories/Presentation/PresheafEquiv/StrictGpd/Functor.v
 theories/Presentation/PresheafEquiv/StrictGpd/Roundtrip.v
 theories/Presentation/Set/Presentation.v
 theories/Presentation/StrictGpd/Presentation.v
+theories/Presentation/Strictification.v
 theories/Presentation/WordAction.v
 theories/Presentation/WordCoherence.v
 theories/Presentation/WordMap.v
@@ -143,6 +145,7 @@ theories/Presheaf/Strictification/DiagramCompletionUnit.v
 theories/Presheaf/Strictification/DiagramDescent.v
 theories/Presheaf/Strictification/DiagramEvaluation.v
 theories/Presheaf/Strictification/Strictification.v
+theories/Presheaf/Strictification/Transport.v
 theories/Presheaf/WordTensor.v
 theories/Presheaf/νSemiShape.v
 theories/Reedy/Dgn/Extension.v
@@ -169,6 +172,7 @@ theories/Reedy/Set/GeneratorBoundary.v
 theories/Reedy/Set/Reedy.v
 theories/Reedy/StrictGpd/Extension.v
 theories/Reedy/StrictGpd/Reedy.v
+theories/Reedy/Strictification.v
 theories/νGpd/Layer.v
 theories/νGpd/Lemmas.v
 theories/νGpd/Pasting.v

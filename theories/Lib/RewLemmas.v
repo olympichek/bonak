@@ -380,3 +380,18 @@ Defined.
 Polymorphic Lemma tailSubst {X: Type} {a b c d: X} (P: a = d) (Q1: a = b) (Q2: b = c)
   (R1 R2: c = d) (e: R1 = R2) (ih: P = Q1 • (Q2 • R1)): P = Q1 • (Q2 • R2).
 Proof. now destruct e. Defined.
+
+(** Change a path's endpoints along comparisons pointing to its old vertices. *)
+Definition path_change {X: Type} {x y x' y': X}
+  (s: x' = x) (p: x = y) (t: y' = y): x' = y' :=
+  s • (p • eq_sym t).
+
+(** Matching endpoint comparisons cancel when paths are pasted. *)
+Lemma path_change_comp {X: Type} {x y z x' y' z': X}
+  (s: x' = x) (t: y' = y) (u: z' = z) (p: x = y) (q: y = z):
+  path_change s p t • path_change t q u = path_change s (p • q) u.
+Proof.
+  unfold path_change.
+  rewrite <- 3 eq_trans_assoc.
+  now rewrite eq_trans_sym_cancel_l.
+Defined.

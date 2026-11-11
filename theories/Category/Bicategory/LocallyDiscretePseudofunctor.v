@@ -273,3 +273,34 @@ Proof.
   - intros a b c f g. apply functional_extensionality_dep. intro x.
     cbn. rewrite 3 eq_trans_refl_l. now apply np.
 Defined.
+
+(** The constant diagram on a 1-type. Every arrow acts by the identity
+    function and every comparison is a reflexivity path, so the object of
+    its pseudofunctor at any object reduces to the given 1-type. *)
+
+Section ConstantDiagram.
+Context (C: Category) (X: HGpd).
+
+Definition constantPathDiagramData: PathDiagramData C (fun _ => X) :=
+  Build_PathDiagramData C (fun _ => X)
+    (fun a b f => id1 (B := HGpdBicat) X) (fun a => eq_refl)
+    (fun a b c f g => id2 (id1 (B := HGpdBicat) X)).
+
+(** The arrow action is constant, so its action on the paths of the unit
+    and associativity laws of [C] is reflexivity. *)
+
+Definition constantPathDiagram: PathDiagram C (fun _ => X).
+Proof.
+  refine (Build_PathDiagram C (fun _ => X) constantPathDiagramData _ _ _).
+  - intros a b f. unfold constantPathDiagramData; cbn [phom pid pcomp].
+    now rewrite fEqualConst.
+  - intros a b f. unfold constantPathDiagramData; cbn [phom pid pcomp].
+    now rewrite fEqualConst.
+  - intros a b c d f g h. unfold constantPathDiagramData; cbn [phom pcomp].
+    now rewrite fEqualConst.
+Defined.
+
+Definition constantPseudofunctor: Pseudofunctor (locallyDiscrete C) HGpdBicat :=
+  expandPseudofunctor (Build_PathDiagramFamily C (fun _ => X) constantPathDiagram).
+
+End ConstantDiagram.

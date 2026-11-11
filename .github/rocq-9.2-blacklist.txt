@@ -1,3 +1,3 @@
 theories/νGpd/νGpd.v
 theories/Indexed/ReedyEquiv/Gpd
-theories/Presheaf/Strictification/Strictification.v
+theories/Indexed/Strictification.v
