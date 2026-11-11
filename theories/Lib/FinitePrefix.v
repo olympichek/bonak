@@ -10,8 +10,13 @@ Set Universe Polymorphism.
 Unset Universe Minimization ToSet.
 
 (** The ranks below [n]. [Some] retains an earlier rank; [None] adds the
-    highest rank. Reedy theory calls the rank of an object its degree. *)
-Fixpoint Index (n: nat): Type :=
+    highest rank. Reedy theory calls the rank of an object its degree.
+
+    [Index] is universe monomorphic, in one fixed universe. Two universe
+    instances of a polymorphic [Index] at a variable [n] are not convertible,
+    and Rocq up to 9.3 gives the occurrences of [Index] in the type of a
+    monomorphic definition different instances. *)
+Monomorphic Fixpoint Index (n: nat): Type :=
   match n with
   | 0 => Empty_set
   | S n => option (Index n)
