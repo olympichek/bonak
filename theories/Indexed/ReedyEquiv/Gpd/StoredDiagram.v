@@ -6,7 +6,7 @@ Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality Logic.Eqdep_dec Arith.PeanoNat Lia.
 From Bonak.Lib Require Import HSet HGpd SigT Notation LeSProp Funext Equiv RewLemmas
   CohShapes FinitePrefix.
-From Bonak.νGpd Require Import Layer νGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Presentation.Gpd Require Import Presentation.
 From Bonak.Presentation.PresheafEquiv.Gpd Require Import Pseudofunctor
   Transformation.

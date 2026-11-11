@@ -3,7 +3,7 @@
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import SigT HSet HGpd Equiv Notation RewLemmas LeSProp.
-From Bonak.νGpd Require Import Layer νGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Indexed.ReedyEquiv.Gpd Require Import Face.
 
 Set Primitive Projections.

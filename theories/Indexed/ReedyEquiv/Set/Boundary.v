@@ -5,7 +5,7 @@
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import SigT HSet Notation LeSProp NatLemmas Equiv.
-From Bonak.νSet Require Import Layer νSet.
+From Bonak.Indexed.Set Require Import Layer νSet.
 From Bonak.Indexed.ReedyEquiv.Set Require Import Face.
 From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
 

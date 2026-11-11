@@ -1,8 +1,10 @@
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT νSet.Layer RewLemmas HSet LeSProp Notation
-  Limit νSet.
+From Bonak.Lib Require Import SigT.
+From Bonak.Indexed.Set Require Import Layer.
+From Bonak.Lib Require Import RewLemmas HSet LeSProp Notation Limit.
+From Bonak.Indexed.Set Require Import νSet.
 
 Set Primitive Projections.
 Set Printing Projections.

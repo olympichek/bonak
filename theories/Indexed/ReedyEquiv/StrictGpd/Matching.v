@@ -14,7 +14,7 @@ From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
 From Bonak.Reedy.Set Require Reedy.
 From Bonak.Reedy.Set Require Import GeneratorBoundary.
 From Bonak.Reedy.StrictGpd Require Import Reedy Extension.
-From Bonak.νStrictGpd Require Import Layer νStrictGpd.
+From Bonak.Indexed.StrictGpd Require Import Layer νStrictGpd.
 From Bonak.Indexed.ReedyEquiv.StrictGpd Require Import Face Boundary.
 
 Set Primitive Projections.

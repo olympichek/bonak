@@ -4,7 +4,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet HGpd SigT Notation LeSProp NatLemmas
   RewLemmas Funext Equiv PathSquares FinitePrefix.
-From Bonak.νGpd Require Import Layer νGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Indexed.ReedyEquiv.Gpd Require Import Face Diagram Causality
   DiagramPrefix.
 

@@ -5,7 +5,7 @@ Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import HSet HGpd SigT Equiv Notation Univalence
   FinitePrefix SequentialLimit TelescopeLimit.
-From Bonak.νGpd Require Import Layer νGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import Pseudofunctor LocallyDiscrete
   HGpdBicat.

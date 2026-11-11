@@ -6,7 +6,7 @@
     Object fibers and arrows are h-sets, and families require no chosen lifts. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT RewLemmas HSet Notation LeSProp Limit.
-From Bonak.νStrictGpd Require Import Layer.
+From Bonak.Indexed.StrictGpd Require Import Layer.
 
 Set Primitive Projections.
 Set Printing Projections.

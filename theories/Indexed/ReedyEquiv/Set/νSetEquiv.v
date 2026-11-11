@@ -15,8 +15,9 @@ Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
-From Bonak Require Import SigT RewLemmas HSet LeSProp Notation Univalence
-  νSet.Layer νSet Limit.
+From Bonak.Lib Require Import SigT RewLemmas HSet LeSProp Notation Univalence.
+From Bonak.Indexed.Set Require Import Layer νSet.
+From Bonak.Lib Require Import Limit.
 From Bonak.Lib Require Import Equiv.
 
 Set Primitive Projections.

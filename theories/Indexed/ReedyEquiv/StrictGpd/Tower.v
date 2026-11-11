@@ -1,7 +1,7 @@
 (** Finite tower data of indexed strict groupoids. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation Limit.
-From Bonak.νStrictGpd Require Import Layer νStrictGpd.
+From Bonak.Indexed.StrictGpd Require Import Layer νStrictGpd.
 Set Primitive Projections.
 Set Printing Projections.
 Set Keyed Unification.

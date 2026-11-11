@@ -1,7 +1,8 @@
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT HSet HGpd Notation RewLemmas CohShapes νGpd.Pasting.
+From Bonak.Lib Require Import SigT HSet HGpd Notation RewLemmas CohShapes.
+From Bonak.Indexed.Gpd Require Import Pasting.
 
 Set Primitive Projections.
 Set Printing Projections.
@@ -9,7 +10,7 @@ Local Set Keyed Unification.
 
 (** The layer former over [HGpd], for [νGpd]
 
-    The groupoid-level counterpart of [νSet.Layer]: the same weak-product
+    The groupoid-level counterpart of [Indexed.Set.Layer]: the same weak-product
     abstraction of the layer former. The signature is extended with the two new
     propositional facts: computation rule on [ext]-paths ([ap_nth_ext]) and the
     level-1 extensionality ([ext2]). *)

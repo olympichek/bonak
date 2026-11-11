@@ -8,8 +8,8 @@ Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet SigT Equiv Truncation.
 From Bonak.Presheaf.Strictification Require Import DiagramCompletion Transport.
 From Bonak.Reedy Require Import Strictification.
-From Bonak.νStrictGpd Require Import Layer νStrictGpd.
-From Bonak.νGpd Require Import Layer νGpd.
+From Bonak.Indexed.StrictGpd Require Import Layer νStrictGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Indexed.ReedyEquiv.StrictGpd Require ReedyCorrespondence.
 From Bonak.Indexed.ReedyEquiv.Gpd Require ReedyCorrespondence.
 Set Universe Polymorphism.

@@ -4,7 +4,7 @@ Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality Arith.PeanoNat.
 From Bonak.Lib Require Import HSet HGpd SigT Equiv Contractible Notation LeSProp FinitePrefix
   RewLemmas Funext Limit PathSquares HomotopyPullback.
-From Bonak.νGpd Require Import Layer νGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Presentation.Gpd Require Import Presentation.
 From Bonak.Indexed.ReedyEquiv.Gpd Require Import Cone Model.
 From Bonak.Indexed.ReedyEquiv.Gpd Require Import Face Boundary PresheafOfνGpd

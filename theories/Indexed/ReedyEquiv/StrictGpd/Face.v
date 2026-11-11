@@ -1,7 +1,7 @@
 (** Face functors derived from the recursive frame and painting decomposition. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet LeSProp Notation.
-From Bonak.νStrictGpd Require Import Layer νStrictGpd.
+From Bonak.Indexed.StrictGpd Require Import Layer νStrictGpd.
 From Bonak.Category Require Import FunctorAlgebra.
 Set Primitive Projections.
 Set Printing Projections.

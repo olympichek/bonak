@@ -14,8 +14,8 @@
 Import Logic.EqNotations.
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT LeSProp Notation RewLemmas HGpd νGpd.Layer
-  νGpd.Lemmas νGpd.
+From Bonak.Lib Require Import SigT LeSProp Notation RewLemmas HGpd.
+From Bonak.Indexed.Gpd Require Import Layer Lemmas νGpd.
 From Bonak.Lib Require Import HSet.
 From Bonak.Indexed.ReedyEquiv.Gpd Require Tower.
 
@@ -25,7 +25,7 @@ From Bonak.Lib Require Import NatLemmas.
 From Bonak.Indexed.ReedyEquiv.Gpd Require Import PathAlgebra.
 
 Set Primitive Projections.
-From Bonak Require Import νGpd.Pasting.
+From Bonak.Indexed.Gpd Require Import Pasting.
 
 Set Keyed Unification.
 

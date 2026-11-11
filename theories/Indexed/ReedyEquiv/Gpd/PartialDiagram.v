@@ -2,7 +2,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet HGpd SigT Equiv Notation LeSProp RewLemmas Limit.
-From Bonak.νGpd Require Import Layer νGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Presentation.Gpd Require Import Presentation.
 From Bonak.Presentation.PresheafEquiv.Gpd Require Import Pseudofunctor.
 From Bonak.Indexed.ReedyEquiv.Gpd Require Import Face PresheafOfνGpd Boundary

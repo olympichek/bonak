@@ -6,7 +6,7 @@ From Stdlib Require Import Logic.FunctionalExtensionality Logic.Eqdep_dec
   Arith.PeanoNat.
 From Bonak.Lib Require Import SigT HSet HGpd Notation LeSProp NatLemmas
   RewLemmas Funext Equiv.
-From Bonak.νGpd Require Import Layer νGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Indexed.ReedyEquiv.Gpd Require Import Face PathAlgebra.
 
 Set Primitive Projections.

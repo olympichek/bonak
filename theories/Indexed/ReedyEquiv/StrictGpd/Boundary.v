@@ -7,7 +7,7 @@
     painting. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT HSet Notation LeSProp.
-From Bonak.νStrictGpd Require Import Layer νStrictGpd.
+From Bonak.Indexed.StrictGpd Require Import Layer νStrictGpd.
 From Bonak.Category Require Import FunctorAlgebra.
 From Bonak.Presheaf Require Import GeneratingFaces.
 From Bonak.Indexed.ReedyEquiv.StrictGpd Require Import Tower Face.

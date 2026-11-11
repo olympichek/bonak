@@ -47,6 +47,11 @@ theories/Category/HSetCat.v
 theories/Category/SequentialFunctor.v
 theories/Category/WeakEquivalence.v
 theories/Category/Yoneda.v
+theories/Indexed/Dgn/νDgnSet.v
+theories/Indexed/Gpd/Layer.v
+theories/Indexed/Gpd/Lemmas.v
+theories/Indexed/Gpd/Pasting.v
+theories/Indexed/Gpd/νGpd.v
 theories/Indexed/ReedyEquiv/ChainDepth.v
 theories/Indexed/ReedyEquiv/Dgn/Latching.v
 theories/Indexed/ReedyEquiv/Dgn/Layer.v
@@ -86,6 +91,10 @@ theories/Indexed/ReedyEquiv/StrictGpd/Face.v
 theories/Indexed/ReedyEquiv/StrictGpd/Matching.v
 theories/Indexed/ReedyEquiv/StrictGpd/ReedyCorrespondence.v
 theories/Indexed/ReedyEquiv/StrictGpd/Tower.v
+theories/Indexed/Set/Layer.v
+theories/Indexed/Set/νSet.v
+theories/Indexed/StrictGpd/Layer.v
+theories/Indexed/StrictGpd/νStrictGpd.v
 theories/Indexed/Strictification.v
 theories/Lib/BoolLemmas.v
 theories/Lib/CohShapes.v
@@ -173,14 +182,5 @@ theories/Reedy/Set/Reedy.v
 theories/Reedy/StrictGpd/Extension.v
 theories/Reedy/StrictGpd/Reedy.v
 theories/Reedy/Strictification.v
-theories/νGpd/Layer.v
-theories/νGpd/Lemmas.v
-theories/νGpd/Pasting.v
-theories/νGpd/νGpd.v
-theories/νSet/Layer.v
-theories/νSet/νDgnSet.v
-theories/νSet/νSet.v
-theories/νStrictGpd/Layer.v
-theories/νStrictGpd/νStrictGpd.v
 
 paper/depstream.v

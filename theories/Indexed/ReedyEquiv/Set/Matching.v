@@ -4,7 +4,7 @@
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import SigT HSet Notation LeSProp Equiv Funext.
-From Bonak.νSet Require Import Layer νSet.
+From Bonak.Indexed.Set Require Import Layer νSet.
 From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
 From Bonak.Reedy.Set Require Import Reedy GeneratorBoundary.
 From Bonak.Indexed.ReedyEquiv.Set Require Import Boundary.

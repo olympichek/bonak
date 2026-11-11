@@ -5,7 +5,7 @@ Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import HSet SigT Equiv HSetFamily Notation FinitePrefix
   Univalence SequentialLimit TelescopeLimit.
-From Bonak.νSet Require Import Layer νSet.
+From Bonak.Indexed.Set Require Import Layer νSet.
 From Bonak.Category Require Import Category HSetCat.
 From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
 From Bonak.Reedy.Set Require Import Reedy Extension.

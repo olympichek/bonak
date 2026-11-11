@@ -1,7 +1,8 @@
 (** Finite prefixes, filler families, and unfoldings of ν-groupoids. *)
 
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT HSet LeSProp Notation Limit HGpd νGpd.Layer νGpd.
+From Bonak.Lib Require Import SigT HSet LeSProp Notation Limit HGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 
 Set Primitive Projections.
 Set Keyed Unification.

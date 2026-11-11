@@ -3,7 +3,7 @@
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet HGpd SigT Equiv Notation LeSProp Limit
   TelescopeLimit TelescopeCompletion FinitePrefix NatLemmas RewLemmas.
-From Bonak.νGpd Require Import Layer νGpd Pasting.
+From Bonak.Indexed.Gpd Require Import Layer νGpd Pasting.
 From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import PathDiagram.
 From Bonak.Presheaf Require Import νSemiShape.

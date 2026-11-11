@@ -1,6 +1,7 @@
 Set Warnings "-notation-overridden".
-From Bonak Require Import SigT νSet.Layer RewLemmas HSet Notation LeSProp
-  Limit.
+From Bonak.Lib Require Import SigT.
+From Bonak.Indexed.Set Require Import Layer.
+From Bonak.Lib Require Import RewLemmas HSet Notation LeSProp Limit.
 
 Set Primitive Projections.
 Set Printing Projections.

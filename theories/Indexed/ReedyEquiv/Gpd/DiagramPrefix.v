@@ -4,7 +4,7 @@ Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import HSet HGpd SigT Equiv Funext Notation RewLemmas
   FinitePrefix Limit SequentialLimit TelescopeCompletion LeSProp NatLemmas PathSquares.
-From Bonak.νGpd Require Import Layer νGpd.
+From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Presentation.Gpd Require Import Presentation Comparison.
 From Bonak.Indexed.ReedyEquiv.Gpd Require Import Face Diagram Causality
   PositionExtraction.

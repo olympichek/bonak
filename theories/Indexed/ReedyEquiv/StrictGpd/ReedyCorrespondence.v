@@ -7,7 +7,7 @@ From Bonak.Lib Require Import HSet SigT Equiv Notation FinitePrefix
 From Bonak.Category.Groupoid Require Import Strict GraphFiberRoundtrip.
 From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
 From Bonak.Reedy.StrictGpd Require Import Reedy Extension.
-From Bonak.νStrictGpd Require Import Layer νStrictGpd.
+From Bonak.Indexed.StrictGpd Require Import Layer νStrictGpd.
 From Bonak.Indexed.ReedyEquiv.StrictGpd Require Import Face Boundary Matching.
 
 Set Primitive Projections.

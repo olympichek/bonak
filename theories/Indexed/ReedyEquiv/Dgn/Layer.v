@@ -5,7 +5,8 @@ Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import SigT HSet LeSProp NatLemmas Notation RewLemmas
   Equiv Funext FinitePrefix.
-From Bonak.νSet Require Import Layer νDgnSet.
+From Bonak.Indexed.Set Require Import Layer.
+From Bonak.Indexed.Dgn Require Import νDgnSet.
 From Bonak.Presheaf Require Import GeneratingFaces.
 From Bonak.Presheaf.Dgn Require Import Generators.
 From Bonak.Reedy.Set Require Import GeneratorBoundary.
