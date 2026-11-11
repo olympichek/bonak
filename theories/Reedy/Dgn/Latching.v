@@ -2,13 +2,13 @@
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality Arith.PeanoNat.
 From Bonak.Lib Require Import HSet SigT Equiv FinitePrefix Notation.
-From Bonak.Reedy Require Reedy.
+From Bonak.Reedy.Set Require Reedy.
 From Bonak.Reedy.Dgn Require Import Reedy ShapeAction.
 From Bonak.Presheaf.Dgn Require Import Generators.
 Set Primitive Projections.
 Set Printing Projections.
 
-Module SemiReedy := Bonak.Reedy.Reedy.
+Module SemiReedy := Bonak.Reedy.Set.Reedy.
 
 Section Cocones.
 Context {A: HSet} {n: nat} (X: Diagram A n) (T: HSet).

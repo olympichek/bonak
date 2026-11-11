@@ -4,13 +4,13 @@ Set Warnings "-notation-overridden".
 From Stdlib Require Import Arith.PeanoNat.
 From Bonak.Lib Require Import HSet SigT Equiv Notation FinitePrefix.
 From Bonak.Presheaf.Dgn Require Import Generators.
-From Bonak.Reedy Require Reedy.
+From Bonak.Reedy.Set Require Reedy.
 From Bonak.Reedy.Dgn Require Import Reedy ShapeAction.
 
 Set Primitive Projections.
 Set Printing Projections.
 
-Module SemiReedy := Bonak.Reedy.Reedy.
+Module SemiReedy := Bonak.Reedy.Set.Reedy.
 
 Section Matching.
 Context (A: HSet) {n} (X: Diagram A n).
