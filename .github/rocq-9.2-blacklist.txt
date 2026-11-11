@@ -1,3 +1,6 @@
 theories/Indexed/Gpd/νGpd.v
+theories/Indexed/ReedyEquiv/Dgn/ReedyCorrespondence.v
 theories/Indexed/ReedyEquiv/Gpd
 theories/Indexed/Strictification.v
+theories/Reedy/Gpd/Pullback.v
+theories/Reedy/Gpd/Shift.v
