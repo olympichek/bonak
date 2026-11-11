@@ -1,6 +1,5 @@
 (** Indexed ν-sets are matching sequences of h-set diagrams on the
-    semi-shape category, and hence functors into h-sets and face
-    presentations. *)
+    semi-shape category. *)
 
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
@@ -8,9 +7,8 @@ From Bonak.Lib Require Import HSet SigT Equiv HSetFamily Notation FinitePrefix
   Univalence SequentialLimit TelescopeLimit.
 From Bonak.νSet Require Import Layer νSet.
 From Bonak.Category Require Import Category HSetCat.
-From Bonak.Presheaf Require Import νSemiShape GeneratingFaces Presentation
-  Correspondence.
-From Bonak.Reedy Require Import Reedy Extension Correspondence.
+From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
+From Bonak.Reedy Require Import Reedy Extension.
 From Bonak.Equiv Require Import Boundary Matching.
 
 Set Primitive Projections.
@@ -142,8 +140,7 @@ Module IndexedReedyCubical := IndexedReedyOn CubicalLayer νSetCubical.
 
 
 (** Indexed ν-sets are matching sequences of h-set diagrams on the
-    semi-shape category, and hence functors into h-sets and face
-    presentations. Each indexed prefix is identified with a finite diagram,
+    semi-shape category. Each indexed prefix is identified with a finite diagram,
     compatibly with truncation. *)
 
 Module ReedyCorrespondenceOn (A: LayerSig) (V: νSetSig A).
@@ -163,18 +160,6 @@ Definition νSetsEquivMatchingSeq: Equiv νSets (MatchingSeq (hsetSystem arity))
 
 Definition νSetsEqMatchingSeq: νSets = MatchingSeq (hsetSystem arity) :=
   ua νSetsEquivMatchingSeq.
-
-Definition νSetsEquivFunctor: Equiv νSets (Functor (Op (νSemiShape arity)) HSetCat) :=
-  compEquiv νSetsEquivMatchingSeq (matchingSeqEquivFunctor arity).
-
-Definition νSetsEqFunctor: νSets = Functor (Op (νSemiShape arity)) HSetCat :=
-  ua νSetsEquivFunctor.
-
-Definition νSetsEquivPresentation: Equiv νSets (νSetPresentation arity) :=
-  compEquiv νSetsEquivFunctor (symEquiv (pshEquivFunctor arity)).
-
-Definition νSetsEqPresentation: νSets = νSetPresentation arity :=
-  ua νSetsEquivPresentation.
 
 End ReedyCorrespondenceOn.
 

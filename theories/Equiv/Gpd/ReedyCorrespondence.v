@@ -1,6 +1,5 @@
 (** Indexed ν-groupoids are matching sequences of diagrams of homotopy
-    groupoids on the semi-shape category, and hence pseudofunctors into
-    homotopy groupoids. *)
+    groupoids on the semi-shape category. *)
 
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
@@ -11,9 +10,8 @@ From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import Pseudofunctor LocallyDiscrete
   HGpdBicat.
 From Bonak.Presheaf Require Import νSemiShape.
-From Bonak.Presheaf.Gpd Require Import Presentation Correspondence.
-From Bonak.Reedy.Gpd Require Import Reedy Extension Bounded Correspondence
-  Target.
+From Bonak.Presheaf.Gpd Require Import Presentation.
+From Bonak.Reedy.Gpd Require Import Reedy Extension Bounded Target.
 From Bonak.Equiv.Gpd Require Import Face Diagram StoredDiagram Matching.
 From Bonak.Equiv.Gpd Require Tower.
 
@@ -93,9 +91,8 @@ End ReadoutClassifierOn.
 
 
 (** Indexed ν-groupoids are matching sequences of diagrams of homotopy
-    groupoids on the semi-shape category, and hence pseudofunctors into
-    homotopy groupoids. Each indexed prefix is identified with the finite
-    diagram read off from it, compatibly with truncation. *)
+    groupoids on the semi-shape category. Each indexed prefix is identified
+    with the finite diagram read off from it, compatibly with truncation. *)
 
 Module ReedyCorrespondenceOn (A: LayerGpdSig) (Core: νGpdSig A).
 Module Faces := FaceOn A Core.
@@ -150,19 +147,6 @@ Definition νGpdsEquivMatchingSeq: Equiv νGpds (MatchingSeq (gpdSystem arity)) 
 Definition νGpdsEqMatchingSeq: νGpds = MatchingSeq (gpdSystem arity) :=
   ua νGpdsEquivMatchingSeq.
 
-Definition νGpdsEquivPseudofunctor:
-  Equiv νGpds (Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat) :=
-  compEquiv νGpdsEquivMatchingSeq (matchingSeqEquivPseudofunctor arity).
-
-Definition νGpdsEqPseudofunctor:
-  νGpds = Pseudofunctor (locallyDiscrete (Op (νSemiShape arity))) HGpdBicat :=
-  ua νGpdsEquivPseudofunctor.
-
-Definition νGpdsEquivPresentation: Equiv νGpds (νGpdPresentation arity) :=
-  compEquiv νGpdsEquivPseudofunctor (symEquiv (pshGpdEquivPsf arity)).
-
-Definition νGpdsEqPresentation: νGpds = νGpdPresentation arity :=
-  ua νGpdsEquivPresentation.
 End ReedyCorrespondenceOn.
 
 Module ReedyCorrespondence (A: LayerGpdSig).

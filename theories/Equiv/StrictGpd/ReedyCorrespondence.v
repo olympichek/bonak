@@ -1,14 +1,12 @@
 (** Indexed strict groupoids are matching sequences of strict groupoid
-    diagrams on the semi-shape category, and hence functors into strict
-    groupoids and face presentations. *)
+    diagrams on the semi-shape category. *)
 
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet SigT Equiv Notation FinitePrefix
   Univalence SequentialLimit TelescopeLimit.
 From Bonak.Category.Groupoid Require Import Strict GraphFiberRoundtrip.
 From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
-From Bonak.Presheaf.StrictGpd Require Import Presentation Correspondence.
-From Bonak.Reedy.StrictGpd Require Import Reedy Extension Correspondence.
+From Bonak.Reedy.StrictGpd Require Import Reedy Extension.
 From Bonak.νStrictGpd Require Import Layer νStrictGpd.
 From Bonak.Equiv.StrictGpd Require Import Face Boundary Matching.
 
@@ -200,8 +198,7 @@ Proof. destruct n; now apply nextIndexedBond. Defined.
 
 End IndexedReedyOn.
 
-(** Indexed strict groupoids are matching sequences, functors into strict
-    groupoids and face presentations. *)
+(** Indexed strict groupoids are matching sequences. *)
 
 Module ReedyCorrespondenceOn (A: LayerSig) (S: νStrictGpdSig A)
   (F: FaceSig A S).
@@ -224,22 +221,6 @@ Definition νStrictGpdsEquivMatchingSeq:
 Definition νStrictGpdsEqMatchingSeq:
   νStrictGpds = MatchingSeq (strictGpdSystem arity) :=
   ua νStrictGpdsEquivMatchingSeq.
-
-Definition νStrictGpdsEquivFunctor:
-  Equiv νStrictGpds (Functor (Op (νSemiShape arity)) StrictGroupoidCat) :=
-  compEquiv νStrictGpdsEquivMatchingSeq (matchingSeqEquivFunctor arity).
-
-Definition νStrictGpdsEqFunctor:
-  νStrictGpds = Functor (Op (νSemiShape arity)) StrictGroupoidCat :=
-  ua νStrictGpdsEquivFunctor.
-
-Definition νStrictGpdsEquivPresentation:
-  Equiv νStrictGpds (νStrictGpdPresentation arity) :=
-  compEquiv νStrictGpdsEquivFunctor (symEquiv (pshEquivFunctor arity)).
-
-Definition νStrictGpdsEqPresentation:
-  νStrictGpds = νStrictGpdPresentation arity :=
-  ua νStrictGpdsEquivPresentation.
 
 End ReedyCorrespondenceOn.
 
