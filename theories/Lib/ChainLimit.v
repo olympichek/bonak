@@ -1,4 +1,4 @@
-(** Telescope limits with a contractible initial stage are sequential limits. *)
+(** Chain limits with a contractible initial stage are sequential limits. *)
 
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT Notation LeSProp Equiv Contractible Limit SequentialLimit.
@@ -6,13 +6,13 @@ From Bonak.Lib Require Import SigT Notation LeSProp Equiv Contractible Limit Seq
 Set Primitive Projections.
 Set Printing Projections.
 
-Definition limitToSequential {T: Telescope} {s: T.(stage) 0}
+Definition limitToSequential {T: Chain} {s: T.(stage) 0}
   (L: Limit T 0 s): SequentialLimit T.(stage) (fun n => @bond T n) :=
   (fun n => L.(approx) n leR_O;
    fun n => L.(approxS) n leR_O leR_O).
 
 Section ContractibleInitialStage.
-Context (T: Telescope) (s: T.(stage) 0) (c: Contr (T.(stage) 0)).
+Context (T: Chain) (s: T.(stage) 0) (c: Contr (T.(stage) 0)).
 
 Definition sequentialToLimit (X: SequentialLimit T.(stage) (fun n => @bond T n)):
   Limit T 0 s :=
@@ -31,7 +31,7 @@ Lemma limitToFromSequential (X: SequentialLimit T.(stage) (fun n => @bond T n)):
   limitToSequential (sequentialToLimit X) = X.
 Proof. now reflexivity. Defined.
 
-Definition telescopeLimitEquiv:
+Definition chainLimitEquiv:
   Equiv (Limit T 0 s) (SequentialLimit T.(stage) (fun n => @bond T n)) :=
   qinvEquiv limitToSequential sequentialToLimit sequentialToFromLimit limitToFromSequential.
 

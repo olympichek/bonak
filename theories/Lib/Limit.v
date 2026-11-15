@@ -1,6 +1,6 @@
-(** Telescopes and their ω-limits
+(** Chains and their ω-limits
 
-    A [Telescope] is a sequence of types [stage l], each of which extends
+    A [Chain] is a sequence of types [stage l], each of which extends
     the one below by a single [datum]: [extend] pairs a stage with a datum
     over it, and [bond] and [head] split a stage one level up back into the
     stage below and the datum over it. The laws [bondExtend] and
@@ -25,7 +25,7 @@
     Σ-eta for primitive records gives whenever its stages really are nested
     Σ-types — the derived operations reduce, and [this] and [next] of an
     [ana] compute to the datum-producing function; for an arbitrary
-    telescope, [thisAna] states this up to [headExtend].
+    chain, [thisAna] states this up to [headExtend].
 
     [limitEqIntro] is the extensionality principle: two limits over the
     same stage are equal as soon as their families of stages are, coherently
@@ -44,7 +44,7 @@ From Bonak Require Import Notation SigT LeSProp RewLemmas HSet Funext.
 Set Primitive Projections.
 Set Printing Projections.
 
-Record Telescope := {
+Record Chain := {
   stage: nat -> Type;
   datum: forall l, stage l -> Type;
   extend: forall l (s: stage l), datum l s -> stage l.+1;
@@ -68,7 +68,7 @@ Arguments head {_ _} _.
     level at or above [n], agreeing with [s] at [n] and with its own
     truncation one level down. *)
 
-Record Limit (T: Telescope) n (s: T.(stage) n): Type := limit {
+Record Limit (T: Chain) n (s: T.(stage) n): Type := limit {
   approx l: n <= l -> T.(stage) l;
   approxO: approx n leR_refl = s;
   approxS l (Hl: n <= l) (HSl: n <= l.+1):
@@ -199,7 +199,7 @@ End FiniteUnfoldings.
 
     [ofChain] restricts a globally coherent family to the levels at or
     above [n]. If its coherence is pointwise [eq_refl] — as it is for
-    families built by [mkApprox] on a telescope whose [bondExtend] is
+    families built by [mkApprox] on a chain whose [bondExtend] is
     [eq_refl] — then [this] and [next] of the result compute. *)
 
 Definition ofChain {T} (A: forall l, T.(stage) l)
@@ -385,8 +385,8 @@ Qed.
     [S]: the step consumes the state at a level and returns the path
     between the data together with the state one level up. *)
 
-Section Chain.
-Context {T: Telescope} {s: T.(stage) 0} (L1 L2: Limit T 0 s)
+Section PrefixPaths.
+Context {T: Chain} {s: T.(stage) 0} (L1 L2: Limit T 0 s)
   (S: forall m, (limitPack m L1).1 = (limitPack m L2).1 -> Type)
   (s0: S 0 eq_refl)
   (step: forall m (e: (limitPack m L1).1 = (limitPack m L2).1), S m e ->
@@ -409,7 +409,7 @@ Definition limitEqOfChain: L1 = L2 :=
     (fun m => extendCongBond (limitChain m).1
       (step m (limitChain m).1 (limitChain m).2).1).
 
-End Chain.
+End PrefixPaths.
 
 (** Chains over positions
 
@@ -425,7 +425,7 @@ End Chain.
     the unfolding, and carries [S] one level up along [QS]. *)
 
 Section Positions.
-Context {T: Telescope} (Q: forall m, {t: T.(stage) m &T Limit T m t})
+Context {T: Chain} (Q: forall m, {t: T.(stage) m &T Limit T m t})
   (QS: forall m, Q m.+1 = (extend (Q m).1 (this (Q m).2); next (Q m).2))
   (L: Limit T 0 (Q 0).1)
   (S: forall m, (Q m).1 = (limitPack m L).1 -> Type)

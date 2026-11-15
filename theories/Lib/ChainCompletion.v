@@ -1,13 +1,13 @@
-(** Completing a finite telescope prefix with a chosen family of later data. *)
+(** Completing a finite chain prefix with a chosen family of later data. *)
 
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT Notation LeSProp Equiv Limit SequentialLimit
-  TelescopeLimit RewLemmas.
+  ChainLimit RewLemmas.
 
 Set Primitive Projections.
 Set Printing Projections.
 
-Definition shiftTelescope (T: Telescope): Telescope := {|
+Definition shiftChain (T: Chain): Chain := {|
   stage n := T.(stage) (S n);
   datum n := @datum T (S n);
   extend n := @extend T (S n);
@@ -19,25 +19,25 @@ Definition shiftTelescope (T: Telescope): Telescope := {|
   bondExtendHead n := T.(bondExtendHead) (S n);
 |}.
 
-Definition prependSequential {T: Telescope}
-  (L: SequentialLimit (shiftTelescope T).(stage)
-    (fun n => @bond (shiftTelescope T) n)):
+Definition prependSequential {T: Chain}
+  (L: SequentialLimit (shiftChain T).(stage)
+    (fun n => @bond (shiftChain T) n)):
   SequentialLimit T.(stage) (fun n => @bond T n).
 Proof.
   exists (fun n => match n with 0 => bond (L.1 0) | S k => L.1 k end).
   intros [|n]; [now reflexivity|now exact (L.2 n)].
 Defined.
 
-(** Shifting both the telescope and the remaining height avoids arithmetic
+(** Shifting both the chain and the remaining height avoids arithmetic
     casts. Every object below the supplied prefix is obtained by bonding. *)
-Fixpoint completePrefixChain (n: nat) (T: Telescope)
+Fixpoint completePrefixChain (n: nat) (T: Chain)
   (later: forall l (s: T.(stage) l), @datum T l s)
   (s: T.(stage) n): SequentialLimit T.(stage) (fun l => @bond T l) :=
   match n as n return forall (s: T.(stage) n),
       SequentialLimit T.(stage) (fun l => @bond T l) with
   | 0 => fun s => limitToSequential (ana s later)
   | S n => fun s => prependSequential
-      (completePrefixChain n (shiftTelescope T) (fun l => later (S l)) s)
+      (completePrefixChain n (shiftChain T) (fun l => later (S l)) s)
   end s.
 
 Lemma completePrefixAt n T later (s: T.(stage) n):
@@ -45,19 +45,19 @@ Lemma completePrefixAt n T later (s: T.(stage) n):
 Proof.
   revert T later s; induction n as [|n IH]; intros T later s.
   - now reflexivity.
-  - now exact (IH (shiftTelescope T) (fun l => later (S l)) s).
+  - now exact (IH (shiftChain T) (fun l => later (S l)) s).
 Defined.
 
 (** Starting the chosen continuation one step later gives the same chain,
     including its bonding paths. Naturality of [bondExtend] supplies the
     compatibility square without truncation assumptions on the stages. *)
 Section ContinuePrefix.
-Context (T: Telescope)
+Context (T: Chain)
   (later: forall l (s: T.(stage) l), @datum T l s)
   (s: T.(stage) 0).
 
 Fixpoint advanceApprox (l: nat):
-  @mkApprox (shiftTelescope T) (extend s (later 0 s))
+  @mkApprox (shiftChain T) (extend s (later 0 s))
     (fun l => later (S l)) l = mkApprox s later (S l) :=
   match l with
   | 0 => eq_refl
@@ -70,9 +70,9 @@ Lemma advanceApproxBond l:
     • T.(bondExtend) (S l) (mkApprox s later (S l))
         (later (S l) (mkApprox s later (S l)))
   = T.(bondExtend) (S l)
-      (@mkApprox (shiftTelescope T) (extend s (later 0 s))
+      (@mkApprox (shiftChain T) (extend s (later 0 s))
         (fun l => later (S l)) l)
-      (later (S l) (@mkApprox (shiftTelescope T) (extend s (later 0 s))
+      (later (S l) (@mkApprox (shiftChain T) (extend s (later 0 s))
         (fun l => later (S l)) l)) • advanceApprox l.
 Proof.
   cbn [advanceApprox].
@@ -113,29 +113,29 @@ Proof.
   revert T later s; induction n as [|n IH]; intros T later s.
   - now apply completePrefixExtendZero.
   - now exact (f_equal (@prependSequential T)
-      (IH (shiftTelescope T) (fun l => later (S l)) s)).
+      (IH (shiftChain T) (fun l => later (S l)) s)).
 Defined.
 
 (** Restricting a stored prefix preserves its adjacent bonding paths. *)
-Fixpoint takeStage (n: nat): forall (T: Telescope) (s: T.(stage) n)
+Fixpoint takeStage (n: nat): forall (T: Chain) (s: T.(stage) n)
   (m: nat), leR m n -> T.(stage) m.
 Proof.
   destruct n as [|n]; intros T s [|m] h.
   - now exact s.
   - now destruct (leR_O_contra h).
-  - now exact (@bond T 0 (takeStage n (shiftTelescope T) s 0 leR_O)).
-  - now exact (takeStage n (shiftTelescope T) s m (⇓ h)).
+  - now exact (@bond T 0 (takeStage n (shiftChain T) s 0 leR_O)).
+  - now exact (takeStage n (shiftChain T) s m (⇓ h)).
 Defined.
 
-Lemma takeStageAt n (T: Telescope) (s: T.(stage) n):
+Lemma takeStageAt n (T: Chain) (s: T.(stage) n):
   takeStage n T s n leR_refl = s.
 Proof.
   revert T s; induction n as [|n IH]; intros T s.
   - now reflexivity.
-  - now exact (IH (shiftTelescope T) s).
+  - now exact (IH (shiftChain T) s).
 Defined.
 
-Lemma takeStageBond n (T: Telescope) (s: T.(stage) n)
+Lemma takeStageBond n (T: Chain) (s: T.(stage) n)
   m (h: leR (S m) n):
   @bond T m (takeStage n T s (S m) h) = takeStage n T s m (↓ h).
 Proof.
@@ -143,10 +143,10 @@ Proof.
   - now destruct (leR_O_contra h).
   - now destruct (leR_O_contra h).
   - now reflexivity.
-  - now exact (IH (shiftTelescope T) s m (⇓ h)).
+  - now exact (IH (shiftChain T) s m (⇓ h)).
 Defined.
 
-Lemma takeStageNaturality n (T: Telescope) (x y: T.(stage) n) (e: x = y)
+Lemma takeStageNaturality n (T: Chain) (x y: T.(stage) n) (e: x = y)
   m (h: leR (S m) n):
   f_equal (@bond T m) (f_equal (fun s => takeStage n T s (S m) h) e)
     • takeStageBond n T y m h
@@ -157,12 +157,12 @@ Proof.
   now exact (eq_trans_refl_l _ • eq_sym (eq_trans_refl_r _)).
 Defined.
 
-Definition shiftChain {T: Telescope}
+Definition shiftSequentialLimit {T: Chain}
   (X: SequentialLimit T.(stage) (fun m => @bond T m)):
-  SequentialLimit (shiftTelescope T).(stage) (fun m => @bond (shiftTelescope T) m) :=
+  SequentialLimit (shiftChain T).(stage) (fun m => @bond (shiftChain T) m) :=
   ((fun m => X.1 (S m)); fun m => X.2 (S m)).
 
-Fixpoint takeStageOfChain (n: nat): forall (T: Telescope)
+Fixpoint takeStageOfChain (n: nat): forall (T: Chain)
   (X: SequentialLimit T.(stage) (fun m => @bond T m)) m (h: leR m n),
   takeStage n T (X.1 n) m h = X.1 m.
 Proof.
@@ -170,12 +170,12 @@ Proof.
   - now reflexivity.
   - now destruct (leR_O_contra h).
   - now exact (f_equal (@bond T 0)
-      (takeStageOfChain n (shiftTelescope T) (shiftChain X) 0 leR_O) • X.2 0).
-  - now exact (takeStageOfChain n (shiftTelescope T) (shiftChain X) m (⇓ h)).
+      (takeStageOfChain n (shiftChain T) (shiftSequentialLimit X) 0 leR_O) • X.2 0).
+  - now exact (takeStageOfChain n (shiftChain T) (shiftSequentialLimit X) m (⇓ h)).
 Defined.
 
 (** This square retains the actual bonding path supplied by the chain. *)
-Lemma takeStageOfChainBond n (T: Telescope)
+Lemma takeStageOfChainBond n (T: Chain)
   (X: SequentialLimit T.(stage) (fun m => @bond T m)) m (h: leR (S m) n):
   f_equal (@bond T m) (takeStageOfChain n T X (S m) h) • X.2 m
   = takeStageBond n T (X.1 n) m h • takeStageOfChain n T X m (↓ h).
@@ -184,30 +184,30 @@ Proof.
   - now destruct (leR_O_contra h).
   - now destruct (leR_O_contra h).
   - change (f_equal (@bond T 0)
-      (takeStageOfChain n (shiftTelescope T) (shiftChain X) 0 leR_O) • X.2 0
+      (takeStageOfChain n (shiftChain T) (shiftSequentialLimit X) 0 leR_O) • X.2 0
     = eq_refl • (f_equal (@bond T 0)
-      (takeStageOfChain n (shiftTelescope T) (shiftChain X) 0 leR_O) • X.2 0)).
+      (takeStageOfChain n (shiftChain T) (shiftSequentialLimit X) 0 leR_O) • X.2 0)).
     now apply eq_sym, eq_trans_refl_l.
-  - now exact (IH (shiftTelescope T) (shiftChain X) m (⇓ h)).
+  - now exact (IH (shiftChain T) (shiftSequentialLimit X) m (⇓ h)).
 Defined.
 
-Lemma takeStageOfChainAt n (T: Telescope)
+Lemma takeStageOfChainAt n (T: Chain)
   (X: SequentialLimit T.(stage) (fun m => @bond T m)):
   takeStageOfChain n T X n leR_refl = takeStageAt n T (X.1 n).
 Proof.
   revert T X; induction n as [|n IH]; intros T X.
   - now reflexivity.
-  - now exact (IH (shiftTelescope T) (shiftChain X)).
+  - now exact (IH (shiftChain T) (shiftSequentialLimit X)).
 Defined.
 
 (** A shared later stage determines compatible paths at all earlier stages. *)
-Definition takeStageChainPath n (T: Telescope)
+Definition takeStageChainPath n (T: Chain)
   (X Y: SequentialLimit T.(stage) (fun m => @bond T m))
   (e: X.1 n = Y.1 n) m (h: leR m n): X.1 m = Y.1 m :=
   eq_sym (takeStageOfChain n T X m h)
     • (f_equal (fun z => takeStage n T z m h) e • takeStageOfChain n T Y m h).
 
-Lemma takeStageChainPathAt n (T: Telescope)
+Lemma takeStageChainPathAt n (T: Chain)
   (X Y: SequentialLimit T.(stage) (fun m => @bond T m)) (e: X.1 n = Y.1 n):
   takeStageChainPath n T X Y e n leR_refl = e.
 Proof.
@@ -230,7 +230,7 @@ Proof.
   now rewrite hs, ht, <- hp.
 Defined.
 
-Lemma takeStageChainPathBond n (T: Telescope)
+Lemma takeStageChainPathBond n (T: Chain)
   (X Y: SequentialLimit T.(stage) (fun m => @bond T m))
   (e: X.1 n = Y.1 n) m (h: leR (S m) n):
   f_equal (@bond T m) (takeStageChainPath n T X Y e (S m) h) • Y.2 m

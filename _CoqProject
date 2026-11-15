@@ -114,8 +114,8 @@ theories/Lib/PathSquares.v
 theories/Lib/RewLemmas.v
 theories/Lib/SequentialLimit.v
 theories/Lib/SigT.v
-theories/Lib/TelescopeCompletion.v
-theories/Lib/TelescopeLimit.v
+theories/Lib/ChainCompletion.v
+theories/Lib/ChainLimit.v
 theories/Lib/Truncation.v
 theories/Lib/Univalence.v
 theories/Presentation/Dgn/MaskAction.v

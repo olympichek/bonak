@@ -2,7 +2,7 @@
     A frame is the total groupoid of its next layer. A layer combines the
     pulled-back painting families, and a painting extends it by a dependent
     sum. Restrictions and their pointwise strict equalities are constructed
-    recursively at every finite prefix; the generic telescope limit closes the infinite tower.
+    recursively at every finite prefix; the generic chain limit closes the infinite tower.
     Object fibers and arrows are h-sets, and families require no chosen lifts. *)
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import SigT RewLemmas HSet Notation LeSProp Limit.
@@ -513,7 +513,7 @@ Fixpoint νStrictGpdAt n: νStrictGpd n :=
 Definition mkExtensionType {p} {C: νStrictGpd p} (D: C.(prefix)): Type :=
   Family (mkFrame (toDepsRestr (C.(data) D).(restrFrames))).
 
-Definition νStrictGpdTel: Telescope := {|
+Definition νStrictGpdChain: Chain := {|
   stage l := (νStrictGpdAt l).(prefix);
   datum l X := mkExtensionType X;
   extend l X E := ((X; E): (νStrictGpdAt l.+1).(prefix));
@@ -525,7 +525,7 @@ Definition νStrictGpdTel: Telescope := {|
   bondExtendHead _ _ := eq_refl;
 |}.
 
-Definition νStrictGpdFrom n (X: (νStrictGpdAt n).(prefix)): Type := Limit νStrictGpdTel n X.
+Definition νStrictGpdFrom n (X: (νStrictGpdAt n).(prefix)): Type := Limit νStrictGpdChain n X.
 
 Definition νStrictGpds := νStrictGpdFrom 0 tt.
 

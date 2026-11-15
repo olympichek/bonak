@@ -4,7 +4,7 @@
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import HSet HGpd SigT Equiv Notation Univalence
-  FinitePrefix SequentialLimit TelescopeLimit.
+  FinitePrefix SequentialLimit ChainLimit.
 From Bonak.Indexed.Gpd Require Import Layer νGpd.
 From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import Pseudofunctor LocallyDiscrete
@@ -137,7 +137,7 @@ Definition indexedPrefixDiagramBond n (X: (νGpdAt (S n)).(prefix)):
 
 Definition νGpdsEquivDiagramLimit:
   Equiv νGpds (SequentialLimit (Diagram arity) (fun n => @truncateDiagram arity n)) :=
-  compEquiv (telescopeLimitEquiv νGpdTel tt (tt; fun x => hunit_ext tt x))
+  compEquiv (chainLimitEquiv νGpdChain tt (tt; fun x => hunit_ext tt x))
     (sequentialLimitEquiv (fun n X => X.1) (fun n => @truncateDiagram arity n)
       indexedPrefixDiagramEquiv indexedPrefixDiagramBond).
 

@@ -4,7 +4,7 @@
 Set Warnings "-notation-overridden".
 From Stdlib Require Import Logic.FunctionalExtensionality.
 From Bonak.Lib Require Import HSet SigT Equiv HSetFamily Notation FinitePrefix
-  Univalence SequentialLimit TelescopeLimit.
+  Univalence SequentialLimit ChainLimit.
 From Bonak.Indexed.Set Require Import Layer νSet.
 From Bonak.Category Require Import Category HSetCat.
 From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
@@ -149,7 +149,7 @@ Module Export PrefixComparison := IndexedReedyOn A V.
 
 Definition νSetsEquivDiagramLimit:
   Equiv νSets (SequentialLimit (Diagram arity) (fun n => @truncateDiagram arity n)) :=
-  compEquiv (telescopeLimitEquiv νSetTel tt (tt; fun x => hunit_ext tt x))
+  compEquiv (chainLimitEquiv νSetChain tt (tt; fun x => hunit_ext tt x))
     (sequentialLimitEquiv (fun n X => X.1) (fun n => @truncateDiagram arity n)
       indexedPrefixDiagramEquiv indexedPrefixDiagramBond).
 

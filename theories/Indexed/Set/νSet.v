@@ -644,14 +644,14 @@ Fixpoint νSetAt n: νSet n :=
 
 (** The ω-limit tower
 
-    Prefixes form a telescope: a prefix one level up is definitionally a
+    Prefixes form a chain: a prefix one level up is definitionally a
     Σ-type over the one below, so extending is pairing and the bonding map
     and the head are its two projections. A νSet is a limit of it. *)
 
 Definition mkExtensionType {p} {C: νSet p} (D: C.(prefix)): Type :=
   mkFrame (toDepsRestr (C.(data) D).(restrFrames)) -> HSet.
 
-Definition νSetTel: Telescope := {|
+Definition νSetChain: Chain := {|
   stage l := (νSetAt l).(prefix);
   datum l X := mkExtensionType X;
   extend l X E := ((X; E): (νSetAt l.+1).(prefix));
@@ -663,7 +663,7 @@ Definition νSetTel: Telescope := {|
   bondExtendHead _ _ := eq_refl;
 |}.
 
-Definition νSetFrom n (X: (νSetAt n).(prefix)): Type := Limit νSetTel n X.
+Definition νSetFrom n (X: (νSetAt n).(prefix)): Type := Limit νSetChain n X.
 
 (** The final construction *)
 Definition νSets := νSetFrom 0 tt.

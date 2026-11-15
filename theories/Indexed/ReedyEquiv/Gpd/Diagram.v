@@ -2,7 +2,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet HGpd SigT Equiv Notation LeSProp Limit
-  TelescopeLimit TelescopeCompletion FinitePrefix NatLemmas RewLemmas.
+  ChainLimit ChainCompletion FinitePrefix NatLemmas RewLemmas.
 From Bonak.Indexed.Gpd Require Import Layer νGpd Pasting.
 From Bonak.Category Require Import Category.
 From Bonak.Category.Bicategory Require Import PathDiagram.
@@ -27,8 +27,8 @@ Module Export Indexed := Faces.
 Module Extraction := PresheafOfνGpdOn A Core Faces.
 
 Definition completePrefix {n} (X: (νGpdAt n).(prefix)): νGpds :=
-  sequentialToLimit νGpdTel tt (tt; fun x => hunit_ext tt x)
-    (completePrefixChain n νGpdTel (fun _ _ _ => gunit) X).
+  sequentialToLimit νGpdChain tt (tt; fun x => hunit_ext tt x)
+    (completePrefixChain n νGpdChain (fun _ _ _ => gunit) X).
 
 Lemma completionAt {n} (X: (νGpdAt n).(prefix)):
   (completePrefix X).(approx) n leR_O = X.
@@ -56,7 +56,7 @@ Lemma completePrefixUnitExtension {n} (X: (νGpdAt n).(prefix)):
 Proof.
   unfold completePrefix, unitExtension.
   apply f_equal.
-  now exact (completePrefixExtend n νGpdTel (fun _ _ _ => gunit) X).
+  now exact (completePrefixExtend n νGpdChain (fun _ _ _ => gunit) X).
 Defined.
 
 Definition unitPrefixProjectionEquiv {n} (X: (νGpdAt n).(prefix)):

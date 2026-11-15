@@ -54,7 +54,7 @@ Definition Prefix n: Type := (prefixPackage n).1.
 Definition prefixDiagram {n} (X: Prefix n): PartialDiagram Sys n :=
   (prefixPackage n).2 X.
 
-Definition prefixTelescope: Telescope := {|
+Definition prefixChain: Chain := {|
   stage := Prefix;
   datum n X := FillerData (prefixDiagram X);
   extend n X E := (X; E);
@@ -67,7 +67,7 @@ Definition prefixTelescope: Telescope := {|
 |}.
 
 (** Compatible filler prefixes at every rank, starting at rank zero. *)
-Definition MatchingSeq: Type := Limit prefixTelescope 0 tt.
+Definition MatchingSeq: Type := Limit prefixChain 0 tt.
 
 Definition extendPacked {n} (z: {X: PartialDiagram Sys n &T FillerData X}):
   PartialDiagram Sys (S n) := extendDiagram z.1 z.2.
@@ -103,7 +103,7 @@ Definition toPrefixLimit (L': MatchingSeq): PrefixLimit :=
   (fun n => L'.(approx) n leR_O; fun n => L'.(approxS) n leR_O leR_O).
 
 Definition ofPrefixLimit (X: PrefixLimit): MatchingSeq :=
-  @limit prefixTelescope 0 tt (fun n Hn => X.1 n)
+  @limit prefixChain 0 tt (fun n Hn => X.1 n)
     (hunit_ext (X.1 0) tt) (fun n Hn HSn => X.2 n).
 
 Lemma ofToPrefixLimit (L': MatchingSeq): ofPrefixLimit (toPrefixLimit L') = L'.

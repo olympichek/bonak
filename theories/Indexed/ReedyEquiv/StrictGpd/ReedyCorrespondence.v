@@ -3,7 +3,7 @@
 
 Set Warnings "-notation-overridden".
 From Bonak.Lib Require Import HSet SigT Equiv Notation FinitePrefix
-  Univalence SequentialLimit TelescopeLimit.
+  Univalence SequentialLimit ChainLimit.
 From Bonak.Category.Groupoid Require Import Strict GraphFiberRoundtrip.
 From Bonak.Presheaf Require Import νSemiShape GeneratingFaces.
 From Bonak.Reedy.StrictGpd Require Import Reedy Extension.
@@ -208,7 +208,7 @@ Module Export PrefixComparison := IndexedReedyOn A S F.
 Definition νStrictGpdsEquivDiagramLimit:
   Equiv νStrictGpds
     (SequentialLimit (Diagram arity) (fun n => @truncateDiagram arity n)) :=
-  compEquiv (telescopeLimitEquiv νStrictGpdTel tt (tt; fun x => hunit_ext tt x))
+  compEquiv (chainLimitEquiv νStrictGpdChain tt (tt; fun x => hunit_ext tt x))
     (sequentialLimitEquiv (fun n X => X.1) (fun n => @truncateDiagram arity n)
       indexedPrefixDiagramEquiv indexedPrefixDiagramBond).
 
